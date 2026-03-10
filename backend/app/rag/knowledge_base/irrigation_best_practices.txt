@@ -1,0 +1,8 @@
+Title: Irrigation Best Practices for Indian Farms
+
+Irrigation should be planned based on crop stage, soil moisture and rainfall forecast.
+For paddy and sugarcane, avoid continuous overwatering; use alternate wetting and drying where feasible.
+For wheat and pulses, critical stages include crown root initiation, flowering and grain filling.
+Use morning or evening irrigation windows to reduce evaporation loss.
+Drip and sprinkler systems improve water-use efficiency compared to flood irrigation.
+When rainfall above 5 mm is expected in the next 24 hours, postpone non-critical irrigation cycles.

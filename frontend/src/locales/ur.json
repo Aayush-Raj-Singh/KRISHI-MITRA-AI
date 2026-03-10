@@ -1,0 +1,313 @@
+{
+  "app": {
+    "title": "KrishiMitra-AI",
+    "subtitle": "دیہی فیصلے کی ذہانت __TERM__0__ کے ذریعے تقویت یافتہ"
+  },
+  "nav": {
+    "dashboard": "ڈیش بورڈ",
+    "advisory": "ایڈوائزری",
+    "logout": "لاگ آؤٹ",
+    "login": "لاگ ان",
+    "register": "رجسٹر کریں۔"
+  },
+  "layout": {
+    "nav_notices": "نوٹس",
+    "services": "خدمات",
+    "govt_caption": "محکمہ زراعت، حکومت بہار",
+    "dbt_portal": "Agriculture Services Portal",
+    "open_in_dashboard": "ڈیش بورڈ میں کھولیں۔",
+    "service_map": "سروس کا نقشہ",
+    "default_user": "کسان",
+    "default_role": "کسان",
+    "role_admin": "ایڈمن",
+    "helpdesk": "ہیلپ ڈیسک",
+    "helpline": "ہیلپ لائن"
+  },
+  "languages": {
+    "en": "انگریزی",
+    "hi": "ہندی",
+    "bn": "بنگالی",
+    "ta": "تامل",
+    "te": "تیلگو",
+    "mr": "مراٹھی",
+    "gu": "گجراتی",
+    "kn": "کنڑ",
+    "pa": "پنجابی",
+    "as": "آسامی",
+    "ml": "ملیالم",
+    "or": "اوڈیا",
+    "ur": "اردو",
+    "ne": "نیپالی",
+    "sa": "سنسکرت"
+  },
+  "auth": {
+    "welcome": "دوبارہ خوش آمدید",
+    "create": "اپنا اکاؤنٹ بنائیں",
+    "phone": "فون نمبر",
+    "password": "پاس ورڈ",
+    "name": "پورا نام",
+    "location": "مقام",
+    "farm_size": "فارم کا سائز (ایکڑ)",
+    "soil_type": "مٹی کی قسم",
+    "water_source": "پانی کا ذریعہ",
+    "primary_crops": "بنیادی فصلیں (کوما سے الگ)",
+    "language": "ترجیحی زبان",
+    "role": "کردار",
+    "sign_in": "سائن ان کریں۔",
+    "sign_up": "سائن اپ کریں۔",
+    "login_failed": "لاگ ان ناکام ہو گیا۔",
+    "phone_helper": "اپنا رجسٹرڈ فون نمبر استعمال کریں۔",
+    "password_helper": "کم از کم 8 حروف",
+    "signing_in": "سائن ان ہو رہا ہے...",
+    "forgot_password": "پاس ورڈ بھول گئے؟",
+    "new_to_platform": "KrishiMitra میں نئے ہیں؟",
+    "registration_failed": "رجسٹریشن ناکام ہو گئی۔",
+    "password_range_helper": "8-72 حروف",
+    "primary_crops_helper": "مثال: چاول، گندم",
+    "role_farmer": "کسان",
+    "role_extension_officer": "ایکسٹینشن آفیسر",
+    "creating": "تخلیق کر رہا ہے...",
+    "already_have_account": "پہلے سے ہی اکاؤنٹ ہے؟"
+  },
+  "dashboard": {
+    "crop": "فصل کی سفارش",
+    "price": "قیمت کی پیشن گوئی",
+    "water": "پانی کی اصلاح",
+    "feedback": "نتائج کی رائے",
+    "sustainability": "پائیداری کا اسکور",
+    "latest_rec": "تازہ ترین سفارشی ID"
+  },
+  "actions": {
+    "submit": "جمع کروائیں۔",
+    "generate": "پیدا کریں۔",
+    "send": "بھیجیں۔",
+    "sending": "بھیج رہا ہے...",
+    "add_day": "دن شامل کریں۔",
+    "remove": "ہٹا دیں۔",
+    "loading": "لوڈ ہو رہا ہے...",
+    "fetch": "لانا",
+    "analyzing": "تجزیہ کرنا",
+    "forecasting": "پیشن گوئی",
+    "optimizing": "اصلاح کرنا",
+    "submitting": "جمع کروا رہا ہے۔"
+  },
+  "advisory": {
+    "title": "مشاورتی چیٹ",
+    "placeholder": "کاشتکاری سے متعلق سوال پوچھیں..."
+  },
+  "advisory_page": {
+    "subtitle": "بیڈرک کے ذریعے چلنے والی مقامی، سیاق و سباق سے آگاہ فصل کی رہنمائی حاصل کریں۔",
+    "language_label": "زبان",
+    "powered_by_bedrock": "ایمیزون بیڈرک کے ذریعہ تقویت یافتہ",
+    "failed_service": "مشاورتی جواب حاصل کرنے سے قاصر",
+    "quick_prompts_title": "فوری اشارے",
+    "quick_prompt_1": "اگلی بوائی کے چکر کے لیے مجھے اپنے کھیت کو کیسے تیار کرنا چاہیے؟",
+    "quick_prompt_2": "میری مٹی کی قسم کے لیے کون سا کھاد کا مرکب موزوں ہے؟",
+    "quick_prompt_3": "میں اس ہفتے پانی کے استعمال کو کیسے کم کر سکتا ہوں؟",
+    "quick_prompt_4": "مجھے اس مہینے میں کیڑوں کے کن خطرات پر نظر رکھنی چاہیے؟",
+    "usage_tips_title": "استعمال کی تجاویز",
+    "usage_tip_1": "بہتر جوابات کے لیے فصل، مقام اور بڑھوتری کا مرحلہ شامل کریں۔",
+    "usage_tip_2": "قدم بہ قدم رہنمائی حاصل کرنے کے لیے فالو اپ سوالات پوچھیں۔",
+    "model": "ماڈل",
+    "conversation_id": "بات چیت کی شناخت",
+    "sources": "ذرائع",
+    "voice_not_supported": "اس براؤزر میں صوتی ان پٹ تعاون یافتہ نہیں ہے۔"
+  },
+  "login_page": {
+    "portal_description": "ریئل ٹائم ایڈوائزری، AI سفارشات، اور کسانوں کے لیے ڈیزائن کردہ مارکیٹ انٹیلی جنس تک رسائی حاصل کریں۔",
+    "feature_crop_price_water": "فصل، قیمت، اور پانی کی اصلاح کی خدمات۔",
+    "feature_bedrock": "ایمیزون بیڈرک کے ذریعہ تقویت یافتہ ذاتی مشورے",
+    "feature_multilingual": "15 ہندوستانی زبانوں کے ساتھ کثیر لسانی ڈیش بورڈ۔",
+    "latest_update": "نیا: قیمت کی پیشن گوئی اب 30/60/90-دن کے آؤٹ لک کو سپورٹ کرتی ہے۔"
+  },
+  "register_page": {
+    "title": "اپنا کسان پروفائل بنائیں",
+    "subtitle": "DBT فوائد، AI سفارشات، اور پائیداری کی بصیرت کو غیر مقفل کرنے کے لیے ایک بار رجسٹر کریں۔",
+    "feature_irrigation": "قابل عمل نظام الاوقات کے ساتھ سمارٹ آبپاشی کے منصوبے",
+    "feature_price": "فصل کی قیمت کے رجحان کی پیشن گوئی اور مارکیٹ کے اشارے",
+    "feature_sustainability": "پائیداری کے اسکورنگ کے ساتھ نتائج کی رائے"
+  },
+  "reset_password": {
+    "title": "پاس ورڈ دوبارہ ترتیب دیں۔",
+    "subtitle": "ری سیٹ کوڈ کی درخواست کریں اور نیا پاس ورڈ سیٹ کریں۔",
+    "notice_code_sent": "ری سیٹ کوڈ کامیابی سے بھیج دیا گیا۔",
+    "notice_password_updated": "پاس ورڈ کامیابی کے ساتھ اپ ڈیٹ ہو گیا۔",
+    "channel": "چینل",
+    "channel_sms": "SMS",
+    "channel_email": "Email",
+    "send_code": "کوڈ بھیجیں۔",
+    "sending": "بھیج رہا ہے...",
+    "reset_code": "کوڈ کو دوبارہ ترتیب دیں۔",
+    "new_password": "نیا پاس ورڈ",
+    "update_password": "پاس ورڈ اپ ڈیٹ کریں۔",
+    "updating": "اپ ڈیٹ ہو رہا ہے...",
+    "back_to_login": "لاگ ان پر واپس جائیں۔"
+  },
+  "common": {
+    "request_failed": "درخواست ناکام ہوگئی"
+  },
+  "dashboard_page": {
+    "hero": {
+      "title": "KrishiMitra-AI",
+      "description": "فصل کی منصوبہ بندی، مارکیٹ کی پیشن گوئی، اور پانی کی اصلاح کے لیے ایک متفقہ فیصلہ انٹیلی جنس پورٹل۔ بہار کے کسانوں اور فیلڈ افسران کے لیے ڈیزائن کیا گیا ہے۔"
+    },
+    "live_updates": "لائیو اپڈیٹس",
+    "offline_mode": "آف لائن وضع فعال ہے۔",
+    "ws_status": {
+      "idle": "بیکار",
+      "connecting": "جڑ رہا ہے۔",
+      "open": "جڑا ہوا",
+      "closed": "منقطع",
+      "error": "خرابی"
+    },
+    "kpi": {
+      "status": "حیثیت",
+      "online": "آن لائن",
+      "offline": "آف لائن",
+      "water_savings": "پانی کی بچت"
+    },
+    "analytics": {
+      "title": "ایکسٹینشن آفیسر تجزیات",
+      "location": "مقام (گاؤں/بلاک)",
+      "farm_size_min": "فارم کا سائز کم سے کم",
+      "farm_size_max": "فارم کا سائز زیادہ سے زیادہ",
+      "from_date": "تاریخ سے",
+      "to_date": "آج تک",
+      "generate": "جائزہ تیار کریں۔",
+      "download_pdf": "ڈاؤن لوڈ کریں PDF",
+      "download_excel": "ڈاؤن لوڈ کریں Excel",
+      "load_error": "تجزیات لوڈ کرنے میں ناکام",
+      "total_farmers": "کل کسان",
+      "feedback": "تاثرات",
+      "avg_sustainability": "اوسط پائیداری",
+      "at_risk_farmers": "خطرے سے دوچار کسان",
+      "avg_yield": "اوسط پیداوار (kg/acre)",
+      "water": "پانی",
+      "crop_adoption_trends": "فصل اپنانے کے رجحانات",
+      "no_crop_trend": "ابھی تک فصل کے رجحان کا کوئی ڈیٹا دستیاب نہیں ہے۔",
+      "resource_averages": "وسائل کی اوسط",
+      "fertilizer": "کھاد",
+      "yield": "پیداوار",
+      "top_crops": "اوپر کی فصلیں"
+    },
+    "notices": {
+      "title": "نوٹس بورڈ",
+      "item_1_title": "DBT ربیع سیزن 2026 کے لیے ان پٹ سبسڈی ونڈو کھلی ہے۔",
+      "item_1_date": "19 فروری 2026",
+      "item_2_title": "منتخب اضلاع کے لیے دھان کی خریداری کا شیڈول اپ ڈیٹ کر دیا گیا۔",
+      "item_2_date": "18 فروری 2026",
+      "item_3_title": "موسم گرما کی فصلوں کے لیے پانی کی بچت آبپاشی کا مشورہ جاری",
+      "item_3_date": "15 فروری 2026",
+      "item_4_title": "KCC سود کی امدادی درخواستیں پورٹل پر لائیو ہیں۔",
+      "item_4_date": "12 فروری 2026"
+    },
+    "links": {
+      "title": "اہم لنکس",
+      "beneficiary_status": "فائدہ اٹھانے والے کی حیثیت",
+      "farmer_registration": "کسان رجسٹریشن",
+      "market_price_bulletin": "مارکیٹ پرائس بلیٹن",
+      "helpline_support": "ہیلپ لائن اور سپورٹ"
+    },
+    "weather": {
+      "title": "موسم کی پیشن گوئی",
+      "load_error": "موسم لوڈ کرنے میں ناکام",
+      "empty": "اپنے مقام کے لیے اگلے {{days}} دنوں کو دیکھنے کے لیے پیشن گوئی حاصل کریں۔"
+    },
+    "mandi": {
+      "title": "منڈی کی قیمتیں۔",
+      "load_error": "منڈی کی قیمتیں لوڈ کرنے میں ناکام",
+      "empty": "مارکیٹ کے حالیہ رجحانات دیکھنے کے لیے منڈی کی قیمتیں حاصل کریں۔",
+      "price_label": "قیمت"
+    },
+    "services": {
+      "title": "آن لائن خدمات",
+      "subtitle": "ایک ہی پورٹل سے AI ٹولز، پیشین گوئیوں اور پائیداری کی بصیرت تک رسائی حاصل کریں۔",
+      "open": "سروس کھولیں۔",
+      "crop_description": "AI کی قیادت میں فصل کا انتخاب مٹی اور آب و ہوا کے آدانوں کا استعمال کرتے ہوئے۔",
+      "price_description": "اعتماد بینڈ کے ساتھ 30/60/90 دن کی مارکیٹ کی پیشن گوئی۔",
+      "water_description": "پانی کی بچت کی بصیرت کے ساتھ آبپاشی کا نظام الاوقات۔",
+      "feedback_description": "نتائج جمع کروائیں اور پائیداری کے اسکور دیکھیں۔"
+    },
+    "advisory_tip": {
+      "title": "AI مشاورتی ٹپ",
+      "description": "مزید درست AI سفارشات حاصل کرنے کے لیے ہر موسم میں اپنے مٹی کے ڈیٹا کو اپ ڈیٹ کرتے رہیں۔"
+    },
+    "forms": {
+      "crop": "فصل",
+      "market": "بازار",
+      "location": "مقام",
+      "days": "دن"
+    },
+    "crop": {
+      "inputs_title": "مٹی اور آب و ہوا کی معلومات",
+      "soil_n": "مٹی این",
+      "soil_n_helper": "نائٹروجن کی سطح",
+      "soil_p": "مٹی پی",
+      "soil_k": "مٹی K",
+      "soil_ph": "مٹی کا پی ایچ",
+      "temperature_c": "درجہ حرارت (C)",
+      "humidity_pct": "نمی (%)",
+      "rainfall_mm": "بارش (ملی میٹر)",
+      "season": "موسم",
+      "historical_yield": "تاریخی پیداوار",
+      "recommendations": "سفارشات",
+      "empty": "فصل کی اعلیٰ سفارشات حاصل کرنے کے لیے ان پٹ جمع کرائیں۔"
+    },
+    "price": {
+      "inputs_title": "مارکیٹ کی پیشن گوئی آدانوں",
+      "title": "قیمت کی پیشن گوئی",
+      "currency": "کرنسی",
+      "horizon_30": "30 دن",
+      "horizon_60": "60 دن",
+      "horizon_90": "90 دن",
+      "mape": "MAPE",
+      "confidence_band": "اعتماد کا بینڈ شامل ہے۔",
+      "empty": "قیمت کا رجحان چارٹ دیکھنے کے لیے پیشن گوئی بنائیں۔"
+    },
+    "water": {
+      "inputs_title": "آبپاشی آدانوں",
+      "growth_stage": "ترقی کا مرحلہ",
+      "soil_moisture_pct": "مٹی کی نمی (%)",
+      "field_area_acres": "فیلڈ ایریا (ایکڑ)",
+      "water_source": "پانی کا ذریعہ",
+      "forecast_schedule": "5 دن کی پیشن گوئی اور شیڈول",
+      "estimated_savings": "تخمینی بچت"
+    },
+    "feedback": {
+      "title": "نتائج کی رائے",
+      "recommendation_id": "سفارشی ID",
+      "rating": "درجہ بندی (1-5)",
+      "yield_kg_per_acre": "پیداوار (kg/acre)",
+      "income_inr": "آمدنی (INR)",
+      "water_usage": "پانی کا استعمال (L/acre)",
+      "fertilizer_kg_per_acre": "کھاد (kg/acre)",
+      "notes": "نوٹس",
+      "sustainability_snapshot": "پائیداری کا سنیپ شاٹ",
+      "overall_score": "مجموعی سکور",
+      "empty": "پائیداری کے اسکورز اور بہتری کی تجاویز دیکھنے کے لیے تاثرات جمع کروائیں۔"
+    },
+    "chart": {
+      "forecast": "پیشن گوئی",
+      "lower": "زیریں",
+      "upper": "اوپری"
+    },
+    "sustainability_labels": {
+      "water": "پانی",
+      "fertilizer": "کھاد",
+      "yield": "پیداوار",
+      "score": "سکور"
+    },
+    "tables": {
+      "date": "تاریخ",
+      "rainfall_mm": "بارش (ملی میٹر)",
+      "temp_c": "درجہ حرارت (C)",
+      "irrigation_mm": "آبپاشی (ملی میٹر)",
+      "liters": "لیٹر",
+      "reason": "وجہ"
+    },
+    "units": {
+      "kg_per_acre": "kg/acre",
+      "liter_per_acre": "L/acre"
+    }
+  }
+}

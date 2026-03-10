@@ -1,0 +1,7 @@
+Title: Seasonal Crop Planning for Kharif and Rabi
+
+Kharif planning should consider monsoon onset, rainfall distribution and waterlogging risk.
+Rabi planning should focus on residual soil moisture, irrigation availability and cold stress windows.
+Sequence crops to improve soil fertility, for example cereal-pulse rotations.
+Select varieties based on district-level recommendations and expected sowing window.
+Late sowing generally reduces yield potential; prioritize timely land preparation and seed availability.

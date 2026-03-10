@@ -1,0 +1,313 @@
+{
+  "app": {
+    "title": "KrishiMitra-AI",
+    "subtitle": "Rural decision intelligence powered by AI"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "advisory": "Advisory",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register"
+  },
+  "layout": {
+    "nav_notices": "Notices",
+    "services": "Services",
+    "govt_caption": "Agriculture Department, Government of Bihar",
+    "dbt_portal": "Agriculture Services Portal",
+    "open_in_dashboard": "Open in dashboard",
+    "service_map": "Service Map",
+    "default_user": "Farmer",
+    "default_role": "Farmer",
+    "role_admin": "Admin",
+    "helpdesk": "Helpdesk",
+    "helpline": "Helpline"
+  },
+  "languages": {
+    "en": "English",
+    "hi": "Hindi",
+    "bn": "Bengali",
+    "ta": "Tamil",
+    "te": "Telugu",
+    "mr": "Marathi",
+    "gu": "Gujarati",
+    "kn": "Kannada",
+    "pa": "Punjabi",
+    "as": "Assamese",
+    "ml": "Malayalam",
+    "or": "Odia",
+    "ur": "Urdu",
+    "ne": "Nepali",
+    "sa": "Sanskrit"
+  },
+  "auth": {
+    "welcome": "Welcome back",
+    "create": "Create your account",
+    "phone": "Phone Number",
+    "password": "Password",
+    "name": "Full Name",
+    "location": "Location",
+    "farm_size": "Farm Size (acres)",
+    "soil_type": "Soil Type",
+    "water_source": "Water Source",
+    "primary_crops": "Primary Crops (comma separated)",
+    "language": "Preferred Language",
+    "role": "Role",
+    "sign_in": "Sign In",
+    "sign_up": "Sign Up",
+    "login_failed": "Login failed",
+    "phone_helper": "Use your registered phone number",
+    "password_helper": "Minimum 8 characters",
+    "signing_in": "Signing in...",
+    "forgot_password": "Forgot password?",
+    "new_to_platform": "New to KrishiMitra? ",
+    "registration_failed": "Registration failed",
+    "password_range_helper": "8-72 characters",
+    "primary_crops_helper": "Example: rice, wheat",
+    "role_farmer": "Farmer",
+    "role_extension_officer": "Extension Officer",
+    "creating": "Creating...",
+    "already_have_account": "Already have an account? "
+  },
+  "dashboard": {
+    "crop": "Crop Recommendation",
+    "price": "Price Forecast",
+    "water": "Water Optimization",
+    "feedback": "Outcome Feedback",
+    "sustainability": "Sustainability Score",
+    "latest_rec": "Latest Recommendation ID"
+  },
+  "actions": {
+    "submit": "Submit",
+    "generate": "Generate",
+    "send": "Send",
+    "sending": "Sending...",
+    "add_day": "Add Day",
+    "remove": "Remove",
+    "loading": "Loading...",
+    "fetch": "Fetch",
+    "analyzing": "Analyzing",
+    "forecasting": "Forecasting",
+    "optimizing": "Optimizing",
+    "submitting": "Submitting"
+  },
+  "advisory": {
+    "title": "Advisory Chat",
+    "placeholder": "Ask a farming question..."
+  },
+  "advisory_page": {
+    "subtitle": "Get localized, context-aware crop guidance powered by Bedrock.",
+    "language_label": "Language",
+    "powered_by_bedrock": "Powered by Amazon Bedrock",
+    "failed_service": "Unable to fetch advisory response",
+    "quick_prompts_title": "Quick prompts",
+    "quick_prompt_1": "How should I prepare my field for the next sowing cycle?",
+    "quick_prompt_2": "What fertilizer mix is suitable for my soil type?",
+    "quick_prompt_3": "How can I reduce water usage this week?",
+    "quick_prompt_4": "What pest risks should I watch for this month?",
+    "usage_tips_title": "Usage tips",
+    "usage_tip_1": "Include crop, location, and growth stage for better answers.",
+    "usage_tip_2": "Ask follow-up questions to get step-by-step guidance.",
+    "model": "Model",
+    "conversation_id": "Conversation ID",
+    "sources": "Sources",
+    "voice_not_supported": "Voice input is not supported in this browser."
+  },
+  "login_page": {
+    "portal_description": "Access real-time advisories, AI recommendations, and market intelligence designed for farmers.",
+    "feature_crop_price_water": "Crop, price, and water optimization services.",
+    "feature_bedrock": "Personalized advisory powered by Amazon Bedrock.",
+    "feature_multilingual": "Multilingual dashboard with 15 Indian languages.",
+    "latest_update": "New: Price forecasting now supports 30/60/90-day outlooks."
+  },
+  "register_page": {
+    "title": "Create your farmer profile",
+    "subtitle": "Register once to unlock DBT benefits, AI recommendations, and sustainability insights.",
+    "feature_irrigation": "Smart irrigation plans with actionable schedules",
+    "feature_price": "Crop price trend forecasting and market signals",
+    "feature_sustainability": "Outcome feedback with sustainability scoring"
+  },
+  "reset_password": {
+    "title": "Reset password",
+    "subtitle": "Request a reset code and set a new password.",
+    "notice_code_sent": "Reset code sent successfully.",
+    "notice_password_updated": "Password updated successfully.",
+    "channel": "Channel",
+    "channel_sms": "SMS",
+    "channel_email": "Email",
+    "send_code": "Send code",
+    "sending": "Sending...",
+    "reset_code": "Reset code",
+    "new_password": "New password",
+    "update_password": "Update password",
+    "updating": "Updating...",
+    "back_to_login": "Back to login"
+  },
+  "common": {
+    "request_failed": "Request failed"
+  },
+  "dashboard_page": {
+    "hero": {
+      "title": "KrishiMitra-AI",
+      "description": "A unified decision intelligence portal for crop planning, market forecasting, and water optimization. Designed for farmers and field officers."
+    },
+    "live_updates": "Live updates",
+    "offline_mode": "Offline mode enabled",
+    "ws_status": {
+      "idle": "Idle",
+      "connecting": "Connecting",
+      "open": "Connected",
+      "closed": "Disconnected",
+      "error": "Error"
+    },
+    "kpi": {
+      "status": "Status",
+      "online": "Online",
+      "offline": "Offline",
+      "water_savings": "Water Savings"
+    },
+    "analytics": {
+      "title": "Extension Officer Analytics",
+      "location": "Location (Village/Block)",
+      "farm_size_min": "Farm Size Min",
+      "farm_size_max": "Farm Size Max",
+      "from_date": "From Date",
+      "to_date": "To Date",
+      "generate": "Generate Overview",
+      "download_pdf": "Download PDF",
+      "download_excel": "Download Excel",
+      "load_error": "Failed to load analytics",
+      "total_farmers": "Total Farmers",
+      "feedback": "Feedback",
+      "avg_sustainability": "Avg Sustainability",
+      "at_risk_farmers": "At-risk farmers",
+      "avg_yield": "Avg Yield (kg/acre)",
+      "water": "Water",
+      "crop_adoption_trends": "Crop Adoption Trends",
+      "no_crop_trend": "No crop trend data available yet.",
+      "resource_averages": "Resource Averages",
+      "fertilizer": "Fertilizer",
+      "yield": "Yield",
+      "top_crops": "Top Crops"
+    },
+    "notices": {
+      "title": "Notice Board",
+      "item_1_title": "DBT input subsidy window open for Rabi season 2026",
+      "item_1_date": "19 Feb 2026",
+      "item_2_title": "Paddy procurement schedule updated for selected districts",
+      "item_2_date": "18 Feb 2026",
+      "item_3_title": "Water-saving irrigation advisory released for summer crops",
+      "item_3_date": "15 Feb 2026",
+      "item_4_title": "KCC interest subvention applications live on the portal",
+      "item_4_date": "12 Feb 2026"
+    },
+    "links": {
+      "title": "Important Links",
+      "beneficiary_status": "Beneficiary Status",
+      "farmer_registration": "Farmer Registration",
+      "market_price_bulletin": "Market Price Bulletin",
+      "helpline_support": "Helpline and Support"
+    },
+    "weather": {
+      "title": "Weather Forecast",
+      "load_error": "Failed to load weather",
+      "empty": "Fetch forecast to view the next {{days}} days for your location."
+    },
+    "mandi": {
+      "title": "Mandi Prices",
+      "load_error": "Failed to load mandi prices",
+      "empty": "Fetch mandi prices to view recent market trends.",
+      "price_label": "Price"
+    },
+    "services": {
+      "title": "Online Services",
+      "subtitle": "Access AI tools, forecasts, and sustainability insights from a single portal.",
+      "open": "Open Service",
+      "crop_description": "AI-led crop selection using soil and climate inputs.",
+      "price_description": "30/60/90-day market forecasting with confidence bands.",
+      "water_description": "Irrigation scheduling with water savings insights.",
+      "feedback_description": "Submit outcomes and view sustainability scores."
+    },
+    "advisory_tip": {
+      "title": "AI Advisory Tip",
+      "description": "Keep your soil data updated every season to receive more accurate AI recommendations."
+    },
+    "forms": {
+      "crop": "Crop",
+      "market": "Market",
+      "location": "Location",
+      "days": "Days"
+    },
+    "crop": {
+      "inputs_title": "Soil and Climate Inputs",
+      "soil_n": "Soil N",
+      "soil_n_helper": "Nitrogen level",
+      "soil_p": "Soil P",
+      "soil_k": "Soil K",
+      "soil_ph": "Soil pH",
+      "temperature_c": "Temperature (C)",
+      "humidity_pct": "Humidity (%)",
+      "rainfall_mm": "Rainfall (mm)",
+      "season": "Season",
+      "historical_yield": "Historical Yield",
+      "recommendations": "Recommendations",
+      "empty": "Submit inputs to receive top crop recommendations."
+    },
+    "price": {
+      "inputs_title": "Market Forecast Inputs",
+      "title": "Price Forecast",
+      "currency": "Currency",
+      "horizon_30": "30 days",
+      "horizon_60": "60 days",
+      "horizon_90": "90 days",
+      "mape": "MAPE",
+      "confidence_band": "Confidence band included",
+      "empty": "Generate a forecast to view the price trend chart."
+    },
+    "water": {
+      "inputs_title": "Irrigation Inputs",
+      "growth_stage": "Growth Stage",
+      "soil_moisture_pct": "Soil Moisture (%)",
+      "field_area_acres": "Field Area (acres)",
+      "water_source": "Water Source",
+      "forecast_schedule": "5-day Forecast and Schedule",
+      "estimated_savings": "Estimated savings"
+    },
+    "feedback": {
+      "title": "Outcome Feedback",
+      "recommendation_id": "Recommendation ID",
+      "rating": "Rating (1-5)",
+      "yield_kg_per_acre": "Yield (kg/acre)",
+      "income_inr": "Income (INR)",
+      "water_usage": "Water Usage (L/acre)",
+      "fertilizer_kg_per_acre": "Fertilizer (kg/acre)",
+      "notes": "Notes",
+      "sustainability_snapshot": "Sustainability Snapshot",
+      "overall_score": "Overall score",
+      "empty": "Submit feedback to see sustainability scores and improvement tips."
+    },
+    "chart": {
+      "forecast": "Forecast",
+      "lower": "Lower",
+      "upper": "Upper"
+    },
+    "sustainability_labels": {
+      "water": "Water",
+      "fertilizer": "Fertilizer",
+      "yield": "Yield",
+      "score": "Score"
+    },
+    "tables": {
+      "date": "Date",
+      "rainfall_mm": "Rainfall (mm)",
+      "temp_c": "Temp (C)",
+      "irrigation_mm": "Irrigation (mm)",
+      "liters": "Liters",
+      "reason": "Reason"
+    },
+    "units": {
+      "kg_per_acre": "kg/acre",
+      "liter_per_acre": "L/acre"
+    }
+  }
+}

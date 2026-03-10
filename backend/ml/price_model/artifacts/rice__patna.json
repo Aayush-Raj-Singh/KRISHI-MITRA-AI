@@ -1,0 +1,18 @@
+{
+  "artifact_type": "seasonal_linear",
+  "start_date": "2023-09-05",
+  "last_date": "2026-02-20",
+  "coef": [
+    2138.17553953786,
+    0.3441080227459563,
+    -0.3611340258613431,
+    0.5981152384818044,
+    132.26966550912908,
+    -1.1915102029624762,
+    200.1224444014485,
+    3.078774007070064
+  ],
+  "sigma": 54.169265602530345,
+  "interval_width": 0.9,
+  "fallback_reason": "'Prophet' object has no attribute 'stan_backend'"
+}

@@ -1,0 +1,7 @@
+Title: Mandi Market Timing Guidance
+
+Farmgate and mandi prices are seasonal and affected by arrivals, storage and transport constraints.
+Use short-horizon forecasts (7 to 30 days) for tactical selling decisions and long-horizon forecasts for planning.
+Avoid panic selling immediately after harvest when arrivals peak and prices are depressed.
+If storage quality can be maintained, staggered selling can reduce downside risk.
+Track market-specific trends because price movement differs across mandis for the same commodity.

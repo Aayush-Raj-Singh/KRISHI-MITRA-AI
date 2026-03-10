@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "KrishiMitra-AI",
+    "slug": "krishimitra-ai-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#f4f7f0"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "plugins": [
+      "expo-speech-recognition"
+    ]
+  }
+}

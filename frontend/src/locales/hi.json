@@ -1,0 +1,313 @@
+{
+  "app": {
+    "title": "KrishiMitra-AI",
+    "subtitle": "ग्रामीण निर्णय इंटेलिजेंस AI द्वारा संचालित"
+  },
+  "nav": {
+    "dashboard": "डैशबोर्ड",
+    "advisory": "सलाहकार",
+    "logout": "लॉग आउट",
+    "login": "लॉग इन करें",
+    "register": "पंजीकरण करवाना"
+  },
+  "layout": {
+    "nav_notices": "नोटिस",
+    "services": "सेवाएं",
+    "govt_caption": "कृषि विभाग, बिहार सरकार",
+    "dbt_portal": "Agriculture Services Portal",
+    "open_in_dashboard": "डैशबोर्ड में खोलें",
+    "service_map": "सेवा मानचित्र",
+    "default_user": "किसान",
+    "default_role": "किसान",
+    "role_admin": "व्यवस्थापक",
+    "helpdesk": "सहायता केंद्र",
+    "helpline": "हेल्पलाइन"
+  },
+  "languages": {
+    "en": "अंग्रेज़ी",
+    "hi": "हिंदी",
+    "bn": "बंगाली",
+    "ta": "तामिल",
+    "te": "तेलुगू",
+    "mr": "मराठी",
+    "gu": "गुजराती",
+    "kn": "कन्नडा",
+    "pa": "पंजाबी",
+    "as": "असमिया",
+    "ml": "मलयालम",
+    "or": "उड़िया",
+    "ur": "उर्दू",
+    "ne": "नेपाली",
+    "sa": "संस्कृत"
+  },
+  "auth": {
+    "welcome": "वापसी पर स्वागत है",
+    "create": "अपना खाता बनाएं",
+    "phone": "फ़ोन नंबर",
+    "password": "पासवर्ड",
+    "name": "पूरा नाम",
+    "location": "जगह",
+    "farm_size": "खेत का आकार (एकड़)",
+    "soil_type": "मिट्टी का प्रकार",
+    "water_source": "जल स्रोत",
+    "primary_crops": "प्राथमिक फसलें (अल्पविराम से अलग)",
+    "language": "पसंदीदा भाषा",
+    "role": "भूमिका",
+    "sign_in": "दाखिल करना",
+    "sign_up": "साइन अप करें",
+    "login_failed": "लॉगिन विफल",
+    "phone_helper": "अपने पंजीकृत फ़ोन नंबर का उपयोग करें",
+    "password_helper": "न्यूनतम 8 अक्षर",
+    "signing_in": "इन कर रहे हैं...",
+    "forgot_password": "पासवर्ड भूल गए?",
+    "new_to_platform": "KrishiMitra पर नये हैं?",
+    "registration_failed": "पंजीकरण विफल रहा",
+    "password_range_helper": "8-72 अक्षर",
+    "primary_crops_helper": "उदाहरण: चावल, गेहूँ",
+    "role_farmer": "किसान",
+    "role_extension_officer": "विस्तार अधिकारी",
+    "creating": "बनाया जा रहा है...",
+    "already_have_account": "क्या आपके पास पहले से एक खाता मौजूद है?"
+  },
+  "dashboard": {
+    "crop": "फसल सिफ़ारिश",
+    "price": "मूल्य पूर्वानुमान",
+    "water": "जल अनुकूलन",
+    "feedback": "परिणाम प्रतिक्रिया",
+    "sustainability": "स्थिरता स्कोर",
+    "latest_rec": "नवीनतम अनुशंसा आईडी"
+  },
+  "actions": {
+    "submit": "जमा करना",
+    "generate": "उत्पन्न",
+    "send": "भेजना",
+    "sending": "भेजा जा रहा है...",
+    "add_day": "दिन जोड़ें",
+    "remove": "निकालना",
+    "loading": "लोड हो रहा है...",
+    "fetch": "लाना",
+    "analyzing": "का विश्लेषण",
+    "forecasting": "पूर्वानुमान",
+    "optimizing": "अनुकूलन",
+    "submitting": "भेजने से"
+  },
+  "advisory": {
+    "title": "सलाहकार चैट",
+    "placeholder": "खेती संबंधी प्रश्न पूछें..."
+  },
+  "advisory_page": {
+    "subtitle": "बेडरॉक द्वारा संचालित स्थानीयकृत, संदर्भ-जागरूक फसल मार्गदर्शन प्राप्त करें।",
+    "language_label": "भाषा",
+    "powered_by_bedrock": "अमेज़ॅन बेडरॉक द्वारा संचालित",
+    "failed_service": "सलाहकारी प्रतिक्रिया लाने में असमर्थ",
+    "quick_prompts_title": "त्वरित संकेत",
+    "quick_prompt_1": "अगले बुआई चक्र के लिए मुझे अपना खेत कैसे तैयार करना चाहिए?",
+    "quick_prompt_2": "मेरी मिट्टी के प्रकार के लिए कौन सा उर्वरक मिश्रण उपयुक्त है?",
+    "quick_prompt_3": "मैं इस सप्ताह पानी का उपयोग कैसे कम कर सकता हूँ?",
+    "quick_prompt_4": "इस महीने मुझे किन कीट जोखिमों पर नजर रखनी चाहिए?",
+    "usage_tips_title": "उपयोग युक्तियाँ",
+    "usage_tip_1": "बेहतर उत्तरों के लिए फसल, स्थान और विकास चरण शामिल करें।",
+    "usage_tip_2": "चरण-दर-चरण मार्गदर्शन प्राप्त करने के लिए अनुवर्ती प्रश्न पूछें।",
+    "model": "नमूना",
+    "conversation_id": "वार्तालाप आईडी",
+    "sources": "सूत्रों का कहना है",
+    "voice_not_supported": "इस ब्राउज़र में ध्वनि इनपुट समर्थित नहीं है."
+  },
+  "login_page": {
+    "portal_description": "किसानों के लिए डिज़ाइन की गई वास्तविक समय की सलाह, AI सिफ़ारिशों और बाज़ार संबंधी जानकारी तक पहुंचें।",
+    "feature_crop_price_water": "फसल, कीमत और जल अनुकूलन सेवाएँ।",
+    "feature_bedrock": "अमेज़ॅन बेडरॉक द्वारा संचालित वैयक्तिकृत सलाह।",
+    "feature_multilingual": "15 भारतीय भाषाओं वाला बहुभाषी डैशबोर्ड।",
+    "latest_update": "नया: मूल्य पूर्वानुमान अब 30/60/90-दिन के दृष्टिकोण का समर्थन करता है।"
+  },
+  "register_page": {
+    "title": "अपना किसान प्रोफ़ाइल बनाएं",
+    "subtitle": "DBT लाभ, AI सिफ़ारिशें और स्थिरता अंतर्दृष्टि अनलॉक करने के लिए एक बार पंजीकरण करें।",
+    "feature_irrigation": "क्रियाशील कार्यक्रम के साथ स्मार्ट सिंचाई योजनाएँ",
+    "feature_price": "फसल मूल्य प्रवृत्ति पूर्वानुमान और बाजार संकेत",
+    "feature_sustainability": "स्थिरता स्कोरिंग के साथ परिणाम प्रतिक्रिया"
+  },
+  "reset_password": {
+    "title": "पासवर्ड रीसेट",
+    "subtitle": "रीसेट कोड का अनुरोध करें और एक नया पासवर्ड सेट करें।",
+    "notice_code_sent": "रीसेट कोड सफलतापूर्वक भेजा गया.",
+    "notice_password_updated": "पासवर्ड सफलतापूर्वक अद्यतन।",
+    "channel": "चैनल",
+    "channel_sms": "SMS",
+    "channel_email": "Email",
+    "send_code": "कोड भेजें",
+    "sending": "भेजा जा रहा है...",
+    "reset_code": "कोड फिर ठीक करें",
+    "new_password": "नया पासवर्ड",
+    "update_password": "पासवर्ड अपडेट करें",
+    "updating": "अद्यतन किया जा रहा है...",
+    "back_to_login": "लॉगिन पर वापस जाएं"
+  },
+  "common": {
+    "request_failed": "अनुरोध विफल रहा"
+  },
+  "dashboard_page": {
+    "hero": {
+      "title": "KrishiMitra-AI",
+      "description": "फसल योजना, बाजार पूर्वानुमान और जल अनुकूलन के लिए एक एकीकृत निर्णय खुफिया पोर्टल। बिहार के किसानों और क्षेत्र के अधिकारियों के लिए डिज़ाइन किया गया।"
+    },
+    "live_updates": "लाइव अपडेट",
+    "offline_mode": "ऑफ़लाइन मोड सक्षम किया गया",
+    "ws_status": {
+      "idle": "निठल्ला",
+      "connecting": "कनेक्ट",
+      "open": "जुड़े हुए",
+      "closed": "डिस्कनेक्ट किया गया",
+      "error": "गलती"
+    },
+    "kpi": {
+      "status": "स्थिति",
+      "online": "ऑनलाइन",
+      "offline": "ऑफलाइन",
+      "water_savings": "जल की बचत"
+    },
+    "analytics": {
+      "title": "विस्तार अधिकारी विश्लेषिकी",
+      "location": "स्थान (ग्राम/ब्लॉक)",
+      "farm_size_min": "खेत का आकार न्यूनतम",
+      "farm_size_max": "खेत का आकार अधिकतम",
+      "from_date": "की तिथि से",
+      "to_date": "तारीख तक",
+      "generate": "अवलोकन उत्पन्न करें",
+      "download_pdf": "डाउनलोड PDF",
+      "download_excel": "डाउनलोड Excel",
+      "load_error": "विश्लेषण लोड करने में विफल",
+      "total_farmers": "कुल किसान",
+      "feedback": "प्रतिक्रिया",
+      "avg_sustainability": "औसत स्थिरता",
+      "at_risk_farmers": "जोखिम में किसान",
+      "avg_yield": "औसत उपज (kg/acre)",
+      "water": "पानी",
+      "crop_adoption_trends": "फसल अपनाने के रुझान",
+      "no_crop_trend": "अभी तक कोई फसल रुझान डेटा उपलब्ध नहीं है।",
+      "resource_averages": "संसाधन औसत",
+      "fertilizer": "उर्वरक",
+      "yield": "उपज",
+      "top_crops": "शीर्ष फसलें"
+    },
+    "notices": {
+      "title": "सूचना पट्ट",
+      "item_1_title": "DBT रबी सीजन 2026 के लिए इनपुट सब्सिडी विंडो खुली",
+      "item_1_date": "19 फरवरी 2026",
+      "item_2_title": "चयनित जिलों के लिए धान खरीद कार्यक्रम अद्यतन किया गया",
+      "item_2_date": "18 फरवरी 2026",
+      "item_3_title": "ग्रीष्मकालीन फसलों के लिए जल-बचत सिंचाई सलाह जारी",
+      "item_3_date": "15 फरवरी 2026",
+      "item_4_title": "केसीसी ब्याज सहायता आवेदन पोर्टल पर लाइव हैं",
+      "item_4_date": "12 फरवरी 2026"
+    },
+    "links": {
+      "title": "महत्वपूर्ण लिंक",
+      "beneficiary_status": "लाभार्थी स्थिति",
+      "farmer_registration": "किसान पंजीकरण",
+      "market_price_bulletin": "बाज़ार मूल्य बुलेटिन",
+      "helpline_support": "हेल्पलाइन और सहायता"
+    },
+    "weather": {
+      "title": "मौसम पूर्वानुमान",
+      "load_error": "मौसम लोड करने में विफल",
+      "empty": "अपने स्थान के लिए अगले {{days}} दिन देखने के लिए पूर्वानुमान प्राप्त करें।"
+    },
+    "mandi": {
+      "title": "मंडी कीमतें",
+      "load_error": "मंडी मूल्य लोड करने में विफल",
+      "empty": "हाल के बाज़ार रुझानों को देखने के लिए मंडी मूल्य प्राप्त करें।",
+      "price_label": "कीमत"
+    },
+    "services": {
+      "title": "ऑनलाइन सेवाओं",
+      "subtitle": "एक ही पोर्टल से AI टूल, पूर्वानुमान और स्थिरता अंतर्दृष्टि तक पहुंचें।",
+      "open": "सेवा खोलें",
+      "crop_description": "AI-मिट्टी और जलवायु इनपुट का उपयोग करके फसल चयन।",
+      "price_description": "कॉन्फिडेंस बैंड के साथ 30/60/90-दिन का बाज़ार पूर्वानुमान।",
+      "water_description": "जल बचत अंतर्दृष्टि के साथ सिंचाई शेड्यूलिंग।",
+      "feedback_description": "परिणाम सबमिट करें और स्थिरता स्कोर देखें।"
+    },
+    "advisory_tip": {
+      "title": "AI सलाहकार युक्ति",
+      "description": "अधिक सटीक AI सिफ़ारिशें प्राप्त करने के लिए अपने मृदा डेटा को हर मौसम में अद्यतन रखें।"
+    },
+    "forms": {
+      "crop": "काटना",
+      "market": "बाज़ार",
+      "location": "जगह",
+      "days": "दिन"
+    },
+    "crop": {
+      "inputs_title": "मिट्टी और जलवायु इनपुट",
+      "soil_n": "मृदा एन",
+      "soil_n_helper": "नाइट्रोजन स्तर",
+      "soil_p": "मृदा पी",
+      "soil_k": "मिट्टी के",
+      "soil_ph": "मिट्टी का पी.एच",
+      "temperature_c": "तापमान (सी)",
+      "humidity_pct": "नमी (%)",
+      "rainfall_mm": "वर्षा (मिमी)",
+      "season": "मौसम",
+      "historical_yield": "ऐतिहासिक उपज",
+      "recommendations": "सिफारिशों",
+      "empty": "शीर्ष फसल अनुशंसाएँ प्राप्त करने के लिए इनपुट सबमिट करें।"
+    },
+    "price": {
+      "inputs_title": "बाज़ार पूर्वानुमान इनपुट",
+      "title": "मूल्य पूर्वानुमान",
+      "currency": "मुद्रा",
+      "horizon_30": "30 दिन",
+      "horizon_60": "60 दिन",
+      "horizon_90": "90 दिन",
+      "mape": "MAPE",
+      "confidence_band": "कॉन्फिडेंस बैंड शामिल है",
+      "empty": "मूल्य प्रवृत्ति चार्ट देखने के लिए पूर्वानुमान तैयार करें।"
+    },
+    "water": {
+      "inputs_title": "सिंचाई इनपुट",
+      "growth_stage": "वृद्धि चरण",
+      "soil_moisture_pct": "मिट्टी की नमी (%)",
+      "field_area_acres": "फ़ील्ड क्षेत्रफल (एकड़)",
+      "water_source": "जल स्रोत",
+      "forecast_schedule": "5-दिवसीय पूर्वानुमान और कार्यक्रम",
+      "estimated_savings": "अनुमानित बचत"
+    },
+    "feedback": {
+      "title": "परिणाम प्रतिक्रिया",
+      "recommendation_id": "सिफ़ारिश आईडी",
+      "rating": "रेटिंग (1-5)",
+      "yield_kg_per_acre": "उपज (kg/acre)",
+      "income_inr": "आय (INR)",
+      "water_usage": "जल उपयोग (L/acre)",
+      "fertilizer_kg_per_acre": "उर्वरक (kg/acre)",
+      "notes": "टिप्पणियाँ",
+      "sustainability_snapshot": "स्थिरता स्नैपशॉट",
+      "overall_score": "समग्र प्राप्तांक",
+      "empty": "स्थिरता स्कोर और सुधार युक्तियाँ देखने के लिए प्रतिक्रिया सबमिट करें।"
+    },
+    "chart": {
+      "forecast": "पूर्वानुमान",
+      "lower": "निचला",
+      "upper": "अपर"
+    },
+    "sustainability_labels": {
+      "water": "पानी",
+      "fertilizer": "उर्वरक",
+      "yield": "उपज",
+      "score": "अंक"
+    },
+    "tables": {
+      "date": "तारीख",
+      "rainfall_mm": "वर्षा (मिमी)",
+      "temp_c": "तापमान (सी)",
+      "irrigation_mm": "सिंचाई (मिमी)",
+      "liters": "लीटर",
+      "reason": "कारण"
+    },
+    "units": {
+      "kg_per_acre": "kg/acre",
+      "liter_per_acre": "L/acre"
+    }
+  }
+}

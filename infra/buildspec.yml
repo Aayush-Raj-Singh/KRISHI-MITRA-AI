@@ -1,0 +1,13 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Starting build for KrishiMitra-AI"
+  build:
+    commands:
+      - echo "Run build steps here (backend/frontend)"
+
+artifacts:
+  files:
+    - "**/*"
