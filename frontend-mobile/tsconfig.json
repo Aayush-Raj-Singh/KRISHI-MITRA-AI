@@ -1,8 +1,0 @@
-{
-  "extends": "expo/tsconfig.base.json",
-  "compilerOptions": {
-    "strict": true,
-    "baseUrl": ".",
-    "types": ["react", "react-native", "node"]
-  }
-}

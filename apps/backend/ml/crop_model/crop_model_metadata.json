@@ -1,0 +1,25 @@
+{
+  "version": "rf-crop-v20260317181646",
+  "accuracy": 0.8882,
+  "trained_at": "2026-03-17T18:16:46.716110+00:00",
+  "samples": 805,
+  "feature_columns": [
+    "soil_n",
+    "soil_p",
+    "soil_k",
+    "soil_ph",
+    "temperature_c",
+    "humidity_pct",
+    "rainfall_mm",
+    "season_index",
+    "location_score",
+    "historical_yield"
+  ],
+  "classes": [
+    "cotton",
+    "maize",
+    "rice",
+    "sugarcane",
+    "wheat"
+  ]
+}

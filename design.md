@@ -54,7 +54,7 @@ The architecture prioritizes scalability, multilingual support, offline capabili
 │  ┌─────────────────────────┴────────────────────────────────┐   │
 │  │                   Data Layer                             │   │
 │  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐    │   │
-│  │  │   MongoDB    │  │   S3 Bucket  │  │  ElastiCache │    │   │
+│  │  │ PostgreSQL   │  │   S3 Bucket  │  │  ElastiCache │    │   │
 │  │  │  (Atlas)     │  │  (ML Models, │  │   (Redis)    │    │   │
 │  │  │              │  │   Datasets)  │  │              │    │   │
 │  │  └──────────────┘  └──────────────┘  └──────────────┘    │   │
@@ -220,7 +220,7 @@ src/
 - FastAPI (Python 3.11+)
 - Pydantic for data validation
 - SQLAlchemy for ORM (if needed)
-- Motor for async MongoDB operations
+- asyncpg for async PostgreSQL operations
 - Celery for background task processing
 - Redis for caching and session management
 - JWT for authentication
@@ -417,7 +417,7 @@ src/
 
 **Implementation**:
 - Calculated post-harvest when user reports outcomes
-- Stored in MongoDB for trend analysis
+- Stored in PostgreSQL for trend analysis
 - Visualized in dashboard with improvement suggestions
 
 ---
@@ -474,7 +474,7 @@ Guidelines:
 
 
 **Conversation Management**:
-- Store conversation history in MongoDB
+- Store conversation history in PostgreSQL
 - Maintain context window of last 5 exchanges
 - Implement conversation summarization for long threads
 - Allow users to start new conversation threads
@@ -495,7 +495,7 @@ Guidelines:
 
 ### 5. Database Design
 
-#### 5.1 MongoDB Schema
+#### 5.1 PostgreSQL (JSONB) Schema
 
 **Users Collection**:
 ```json
@@ -650,7 +650,7 @@ User (Mobile/Web)
   → Auth Service 
   → Validate input 
   → Hash password 
-  → Store in MongoDB 
+  → Store in PostgreSQL 
   → Generate JWT token 
   → Return token to client
 ```
@@ -667,7 +667,7 @@ User submits soil/climate data
       → Call SageMaker endpoint 
       → Receive predictions 
       → Enrich with explanations 
-      → Store in MongoDB 
+      → Store in PostgreSQL 
       → Cache in Redis (TTL: 24h) 
   → Return recommendations to client
 ```
@@ -680,12 +680,12 @@ User selects crop and market
   → Recommendation Service 
   → Check Redis cache 
   → If cache miss:
-      → Fetch latest price data from MongoDB 
+      → Fetch latest price data from PostgreSQL 
       → Fetch weather forecast from cache/API 
       → Prepare input sequence 
       → Call SageMaker endpoint 
       → Generate confidence intervals 
-      → Store forecast in MongoDB 
+      → Store forecast in PostgreSQL 
       → Cache in Redis (TTL: 7 days) 
   → Return forecast with visualization data
 ```
@@ -697,7 +697,7 @@ User asks question in regional language
   → API Gateway 
   → Advisory Service 
   → Detect language 
-  → Retrieve user context from MongoDB 
+  → Retrieve user context from PostgreSQL 
   → Retrieve conversation history 
   → If non-English: Translate query using AWS Translate 
   → Perform semantic search in knowledge base (OpenSearch) 
@@ -705,7 +705,7 @@ User asks question in regional language
   → Call Amazon Bedrock API 
   → Receive response 
   → If non-English: Translate response back 
-  → Store conversation in MongoDB 
+  → Store conversation in PostgreSQL 
   → Return response to client
 ```
 
@@ -715,12 +715,12 @@ User asks question in regional language
 User provides feedback/outcome 
   → API Gateway 
   → Feedback Service 
-  → Store in MongoDB 
+  → Store in PostgreSQL 
   → Trigger async job (Celery) 
   → Aggregate feedback data 
   → If threshold met (e.g., 1000 new outcomes):
       → Trigger model retraining pipeline 
-      → Fetch training data from MongoDB + S3 
+      → Fetch training data from PostgreSQL + S3 
       → Train updated model 
       → Evaluate performance 
       → If improved: Deploy to SageMaker 
@@ -1108,7 +1108,7 @@ krishimitra-data/
    - Max tasks: 20 (supports ~10,000 concurrent users)
 
 2. **Database Layer**:
-   - MongoDB Atlas with auto-scaling
+   - PostgreSQL (RDS/Aurora) with auto-scaling
    - Vertical scaling: M10 → M30 → M50
    - Horizontal scaling: Sharding by agro-climatic zone
    - Read replicas for read-heavy workloads
@@ -1188,7 +1188,7 @@ krishimitra-data/
 ### Data Security
 
 1. **Encryption at Rest**:
-   - MongoDB: Encryption enabled
+   - PostgreSQL: Encryption enabled
    - S3: SSE-S3 encryption
    - EBS volumes: Encrypted
    - Secrets Manager: Encrypted by default

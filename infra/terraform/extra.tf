@@ -1,9 +1,8 @@
 resource "aws_s3_bucket" "assets" {
   bucket = var.assets_bucket_name
-  tags = {
-    Project = var.project_name
+  tags = merge(local.tags, {
     Purpose = "static-assets"
-  }
+  })
 }
 
 resource "aws_s3_bucket_public_access_block" "assets" {
@@ -14,15 +13,49 @@ resource "aws_s3_bucket_public_access_block" "assets" {
   restrict_public_buckets = true
 }
 
+resource "aws_s3_bucket" "models" {
+  count  = var.enable_models_bucket ? 1 : 0
+  bucket = var.models_bucket_name
+  tags = merge(local.tags, {
+    Purpose = "ml-models"
+  })
+}
+
+resource "aws_s3_bucket_public_access_block" "models" {
+  count                   = var.enable_models_bucket ? 1 : 0
+  bucket                  = aws_s3_bucket.models[0].id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_versioning" "models" {
+  count  = var.enable_models_bucket ? 1 : 0
+  bucket = aws_s3_bucket.models[0].id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 resource "aws_secretsmanager_secret" "app_secrets" {
   name        = "${var.project_name}-app-secrets"
   description = "Application secrets for KrishiMitra-AI"
+  kms_key_id  = local.kms_key_arn
+  tags        = local.tags
+}
+
+resource "aws_secretsmanager_secret_version" "app_secrets" {
+  count         = var.app_secrets_json != "" ? 1 : 0
+  secret_id     = aws_secretsmanager_secret.app_secrets.id
+  secret_string = var.app_secrets_json
 }
 
 resource "aws_apigatewayv2_api" "http_api" {
   name          = "${var.project_name}-http-api"
   protocol_type = "HTTP"
   description   = "API Gateway front door for KrishiMitra-AI"
+  tags          = local.tags
 }
 
 resource "aws_apigatewayv2_stage" "default" {
@@ -34,15 +67,15 @@ resource "aws_apigatewayv2_stage" "default" {
 resource "aws_ecr_repository" "api" {
   name                 = "${var.project_name}-api"
   image_tag_mutability = "MUTABLE"
+  tags                 = local.tags
 }
 
 resource "aws_s3_bucket" "cicd_artifacts" {
   count  = var.enable_cicd ? 1 : 0
   bucket = var.cicd_artifacts_bucket
-  tags = {
-    Project = var.project_name
+  tags = merge(local.tags, {
     Purpose = "cicd-artifacts"
-  }
+  })
 }
 
 resource "aws_codebuild_project" "app_build" {
@@ -56,16 +89,17 @@ resource "aws_codebuild_project" "app_build" {
   }
 
   environment {
-    compute_type                = "BUILD_GENERAL1_SMALL"
-    image                       = "aws/codebuild/standard:7.0"
-    type                        = "LINUX_CONTAINER"
-    privileged_mode             = true
+    compute_type    = "BUILD_GENERAL1_SMALL"
+    image           = "aws/codebuild/standard:7.0"
+    type            = "LINUX_CONTAINER"
+    privileged_mode = true
   }
 
   source {
-    type            = "CODEPIPELINE"
-    buildspec       = "infra/buildspec.yml"
+    type      = "CODEPIPELINE"
+    buildspec = "infra/buildspec.yml"
   }
+  tags = local.tags
 }
 
 resource "aws_codepipeline" "app_pipeline" {
@@ -115,4 +149,5 @@ resource "aws_codepipeline" "app_pipeline" {
       }
     }
   }
+  tags = local.tags
 }

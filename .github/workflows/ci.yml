@@ -10,8 +10,9 @@ jobs:
   backend:
     runs-on: ubuntu-latest
     env:
-      PYTHONPATH: backend
+      PYTHONPATH: apps/backend
       ENVIRONMENT: test
+      ALLOW_INMEMORY_DB_FALLBACK: "true"
       MONGODB_SERVER_SELECTION_TIMEOUT_MS: "200"
       REDIS_URL: ""
     steps:
@@ -26,10 +27,10 @@ jobs:
       - name: Install backend dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r backend/requirements.txt
+          python -m pip install -r apps/backend/requirements.txt
 
       - name: Run backend smoke tests
-        run: python -m pytest backend/tests -q
+        run: python -m pytest apps/backend/tests -q
 
   frontend:
     runs-on: ubuntu-latest
@@ -42,17 +43,25 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: apps/frontend/package-lock.json
 
       - name: Install frontend dependencies
-        working-directory: frontend
+        working-directory: apps/frontend
         run: npm ci
 
+      - name: Lint frontend
+        working-directory: apps/frontend
+        run: npm run lint
+
+      - name: Run frontend tests
+        working-directory: apps/frontend
+        run: npm run test:run
+
       - name: Build frontend
-        working-directory: frontend
+        working-directory: apps/frontend
         run: npm run build
 
-  mobile:
+  mobile_shell:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -63,12 +72,31 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
-          cache-dependency-path: frontend-mobile/package-lock.json
+          cache-dependency-path: apps/frontend/package-lock.json
 
-      - name: Install mobile dependencies
-        working-directory: frontend-mobile
+      - name: Install frontend dependencies
+        working-directory: apps/frontend
         run: npm ci
 
-      - name: Type-check mobile app
-        working-directory: frontend-mobile
-        run: npx tsc --noEmit
+      - name: Build Capacitor shell
+        working-directory: apps/frontend
+        run: npm run cap:sync
+
+  infra_validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform init
+        working-directory: infra/terraform
+        run: terraform init -backend=false
+
+      - name: Terraform validate
+        working-directory: infra/terraform
+        run: terraform validate

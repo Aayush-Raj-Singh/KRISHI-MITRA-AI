@@ -1,0 +1,32 @@
+name: Microservices Build
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+jobs:
+  build-microservices:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - services.identity_service.main:app
+          - services.advisory_service.main:app
+          - services.recommendation_service.main:app
+          - services.market_service.main:app
+          - services.analytics_service.main:app
+          - services.operations_service.main:app
+          - services.support_service.main:app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build microservice image
+        run: |
+          docker build \
+            --build-arg SERVICE_MODULE=${{ matrix.service }} \
+            -f apps/backend/services/Dockerfile \
+            -t krishimitra-${{ matrix.service }} \
+            .

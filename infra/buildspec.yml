@@ -2,12 +2,34 @@ version: 0.2
 
 phases:
   install:
+    runtime-versions:
+      python: 3.11
+      nodejs: 20
     commands:
-      - echo "Starting build for KrishiMitra-AI"
+      - echo "Installing KrishiMitra-AI dependencies"
+      - python -m pip install --upgrade pip
+      - python -m pip install -r apps/backend/requirements.txt
+      - python -m pip install pip-audit
+      - curl -fsSL https://releases.hashicorp.com/terraform/1.12.2/terraform_1.12.2_linux_amd64.zip -o terraform.zip
+      - unzip -o terraform.zip -d /usr/local/bin
+      - rm -f terraform.zip
+      - cd apps/frontend && npm ci && cd ../..
+  pre_build:
+    commands:
+      - echo "Running security and quality checks"
+      - pip-audit -r apps/backend/requirements.txt
+      - cd apps/backend && python -m pytest tests -q && cd ../..
+      - cd apps/frontend && npm run lint && cd ../..
+      - cd apps/frontend && npm run test:run && cd ../..
+      - cd infra/terraform && terraform init -backend=false && terraform validate && cd ../..
   build:
     commands:
-      - echo "Run build steps here (backend/frontend)"
+      - echo "Building frontend bundle"
+      - cd apps/frontend && npm run build && cd ../..
+      - echo "Syncing Capacitor Android shell"
+      - cd apps/frontend && npm run cap:sync && cd ../..
 
 artifacts:
   files:
-    - "**/*"
+    - apps/frontend/dist/**/*
+    - apps/backend/**/*

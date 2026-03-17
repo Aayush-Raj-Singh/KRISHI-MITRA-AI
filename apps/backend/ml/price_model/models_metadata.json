@@ -1,0 +1,11 @@
+{
+  "generated_at": "2026-03-11T16:46:39.717807+00:00",
+  "models": [],
+  "failures": [
+    {
+      "crop": "banana",
+      "market": "mithapur",
+      "error": "Not enough historical data for banana/mithapur: 0 rows"
+    }
+  ]
+}
