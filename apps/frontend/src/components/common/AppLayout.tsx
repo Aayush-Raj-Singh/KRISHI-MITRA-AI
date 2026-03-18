@@ -39,6 +39,7 @@ import { logoutAuthSession } from "../../services/auth";
 import { getRefreshToken } from "../../services/authStorage";
 import { buildRedirectUrl } from "../../services/links";
 import { resolveWsUrl } from "../../services/runtimeConfig";
+import { useTranslatedStrings } from "../../utils/useTranslatedStrings";
 import ExternalPortalsMarquee from "./ExternalPortalsMarquee";
 import ExternalLinkWarningDialog from "./ExternalLinkWarningDialog";
 import LayoutFooterLinks from "./LayoutFooterLinks";
@@ -56,16 +57,16 @@ const spacingScale = {
   xl: 6,
   section: 8
 } as const;
-const defaultAppMaxWidth = "min(98vw, 1920px)";
+const defaultAppMaxWidth = "var(--app-shell-width)";
 const horizontalSectionPaddingSx = {
-  px: { xs: spacingScale.sm, md: spacingScale.lg }
+  px: "var(--app-shell-inline-pad)"
 } as const;
 const headerContainerSx = {
-  width: "100%",
-  maxWidth: "100%",
-  mx: 0,
-  pl: { xs: 2, sm: 3, md: 4 },
-  pr: { xs: 2, sm: 3, md: 4 },
+  width: "min(100%, var(--app-shell-width))",
+  maxWidth: "var(--app-shell-width)",
+  mx: "auto",
+  pl: "var(--app-shell-inline-pad)",
+  pr: "var(--app-shell-inline-pad)",
   py: { xs: 1.25, md: 1.5 },
   display: "grid",
   gridTemplateColumns: { xs: "1fr", sm: "minmax(0, 1fr) auto" },
@@ -73,11 +74,11 @@ const headerContainerSx = {
   gap: { xs: 1.5, md: 3 }
 } as const;
 const headerNavContainerSx = {
-  width: "100%",
-  maxWidth: "100%",
-  mx: 0,
-  pl: { xs: 2, sm: 3, md: 4 },
-  pr: 0,
+  width: "min(100%, var(--app-shell-width))",
+  maxWidth: "var(--app-shell-width)",
+  mx: "auto",
+  pl: "var(--app-shell-inline-pad)",
+  pr: "var(--app-shell-inline-pad)",
   py: { xs: spacingScale.sm, md: 1.5 },
   display: "flex",
   alignItems: { xs: "flex-start", md: "center" },
@@ -204,6 +205,33 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
     () => [{ label: t("layout.service_map"), path: "/services" }, ...serviceItems],
     [serviceItems, t]
   );
+  const shellUiCopy = useTranslatedStrings(
+    useMemo(
+      () => ({
+        eventFallback: "event",
+        operationPrefix: "Operation",
+        scheduled: "scheduled",
+        triggered: "triggered",
+        feedbackRecorded: "Outcome feedback recorded",
+        quickRatingReceived: "Quick rating received for",
+        serviceFallback: "service",
+        realtimeConnected: "Realtime channel connected",
+        darkMode: "Dark mode",
+        lightMode: "Light mode",
+        toggleDarkMode: "Toggle dark mode",
+        connectedToInternet: "Connected to internet",
+        offlineNow: "You are offline",
+        changeLanguage: "Change language",
+        openProfile: "Open profile",
+        openNavigation: "Open navigation",
+        openDashboard: "Go to dashboard",
+        seasonKharif: "Kharif",
+        seasonRabi: "Rabi",
+        seasonZaid: "Zaid"
+      }),
+      []
+    )
+  );
   const externalPortals = EXTERNAL_PORTALS;
   const slidingExternalPortals = useMemo(() => [...externalPortals, ...externalPortals], [externalPortals]);
   const headerBadges = HEADER_BADGES;
@@ -250,25 +278,30 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
         new Date().toISOString()
     );
 
-    let summary = eventType || "event";
+    let summary = eventType || shellUiCopy.eventFallback;
     let severity: "info" | "success" | "warning" = "info";
     if (eventType.startsWith("operation")) {
       const operation = String((lastEvent as Record<string, unknown>).operation || "");
-      summary = `Operation ${operation.replace(/_/g, " ")} ${eventType.includes("scheduled") ? "scheduled" : "triggered"}`;
+      summary = `${shellUiCopy.operationPrefix} ${operation.replace(/_/g, " ")} ${
+        eventType.includes("scheduled") ? shellUiCopy.scheduled : shellUiCopy.triggered
+      }`;
       severity = "success";
     } else if (eventType === "feedback.submitted") {
-      summary = `Outcome feedback recorded (rating ${String((lastEvent as Record<string, unknown>).rating || "-")})`;
+      summary = `${shellUiCopy.feedbackRecorded} (rating ${String((lastEvent as Record<string, unknown>).rating || "-")})`;
       severity = "info";
     } else if (eventType === "feedback.quick_submitted") {
-      summary = `Quick rating received for ${String((lastEvent as Record<string, unknown>).service || "service")}`;
+      summary = `${shellUiCopy.quickRatingReceived} ${String(
+        (lastEvent as Record<string, unknown>).service || shellUiCopy.serviceFallback
+      )}`;
       severity = "info";
     } else if (eventType === "connected") {
-      summary = "Realtime channel connected";
+      summary = shellUiCopy.realtimeConnected;
       severity = "success";
     }
 
-    setRealtimeEvents((prev) => [{ id: `${eventType}-${timestamp}`, summary, time: timestamp, severity }, ...prev].slice(0, 5));
-  }, [lastEvent]);
+    const nextId = `${eventType}-${timestamp}`;
+    setRealtimeEvents((prev) => [{ id: nextId, summary, time: timestamp, severity }, ...prev.filter((item) => item.id !== nextId)].slice(0, 5));
+  }, [lastEvent, shellUiCopy]);
 
   const handleLogout = async () => {
     const refreshToken = getRefreshToken();
@@ -364,9 +397,17 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
       .toUpperCase() || "KM";
   const userAvatar = user?.profile_image_url?.trim() ? user.profile_image_url : undefined;
   const contentShellSx = {
-    width: "100%",
-    maxWidth: fullBleed ? "none" : defaultAppMaxWidth,
-    mx: fullBleed ? 0 : "auto"
+    width: "min(100%, var(--app-shell-width))",
+    maxWidth: fullBleed ? "var(--app-shell-width)" : defaultAppMaxWidth,
+    mx: "auto",
+    minWidth: 0,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "stretch",
+    "& > *": {
+      width: "100%",
+      minWidth: 0
+    }
   } as const;
 
   const userRoleLabel = useMemo(() => {
@@ -403,10 +444,14 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
 
   const currentSeasonLabel = useMemo(() => {
     const month = new Date().getMonth() + 1;
-    if (month >= 6 && month <= 10) return "Kharif";
-    if (month >= 11 || month <= 3) return "Rabi";
-    return "Zaid";
-  }, []);
+    if (month >= 6 && month <= 10) {
+      return t("layout.season_kharif", { defaultValue: shellUiCopy.seasonKharif });
+    }
+    if (month >= 11 || month <= 3) {
+      return t("layout.season_rabi", { defaultValue: shellUiCopy.seasonRabi });
+    }
+    return t("layout.season_zaid", { defaultValue: shellUiCopy.seasonZaid });
+  }, [shellUiCopy.seasonKharif, shellUiCopy.seasonRabi, shellUiCopy.seasonZaid, t]);
   const isDark = themeMode === "dark";
   const footerFeatureColumns = useMemo(
     () => [
@@ -451,6 +496,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
     py: 0.75,
     fontSize: { xs: "1.08rem", md: "1.16rem" },
     fontWeight: 700,
+    whiteSpace: "normal",
+    textAlign: "center",
+    lineHeight: 1.15,
+    minHeight: 44,
     "&:hover": {
       borderBottomColor: "rgba(255,255,255,0.55)",
       backgroundColor: "rgba(255,255,255,0.08)",
@@ -463,7 +512,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
     <Stack direction="row" spacing={1} alignItems="center">
       <ButtonBase
         onClick={handleOpenProfile}
-        aria-label="Open profile"
+        aria-label={t("ui.open_profile", { defaultValue: shellUiCopy.openProfile })}
         sx={{
           display: "flex",
           flexDirection: "row",
@@ -474,6 +523,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
           borderRadius: 1,
           px: 0.75,
           py: 0.35,
+          maxWidth: "100%",
+          minWidth: 0,
           "&:hover": {
             bgcolor: isMobile ? "rgba(27,107,58,0.16)" : "rgba(255,255,255,0.2)"
           }
@@ -486,7 +537,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
         >
           {userInitials}
         </Avatar>
-        <Box>
+        <Box sx={{ minWidth: 0 }}>
           <Typography
             variant="subtitle2"
             sx={{ color: isMobile ? "text.primary" : "#fff", lineHeight: 1.1, fontSize: "0.95rem" }}
@@ -495,7 +546,13 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
           </Typography>
           <Typography
             variant="caption"
-            sx={{ color: isMobile ? "text.secondary" : "rgba(255,255,255,0.85)", lineHeight: 1.1, fontSize: "0.78rem" }}
+            sx={{
+              color: isMobile ? "text.secondary" : "rgba(255,255,255,0.85)",
+              lineHeight: 1.1,
+              fontSize: "0.78rem",
+              display: "block",
+              whiteSpace: "normal"
+            }}
           >
             {userRoleLabel}
           </Typography>
@@ -517,7 +574,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
               handleOpenProfile();
             }
           }}
-          aria-label="Open profile"
+          aria-label={t("ui.open_profile", { defaultValue: shellUiCopy.openProfile })}
           sx={{
             display: "flex",
             alignItems: "center",
@@ -552,13 +609,15 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
           <Stack direction="row" spacing={1} alignItems="center">
             {themeMode === "dark" ? <DarkModeIcon color="action" /> : <LightModeIcon color="action" />}
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {themeMode === "dark" ? "Dark mode" : "Light mode"}
+              {themeMode === "dark"
+                ? t("ui.dark_mode", { defaultValue: shellUiCopy.darkMode })
+                : t("ui.light_mode", { defaultValue: shellUiCopy.lightMode })}
             </Typography>
           </Stack>
           <Switch
             checked={themeMode === "dark"}
             onChange={handleThemeToggle}
-            inputProps={{ "aria-label": "Toggle dark mode" }}
+            inputProps={{ "aria-label": t("ui.toggle_dark_mode", { defaultValue: shellUiCopy.toggleDarkMode }) }}
             color="success"
           />
         </Stack>
@@ -566,7 +625,15 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
         <List>
           {navItems.map((item) => (
             <ListItemButton key={item.path} onClick={() => handleNav(item.path)}>
-              <ListItemText primary={item.label} />
+              <ListItemText
+                primary={item.label}
+                primaryTypographyProps={{
+                  sx: {
+                    whiteSpace: "normal",
+                    lineHeight: 1.2
+                  }
+                }}
+              />
             </ListItemButton>
           ))}
         </List>
@@ -577,7 +644,15 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
         <List>
           {serviceItems.map((item) => (
             <ListItemButton key={item.path} onClick={() => handleNav(item.path)}>
-              <ListItemText primary={item.label} />
+              <ListItemText
+                primary={item.label}
+                primaryTypographyProps={{
+                  sx: {
+                    whiteSpace: "normal",
+                    lineHeight: 1.2
+                  }
+                }}
+              />
             </ListItemButton>
           ))}
         </List>
@@ -623,7 +698,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
           <Stack
             direction="row"
             spacing={1}
-            alignItems="center"
+            alignItems="flex-start"
             sx={{
               pr: { xs: 0, md: 2 },
               py: 0.2,
@@ -632,8 +707,13 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
           >
             <ButtonBase
               onClick={() => handleNav("/")}
-              aria-label="Go to dashboard"
-              sx={{ display: "inline-flex", alignItems: "center" }}
+              aria-label={t("ui.go_to_dashboard", { defaultValue: shellUiCopy.openDashboard })}
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                alignSelf: "flex-start",
+                mt: { xs: -0.15, sm: -0.25, md: -0.4 }
+              }}
             >
               <Box
                 component="img"
@@ -643,7 +723,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
                   height: { xs: 40, sm: 46, md: 52 },
                   width: "auto",
                   objectFit: "contain",
-                  mr: 0.4,
+                  mr: 0.7,
                   borderRadius: "50%"
                 }}
               />
@@ -652,7 +732,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
               <Typography
                 sx={{
                   color: "#fff",
-                  fontFamily: '"Prata", serif',
+                  fontFamily: 'var(--app-heading-font), var(--app-body-font), serif',
                   fontWeight: 400,
                   letterSpacing: 0.3,
                   fontSize: { xs: "2rem", md: "2.45rem" },
@@ -743,7 +823,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
                 </Stack>
                 {showConnectedBanner && !isOffline && (
                   <Chip
-                    label="Connected to internet"
+                    label={t("ui.connected_to_internet", { defaultValue: shellUiCopy.connectedToInternet })}
                     size="small"
                     sx={{
                       bgcolor: "rgba(30, 125, 68, 0.9)",
@@ -757,7 +837,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
                 {isOffline && (
                   <Chip
                     icon={<WifiOffRoundedIcon sx={{ color: "#fff" }} fontSize="small" />}
-                    label="You are offline"
+                    label={t("ui.you_are_offline", { defaultValue: shellUiCopy.offlineNow })}
                     size="small"
                     sx={{
                       bgcolor: "rgba(201, 48, 44, 0.9)",
@@ -772,7 +852,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
                 <Tooltip title={t("languages.title", { defaultValue: "Language" })}>
                   <ButtonBase
                   onClick={handleLanguageOpen}
-                  aria-label="Change language"
+                  aria-label={t("ui.change_language", { defaultValue: shellUiCopy.changeLanguage })}
                   sx={{
                     display: "inline-flex",
                     alignItems: "center",
@@ -795,8 +875,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
                 <>
                   <ButtonBase
                     onClick={handleOpenProfile}
-                    aria-label="Open profile"
-                    sx={{
+                    aria-label={t("ui.open_profile", { defaultValue: shellUiCopy.openProfile })}
+                  sx={{
                       display: "flex",
                       flexDirection: "row",
                       alignItems: "center",
@@ -806,6 +886,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
                       borderRadius: 1,
                       px: 0.7,
                       py: 0.25,
+                      minWidth: 0,
+                      maxWidth: 240,
                       "&:hover": {
                         bgcolor: "rgba(255,255,255,0.12)"
                       }
@@ -818,7 +900,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
                     >
                       {userInitials}
                     </Avatar>
-                    <Box>
+                    <Box sx={{ minWidth: 0 }}>
                     <Typography
                       variant="subtitle2"
                       sx={{ color: "#fff", lineHeight: 1.1, fontSize: "0.92rem" }}
@@ -827,7 +909,13 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
                     </Typography>
                     <Typography
                       variant="caption"
-                      sx={{ color: "rgba(255,255,255,0.85)", lineHeight: 1.1, fontSize: "0.76rem" }}
+                      sx={{
+                        color: "rgba(255,255,255,0.85)",
+                        lineHeight: 1.1,
+                        fontSize: "0.76rem",
+                        display: "block",
+                        whiteSpace: "normal"
+                      }}
                     >
                       {userRoleLabel}
                     </Typography>
@@ -918,14 +1006,18 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
                   spacing={1}
                   alignItems="center"
                   sx={{
-                    flexWrap: { xs: "wrap", md: "nowrap" },
+                    flexWrap: "wrap",
                     rowGap: 1,
                     columnGap: 1,
-                    whiteSpace: "nowrap",
-                    overflowX: { md: "auto" }
+                    whiteSpace: "normal",
+                    overflowX: "visible"
                   }}
                 >
-                  <IconButton color="inherit" onClick={() => setMobileOpen(true)} aria-label="Open navigation">
+                  <IconButton
+                    color="inherit"
+                    onClick={() => setMobileOpen(true)}
+                    aria-label={t("ui.open_navigation", { defaultValue: shellUiCopy.openNavigation })}
+                  >
                     <MenuIcon />
                   </IconButton>
                   {topNavItems.map((item) => (
@@ -978,9 +1070,16 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
                   borderColor: "#2f6a3a",
                   color: "#fff",
                   fontWeight: 600,
-                  height: 32,
+                  height: "auto",
                   px: 0.9,
-                  fontSize: "0.86rem"
+                  fontSize: "0.86rem",
+                  maxWidth: "100%",
+                  "& .MuiChip-label": {
+                    display: "block",
+                    whiteSpace: "normal",
+                    lineHeight: 1.15,
+                    py: 0.45
+                  }
                 }}
               />
               <Box
@@ -993,10 +1092,17 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
                   border: "1px solid rgba(255,255,255,0.3)",
                   bgcolor: "rgba(14, 54, 30, 0.7)",
                   boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.05)",
+                  width: { xs: "100%", md: "auto" },
+                  minWidth: 0,
                   maxWidth: { xs: "100%", sm: 520 }
                 }}
               >
-                <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
+                <Stack
+                  direction={{ xs: "column", sm: "row" }}
+                  spacing={1}
+                  alignItems={{ xs: "flex-start", sm: "center" }}
+                  justifyContent="space-between"
+                >
                   <ButtonBase
                     onClick={handleLiveOpen}
                     aria-label={t("dashboard_page.live_updates")}
@@ -1004,6 +1110,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
                       display: "flex",
                       alignItems: "center",
                       gap: 0.6,
+                      justifyContent: "flex-start",
+                      flexWrap: "wrap",
                       color: "#fff",
                       fontWeight: 700,
                       fontSize: "0.9rem",
@@ -1011,6 +1119,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
                       borderRadius: 1,
                       px: 0.5,
                       py: 0.2,
+                      textAlign: "left",
+                      minWidth: 0,
                       "&:hover": { bgcolor: "rgba(255,255,255,0.12)" }
                     }}
                   >
@@ -1028,7 +1138,15 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
                       bgcolor: "rgba(255,255,255,0.16)",
                       color: "#fff",
                       borderColor: "rgba(255,255,255,0.3)",
-                      fontWeight: 700
+                      fontWeight: 700,
+                      height: "auto",
+                      alignSelf: { xs: "flex-start", sm: "center" },
+                      "& .MuiChip-label": {
+                        display: "block",
+                        whiteSpace: "normal",
+                        lineHeight: 1.15,
+                        py: 0.4
+                      }
                     }}
                   />
                 </Stack>
@@ -1047,9 +1165,23 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
         open={servicesMenuOpen}
         onClose={handleServicesClose}
         MenuListProps={{ "aria-label": t("layout.services") }}
+        PaperProps={{
+          sx: {
+            minWidth: 220,
+            maxWidth: 280
+          }
+        }}
       >
         {serviceMenuItems.map((item) => (
-          <MenuItem key={item.path} onClick={() => handleServiceNavigate(item.path)}>
+          <MenuItem
+            key={item.path}
+            onClick={() => handleServiceNavigate(item.path)}
+            sx={{
+              whiteSpace: "normal",
+              lineHeight: 1.2,
+              alignItems: "flex-start"
+            }}
+          >
             {item.label}
           </MenuItem>
         ))}
@@ -1061,12 +1193,23 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
         open={languageMenuOpen}
         onClose={handleLanguageClose}
         MenuListProps={{ "aria-label": t("languages.title", { defaultValue: "Language" }) }}
+        PaperProps={{
+          sx: {
+            minWidth: 180,
+            maxWidth: 240
+          }
+        }}
       >
         {languages.map((lang) => (
           <MenuItem
             key={lang.code}
             selected={i18n.language === lang.code}
             onClick={() => handleLanguageSelect(lang.code)}
+            sx={{
+              whiteSpace: "normal",
+              lineHeight: 1.2,
+              alignItems: "flex-start"
+            }}
           >
             {lang.label}
           </MenuItem>
@@ -1119,8 +1262,13 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
                     bgcolor: "rgba(255,255,255,0.9)"
                   }}
                 >
-                  <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                  <Stack
+                    direction={{ xs: "column", sm: "row" }}
+                    spacing={0.5}
+                    alignItems={{ xs: "flex-start", sm: "center" }}
+                    justifyContent="space-between"
+                  >
+                    <Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.25 }}>
                       {item.summary}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
@@ -1174,7 +1322,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
               <TipsAndUpdatesIcon color="secondary" />
               <Box>
                 <Typography variant="subtitle1">{t("dashboard_page.advisory_tip.title")}</Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.35 }}>
                   {t("dashboard_page.advisory_tip.description")}
                 </Typography>
               </Box>

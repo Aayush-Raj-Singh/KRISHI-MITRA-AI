@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import lru_cache
 from typing import List
 
 from fastapi import Depends, HTTPException, Request, status
@@ -7,10 +8,24 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
 from app.core.database import Database
 
+from app.core.cache import Cache, get_cache
 from app.core.security import decode_token
 from app.core.config import settings
 from app.models.user import UserInDB
+from app.services.advisory_service import AdvisoryService
+from app.services.analytics_service import AnalyticsService
 from app.services.auth_service import AuthService
+from app.services.crop_service import CropRecommender
+from app.services.dashboard_service import DashboardService
+from app.services.disease_service import DiseaseDetectionService
+from app.services.external_data_service import ExternalDataService
+from app.services.feedback_service import FeedbackService
+from app.services.price_service import PriceForecaster
+from app.services.recommendation_service import RecommendationService
+from app.services.report_export_service import ReportExportService
+from app.services.translation_service import TranslationService
+from app.services.trend_service import TrendAnalyticsService
+from app.services.water_service import WaterOptimizer
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
@@ -61,3 +76,73 @@ async def require_public_api_key(request: Request) -> str:
     if not api_key or api_key not in allowed:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API key")
     return api_key
+
+
+async def get_auth_service(db: Database = Depends(get_db)) -> AuthService:
+    return AuthService(db)
+
+
+async def get_recommendation_service(db: Database = Depends(get_db)) -> RecommendationService:
+    return RecommendationService(db)
+
+
+async def get_feedback_service(db: Database = Depends(get_db)) -> FeedbackService:
+    return FeedbackService(db)
+
+
+async def get_dashboard_service(
+    db: Database = Depends(get_db),
+    cache: Cache = Depends(get_cache),
+) -> DashboardService:
+    return DashboardService(db, cache)
+
+
+async def get_analytics_service(db: Database = Depends(get_db)) -> AnalyticsService:
+    return AnalyticsService(db)
+
+
+async def get_external_data_service(db: Database = Depends(get_db)) -> ExternalDataService:
+    return ExternalDataService(db)
+
+
+def get_public_external_data_service() -> ExternalDataService:
+    return ExternalDataService()
+
+
+async def get_advisory_service(db: Database = Depends(get_db)) -> AdvisoryService:
+    return AdvisoryService(db)
+
+
+def get_translation_service() -> TranslationService:
+    return TranslationService()
+
+
+async def get_report_export_service(db: Database = Depends(get_db)) -> ReportExportService:
+    return ReportExportService(db)
+
+
+async def get_trend_analytics_service(
+    db: Database = Depends(get_db),
+    cache: Cache = Depends(get_cache),
+) -> TrendAnalyticsService:
+    return TrendAnalyticsService(db, cache)
+
+
+@lru_cache(maxsize=1)
+def get_crop_recommender() -> CropRecommender:
+    return CropRecommender()
+
+
+@lru_cache(maxsize=1)
+def get_price_forecaster() -> PriceForecaster:
+    return PriceForecaster()
+
+
+@lru_cache(maxsize=1)
+def get_water_optimizer() -> WaterOptimizer:
+    return WaterOptimizer()
+
+
+@lru_cache(maxsize=1)
+def get_disease_detection_service() -> DiseaseDetectionService:
+    return DiseaseDetectionService()

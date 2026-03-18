@@ -16,6 +16,7 @@ import {
   type MandiCatalogResponse,
   type MandiPriceResponse
 } from "../../../services/integrations";
+import { fetchDashboardHeroSummary, type DashboardHeroSummary } from "../../../services/dashboard";
 import {
   fetchSchedulerOverview,
   triggerDailyDataRefresh,
@@ -107,6 +108,7 @@ const useDashboardData = ({ isOfficer, isAdmin, t }: UseDashboardDataOptions) =>
   const [analyticsData, setAnalyticsData] = useState<AnalyticsOverview | null>(null);
   const [farmersNeedingAttention, setFarmersNeedingAttention] = useState<FarmerAttentionItem[]>([]);
   const [feedbackReliability, setFeedbackReliability] = useState<FeedbackReliabilityStats | null>(null);
+  const [heroSummary, setHeroSummary] = useState<DashboardHeroSummary | null>(null);
   const [operationsOverview, setOperationsOverview] = useState<SchedulerOverviewResponse | null>(null);
   const [mandiForm, setMandiForm] = useState({
     crop: "Rice",
@@ -128,6 +130,12 @@ const useDashboardData = ({ isOfficer, isAdmin, t }: UseDashboardDataOptions) =>
       setAnalyticsData(data.overview);
       setFarmersNeedingAttention(data.farmers_needing_attention);
       setFeedbackReliability(data.feedback_reliability);
+    }
+  });
+  const heroSummaryMutation = useMutation({
+    mutationFn: fetchDashboardHeroSummary,
+    onSuccess: (data) => {
+      setHeroSummary(data);
     }
   });
   const reportExportMutation = useMutation({
@@ -328,6 +336,12 @@ const useDashboardData = ({ isOfficer, isAdmin, t }: UseDashboardDataOptions) =>
   }, [isAdmin]);
 
   useEffect(() => {
+    if (!heroSummary && !heroSummaryMutation.isPending) {
+      heroSummaryMutation.mutate();
+    }
+  }, [heroSummary, heroSummaryMutation]);
+
+  useEffect(() => {
     if (!isOfficer || hasLoadedOfficerAnalytics) {
       return;
     }
@@ -344,6 +358,7 @@ const useDashboardData = ({ isOfficer, isAdmin, t }: UseDashboardDataOptions) =>
   };
 
   const combinedError =
+    heroSummaryMutation.error ||
     analyticsMutation.error ||
     reportExportMutation.error ||
     operationsOverviewMutation.error ||
@@ -357,6 +372,7 @@ const useDashboardData = ({ isOfficer, isAdmin, t }: UseDashboardDataOptions) =>
     analyticsFilters,
     setAnalyticsFilters,
     analyticsData,
+    heroSummary,
     farmersNeedingAttention,
     feedbackReliability,
     operationsOverview,
@@ -372,6 +388,7 @@ const useDashboardData = ({ isOfficer, isAdmin, t }: UseDashboardDataOptions) =>
     mandiCards,
     locationLabel,
     analyticsMutation,
+    heroSummaryMutation,
     reportExportMutation,
     operationsOverviewMutation,
     triggerWeeklyMutation,

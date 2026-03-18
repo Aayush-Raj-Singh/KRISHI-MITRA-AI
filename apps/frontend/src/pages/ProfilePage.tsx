@@ -143,7 +143,7 @@ const ProfilePage: React.FC = () => {
         ? t("auth.role_extension_officer")
         : roleCode === "admin"
           ? t("layout.role_admin")
-          : roleCode.replace("_", " ");
+          : String(roleCode).replace("_", " ");
 
   const summaryItems = [
     { label: t("auth.location"), value: user?.location || "-" },

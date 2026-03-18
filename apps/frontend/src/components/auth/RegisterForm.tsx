@@ -21,6 +21,7 @@ import { ApiError } from "../../services/api";
 import { resolveRootBaseUrl } from "../../services/runtimeConfig";
 import { useAppDispatch } from "../../store/hooks";
 import { setTokens, setUser } from "../../store/authSlice";
+import { useTranslatedStrings } from "../../utils/useTranslatedStrings";
 import PersonIcon from "@mui/icons-material/Person";
 import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
 import LockIcon from "@mui/icons-material/Lock";
@@ -39,21 +40,45 @@ const capitalizeWords = (value: string) =>
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const buildPasswordError = (value: string) => {
+const buildPasswordError = (value: string, t: (key: string, options?: Record<string, unknown>) => string) => {
   const issues: string[] = [];
-  if (value.length < 8) issues.push("min 8 characters");
-  if (value.length > 72) issues.push("max 72 characters");
-  if (!/[A-Z]/.test(value)) issues.push("an uppercase letter");
-  if (!/[a-z]/.test(value)) issues.push("a lowercase letter");
-  if (!/[0-9]/.test(value)) issues.push("a number");
-  if (!/[^A-Za-z0-9]/.test(value)) issues.push("a special character");
-  return issues.length ? `Password must include ${issues.join(", ")}.` : "";
+  if (value.length < 8) issues.push(t("auth.validation.password_issue_min", { defaultValue: "minimum 8 characters" }));
+  if (value.length > 72) issues.push(t("auth.validation.password_issue_max", { defaultValue: "maximum 72 characters" }));
+  if (!/[A-Z]/.test(value)) {
+    issues.push(t("auth.validation.password_issue_upper", { defaultValue: "an uppercase letter" }));
+  }
+  if (!/[a-z]/.test(value)) {
+    issues.push(t("auth.validation.password_issue_lower", { defaultValue: "a lowercase letter" }));
+  }
+  if (!/[0-9]/.test(value)) {
+    issues.push(t("auth.validation.password_issue_number", { defaultValue: "a number" }));
+  }
+  if (!/[^A-Za-z0-9]/.test(value)) {
+    issues.push(t("auth.validation.password_issue_special", { defaultValue: "a special character" }));
+  }
+  return issues.length
+    ? t("auth.validation.password_requirements", {
+        defaultValue: "Password must include {{issues}}.",
+        issues: issues.join(", ")
+      })
+    : "";
 };
 
 const RegisterForm: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const registerUiCopy = useTranslatedStrings(
+    useMemo(
+      () => ({
+        retry: "Retry",
+        offline: "You are offline.",
+        connected: "Connected to internet.",
+        reviewFields: "Please review the highlighted fields."
+      }),
+      []
+    )
+  );
   const alignedFieldSx = {
     "& .MuiFormHelperText-root": {
       minHeight: 22,
@@ -139,39 +164,54 @@ const RegisterForm: React.FC = () => {
 
     const name = form.name.trim();
     if (!name || name.length < 2) {
-      errors.name = "Name must be at least 2 characters.";
+      errors.name = t("auth.validation.name_min", {
+        defaultValue: "Name must be at least 2 characters.",
+        count: 2
+      });
     }
 
     const phone = phoneDigits(form.phone);
     if (!phone || phone.length !== 10) {
-      errors.phone = "Phone number must be 10 digits.";
+      errors.phone = t("auth.validation.phone_digits", {
+        defaultValue: "Phone number must be 10 digits."
+      });
     }
 
     const email = form.email.trim();
     if (email && !emailRegex.test(email)) {
-      errors.email = "Enter a valid email address.";
+      errors.email = t("auth.validation.email_invalid", {
+        defaultValue: "Enter a valid email address."
+      });
     }
 
-    const passwordError = buildPasswordError(form.password);
+    const passwordError = buildPasswordError(form.password, t);
     if (passwordError) {
       errors.password = passwordError;
     }
 
     if (!form.location.trim()) {
-      errors.location = "Location is required.";
+      errors.location = t("auth.validation.location_required", {
+        defaultValue: "Location is required."
+      });
     }
 
     const farmSizeNumber = Number(form.farm_size);
     if (!form.farm_size || Number.isNaN(farmSizeNumber) || farmSizeNumber <= 0) {
-      errors.farm_size = "Farm size must be greater than 0.";
+      errors.farm_size = t("auth.validation.farm_size_positive", {
+        defaultValue: "Farm size must be greater than 0."
+      });
     }
 
     if (!form.soil_type.trim()) {
-      errors.soil_type = "Soil type is required.";
+      errors.soil_type = t("auth.validation.soil_type_required", {
+        defaultValue: "Soil type is required."
+      });
     }
 
     if (!form.water_source.trim()) {
-      errors.water_source = "Water source is required.";
+      errors.water_source = t("auth.validation.water_source_required", {
+        defaultValue: "Water source is required."
+      });
     }
 
     const crops = form.primary_crops
@@ -179,11 +219,13 @@ const RegisterForm: React.FC = () => {
       .map((crop) => crop.trim())
       .filter(Boolean);
     if (crops.length === 0) {
-      errors.primary_crops = "Add at least one primary crop.";
+      errors.primary_crops = t("auth.validation.primary_crops_required", {
+        defaultValue: "Add at least one primary crop."
+      });
     }
 
     return errors;
-  }, [form]);
+  }, [form, t]);
 
   const combinedErrors = useMemo(() => ({ ...validationErrors, ...serverErrors }), [validationErrors, serverErrors]);
   const isFormValid = Object.values(combinedErrors).every((value) => !value);
@@ -207,7 +249,9 @@ const RegisterForm: React.FC = () => {
             const loc = Array.isArray(item?.loc) ? item.loc : [];
             const field = String(loc[loc.length - 1] || "");
             if (field) {
-              nextErrors[field] = String(item?.msg || "Invalid value");
+              nextErrors[field] = String(
+                item?.msg || t("common.invalid_value", { defaultValue: "Invalid value" })
+              );
             }
           });
         }
@@ -283,7 +327,7 @@ const RegisterForm: React.FC = () => {
         .split(",")
         .map((crop) => crop.trim())
         .filter(Boolean),
-      role: form.role,
+      role: form.role as RegisterPayload["role"],
       language: form.language,
       assigned_regions: form.assigned_regions
         .split(",")
@@ -297,7 +341,11 @@ const RegisterForm: React.FC = () => {
         if (result.token) {
           dispatch(setTokens(result.token));
         }
-        setSuccessMessage("Registration successful. Redirecting to dashboard...");
+        setSuccessMessage(
+          t("register_page.success_redirect", {
+            defaultValue: "Registration successful. Redirecting to dashboard..."
+          })
+        );
         window.setTimeout(() => navigate("/dashboard"), 600);
       }
     });
@@ -316,22 +364,22 @@ const RegisterForm: React.FC = () => {
                 severity="warning"
                 action={
                   <Button color="inherit" size="small" onClick={checkApiHealth}>
-                    Retry
+                    {t("ui.retry", { defaultValue: registerUiCopy.retry })}
                   </Button>
                 }
               >
-                You are offline.
+                {t("ui.you_are_offline", { defaultValue: registerUiCopy.offline })}
               </Alert>
             )}
             {showConnectedBanner && (
-              <Alert severity="success">Connected to internet.</Alert>
+              <Alert severity="success">{t("ui.connected_to_internet", { defaultValue: registerUiCopy.connected })}</Alert>
             )}
             {mutation.isError && (
               <Alert severity="error">
                 {serverErrors._form
                   ? serverErrors._form
                   : mutation.error instanceof Error && mutation.error.message === "Validation error"
-                    ? "Please review the highlighted fields."
+                    ? t("ui.please_review_fields", { defaultValue: registerUiCopy.reviewFields })
                     : mutation.error instanceof Error
                       ? mutation.error.message
                       : t("auth.registration_failed")}
@@ -371,7 +419,10 @@ const RegisterForm: React.FC = () => {
                     onChange={(event) => updateField("phone", phoneDigits(event.target.value))}
                     sx={alignedFieldSx}
                     error={fieldError("phone")}
-                    helperText={fieldHelper("phone", "10 digits")}
+                    helperText={fieldHelper(
+                      "phone",
+                      t("auth.validation.phone_digits_helper", { defaultValue: "10 digits" })
+                    )}
                     inputProps={{ inputMode: "numeric", pattern: "[0-9]*", maxLength: 10 }}
                     InputProps={{
                       startAdornment: (
@@ -417,7 +468,9 @@ const RegisterForm: React.FC = () => {
                     helperText={
                       fieldError("password")
                         ? validationErrors.password
-                        : "Min 8 chars, upper, lower, number, special"
+                        : t("auth.validation.password_strength_helper", {
+                            defaultValue: "Min 8 chars, upper, lower, number, special"
+                          })
                     }
                     InputProps={{
                       startAdornment: (

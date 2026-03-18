@@ -24,9 +24,14 @@ interface HeroOverviewSectionProps {
   wsUrl?: string;
   wsStatus: string;
   isOffline: boolean;
+  statusCaption?: string;
   latestRecommendation: string;
+  latestRecommendationCaption?: string;
   waterSavingsValue: string;
+  waterSavingsCaption?: string;
   sustainabilityValue: string;
+  sustainabilityCaption?: string;
+  heroLoading?: boolean;
 }
 
 const HeroOverviewSection: React.FC<HeroOverviewSectionProps> = ({
@@ -40,9 +45,14 @@ const HeroOverviewSection: React.FC<HeroOverviewSectionProps> = ({
   wsUrl,
   wsStatus,
   isOffline,
+  statusCaption,
   latestRecommendation,
+  latestRecommendationCaption,
   waterSavingsValue,
-  sustainabilityValue
+  waterSavingsCaption,
+  sustainabilityValue,
+  sustainabilityCaption,
+  heroLoading = false
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
@@ -85,7 +95,7 @@ const HeroOverviewSection: React.FC<HeroOverviewSectionProps> = ({
               sx={{
                 fontSize: { xs: "2.2rem", md: "3.15rem" },
                 lineHeight: 1.08,
-                fontFamily: '"Prata", serif',
+                fontFamily: 'var(--app-heading-font), var(--app-body-font), serif',
                 letterSpacing: 0.2
               }}
             >
@@ -131,6 +141,7 @@ const HeroOverviewSection: React.FC<HeroOverviewSectionProps> = ({
                 <KpiCard
                   label={t("dashboard_page.kpi.status")}
                   value={isOffline ? t("dashboard_page.kpi.offline") : t("dashboard_page.kpi.online")}
+                  caption={statusCaption}
                   icon={isOffline ? <WifiOffIcon color="warning" /> : <WifiIcon color="success" />}
                 />
               </Grid>
@@ -138,6 +149,8 @@ const HeroOverviewSection: React.FC<HeroOverviewSectionProps> = ({
                 <KpiCard
                   label={t("dashboard.latest_rec")}
                   value={latestRecommendation}
+                  caption={latestRecommendationCaption}
+                  loading={heroLoading}
                   icon={<AgricultureIcon color="primary" />}
                 />
               </Grid>
@@ -145,6 +158,8 @@ const HeroOverviewSection: React.FC<HeroOverviewSectionProps> = ({
                 <KpiCard
                   label={t("dashboard_page.kpi.water_savings")}
                   value={waterSavingsValue}
+                  caption={waterSavingsCaption}
+                  loading={heroLoading}
                   icon={<WaterDropIcon color="primary" />}
                 />
               </Grid>
@@ -152,6 +167,8 @@ const HeroOverviewSection: React.FC<HeroOverviewSectionProps> = ({
                 <KpiCard
                   label={t("dashboard.sustainability")}
                   value={sustainabilityValue}
+                  caption={sustainabilityCaption}
+                  loading={heroLoading}
                   icon={<NatureIcon color="success" />}
                 />
               </Grid>

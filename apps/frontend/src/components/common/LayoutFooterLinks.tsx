@@ -62,9 +62,13 @@ const LayoutFooterLinks: React.FC<LayoutFooterLinksProps> = ({
                 onClick={() => onNavigate(link.path)}
                 sx={{
                   justifyContent: "flex-start",
+                  alignItems: "flex-start",
                   color: "rgba(255,255,255,0.94)",
                   fontSize: "1.13rem",
-                  py: 0.15
+                  py: 0.15,
+                  textAlign: "left",
+                  whiteSpace: "normal",
+                  lineHeight: 1.2
                 }}
               >
                 {link.label}

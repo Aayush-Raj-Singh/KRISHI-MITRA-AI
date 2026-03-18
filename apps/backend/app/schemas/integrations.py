@@ -17,6 +17,26 @@ class WeatherResponse(BaseModel):
     stale_data_warning: Optional[str] = None
 
 
+class LocationLookupResponse(BaseModel):
+    latitude: float
+    longitude: float
+    label: str
+    source: str
+    city: Optional[str] = None
+    state: Optional[str] = None
+    country: Optional[str] = None
+
+
+class LocationSearchResponse(BaseModel):
+    label: str
+    source: str
+    city: Optional[str] = None
+    state: Optional[str] = None
+    country: Optional[str] = None
+    latitude: float
+    longitude: float
+
+
 class MandiPricePoint(BaseModel):
     date: date
     price: float = Field(ge=0)

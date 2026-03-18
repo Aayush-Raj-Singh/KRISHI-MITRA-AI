@@ -35,7 +35,11 @@
     "default_role": "کسان",
     "role_admin": "ایڈمن",
     "helpdesk": "ہیلپ ڈیسک",
-    "helpline": "ہیلپ لائن"
+    "helpline": "ہیلپ لائن",
+    "season_kharif": "خریف",
+    "season_rabi": "ربیع",
+    "season_zaid": "زید",
+    "other_links": "دوسرے لنکس"
   },
   "languages": {
     "en": "انگریزی",
@@ -52,7 +56,8 @@
     "or": "اوڈیا",
     "ur": "اردو",
     "ne": "نیپالی",
-    "sa": "سنسکرت"
+    "sa": "سنسکرت",
+    "title": "????"
   },
   "auth": {
     "welcome": "دوبارہ خوش آمدید",
@@ -81,7 +86,33 @@
     "role_farmer": "کسان",
     "role_extension_officer": "ایکسٹینشن آفیسر",
     "creating": "تخلیق کر رہا ہے...",
-    "already_have_account": "پہلے سے ہی اکاؤنٹ ہے؟"
+    "already_have_account": "پہلے سے ہی اکاؤنٹ ہے؟",
+    "email": "?? ??? (???????)",
+    "assigned_regions": "????? ???? ?????",
+    "assigned_regions_helper": "?? ???? ?? ??? ??? ?? ??? ?? ????? ????? ???? ????",
+    "validation": {
+      "name_min": "Name must be at least {{count}} characters.",
+      "phone_digits": "??? ???? 10 ?????? ?? ???? ??????",
+      "phone_digits_helper": "10 digits",
+      "email_invalid": "ایک درست ای میل ایڈریس درج کریں۔",
+      "password_requirements": "??? ??? ??? {{issues}} ???? ???? ??????",
+      "password_issue_min": "minimum 8 characters",
+      "password_issue_max": "maximum 72 characters",
+      "password_issue_upper": "an uppercase letter",
+      "password_issue_lower": "a lowercase letter",
+      "password_issue_number": "a number",
+      "password_issue_special": "a special character",
+      "password_strength_helper": "کم از کم 8 حروف، اوپری، نیچے، نمبر، خصوصی",
+      "location_required": "Location is required.",
+      "farm_size_positive": "Farm size must be greater than 0.",
+      "soil_type_required": "Soil type is required.",
+      "water_source_required": "Water source is required.",
+      "primary_crops_required": "Add at least one primary crop.",
+      "required": "?? ???? ????? ???",
+      "name_short": "??? ?? ?? ?? 2 ???? ?? ????? ???? ??????",
+      "phone_invalid": "???? ?????? ?????? ???? ??? ?????",
+      "password_short": "??? ??? ?? ?? ?? 8 ???? ?? ???? ??????"
+    }
   },
   "dashboard": {
     "crop": "فصل کی سفارش",
@@ -155,7 +186,8 @@
     "subtitle": "DBT فوائد، AI سفارشات، اور پائیداری کی بصیرت کو غیر مقفل کرنے کے لیے ایک بار رجسٹر کریں۔",
     "feature_irrigation": "قابل عمل نظام الاوقات کے ساتھ سمارٹ آبپاشی کے منصوبے",
     "feature_price": "فصل کی قیمت کے رجحان کی پیشن گوئی اور مارکیٹ کے اشارے",
-    "feature_sustainability": "پائیداری کے اسکورنگ کے ساتھ نتائج کی رائے"
+    "feature_sustainability": "پائیداری کے اسکورنگ کے ساتھ نتائج کی رائے",
+    "success_redirect": "???????? ?????? ???? ?? ?? ??? ???? ?? ????? ??? ?? ??? ??..."
   },
   "reset_password": {
     "title": "پاس ورڈ دوبارہ ترتیب دیں۔",
@@ -171,10 +203,14 @@
     "new_password": "نیا پاس ورڈ",
     "update_password": "پاس ورڈ اپ ڈیٹ کریں۔",
     "updating": "اپ ڈیٹ ہو رہا ہے...",
-    "back_to_login": "لاگ ان پر واپس جائیں۔"
+    "back_to_login": "لاگ ان پر واپس جائیں۔",
+    "point_secure": "???? KrishiMitra AI ??? ??? ????? ????? ?? ?? ??? ?????",
+    "point_otp": "???? ?????? ??? ?? ?? ??? ?? OTP ???? ?????",
+    "point_agri": "???? ?????? ??? ??????? ???? ?? ???? ???? ??????"
   },
   "common": {
-    "request_failed": "درخواست ناکام ہوگئی"
+    "request_failed": "درخواست ناکام ہوگئی",
+    "invalid_value": "??? ???"
   },
   "status": {
     "assigned": "تفویض کردہ",
@@ -193,7 +229,12 @@
   "dashboard_page": {
     "hero": {
       "title": "KrishiMitra-AI",
-      "description": "فصل کی منصوبہ بندی، مارکیٹ کی پیشن گوئی، اور پانی کی اصلاح کے لیے ایک متفقہ فیصلہ انٹیلی جنس پورٹل۔ کسانوں اور فیلڈ افسران کے لیے ڈیزائن کیا گیا ہے۔"
+      "description": "فصل کی منصوبہ بندی، مارکیٹ کی پیشن گوئی، اور پانی کی اصلاح کے لیے ایک متفقہ فیصلہ انٹیلی جنس پورٹل۔ کسانوں اور فیلڈ افسران کے لیے ڈیزائن کیا گیا ہے۔",
+      "no_recommendation": "???? ???? ????? ????",
+      "no_water_plan": "???? ???? ??? ?????? ????",
+      "no_feedback": "???? ???? ?????? ????",
+      "saved_count": "{{count}} ???????",
+      "feedback_count": "{{count}} ?????? ????????"
     },
     "live_updates": "لائیو اپڈیٹس",
     "realtime_connected": "ریئل ٹائم چینل منسلک ہے۔",
@@ -292,7 +333,21 @@
       "title": "منڈی کی قیمتیں۔",
       "load_error": "منڈی کی قیمتیں لوڈ کرنے میں ناکام",
       "empty": "مارکیٹ کے حالیہ رجحانات دیکھنے کے لیے منڈی کی قیمتیں حاصل کریں۔",
-      "price_label": "قیمت"
+      "price_label": "قیمت",
+      "market_intelligence": "???? ?????? ?????????",
+      "subtitle": "???? ???? ???? ???? ??? ???? ?? ????? ?? ??????",
+      "nearest_markets": "?? ?? ???? ???? ??????",
+      "location_hint": "???? ???? ?????? ?? ?????? ????? ?? ??? ?????? ???? ?????",
+      "category_label": "????",
+      "days_option": "{{count}} ??",
+      "crops_count": "{{count}} ?????",
+      "km_away": "{{distance}} ???????",
+      "min_label": "?? ?? ??",
+      "max_label": "????? ?? ?????",
+      "modal_label": "????",
+      "latest_label": "???? ????",
+      "source_label": "????",
+      "price_trend": "???? ?? ?????"
     },
     "market_data": {
       "table": "میز",
@@ -399,7 +454,9 @@
     "market_intelligence_description": "ایک ورک اسپیس میں پیشین گوئیاں، آمد، رجحانات اور الرٹ سگنل۔",
     "market_directory_description": "منڈی پروفائلز، سہولیات اور رابطے کی تفصیلات براؤز کریں۔",
     "helpdesk_description": "سپورٹ ٹکٹ بڑھائیں اور جوابات کو ٹریک کریں۔",
-    "modern_farming_description": "250 فصلوں اور سبزیوں کے گائیڈز کے لیے عملی جدید کاشتکاری کے منصوبے۔"
+    "modern_farming_description": "250 فصلوں اور سبزیوں کے گائیڈز کے لیے عملی جدید کاشتکاری کے منصوبے۔",
+    "disease_detection_title": "بیماری کا پتہ لگانا",
+    "disease_detection_description": "???? ?? ?????? ?? ??? ?? ???????? ?? ????? ???? ??? ???? ?? ??????? ???? ?????"
   },
   "filters": {
     "title": "فلٹرز",
@@ -607,5 +664,120 @@
     "by_severity": "شدت سے",
     "latest_findings": "تازہ ترین نتائج",
     "recent_issues": "حالیہ مسائل"
+  },
+  "ui": {
+    "light_mode": "لائٹ موڈ",
+    "dark_mode": "ڈارک موڈ",
+    "toggle_dark_mode": "ڈارک موڈ کو ٹوگل کریں۔",
+    "connected_to_internet": "انٹرنیٹ سے منسلک ہے۔",
+    "you_are_offline": "آپ آف لائن ہیں۔",
+    "change_language": "زبان بدلو",
+    "open_profile": "پروفائل کھولیں۔",
+    "open_navigation": "نیویگیشن کھولیں۔",
+    "go_to_dashboard": "ڈیش بورڈ پر جائیں۔",
+    "retry": "دوبارہ کوشش کریں۔",
+    "please_review_fields": "براہ کرم نمایاں کردہ فیلڈز کا جائزہ لیں۔"
+  },
+  "disease_page": {
+    "title": "فصل کی بیماری کا پتہ لگانا",
+    "subtitle": "فصل کی ممکنہ بیماریوں اور تجویز کردہ علاج کا پتہ لگانے کے لیے پتے کی واضح تصویر اپ لوڈ کریں۔",
+    "offline_notice": "آف لائن موڈ: بعد میں پتہ لگانے کے لیے اپ لوڈز کو قطار میں رکھا جائے گا۔",
+    "offline_queue_success": "آف لائن موڈ: انٹرنیٹ دستیاب ہونے پر پتہ چل جائے گا۔",
+    "upload": "فصل کی تصویر اپ لوڈ کریں۔",
+    "use_camera": "کیمرہ استعمال کریں۔",
+    "preview_alt": "فصل کا پیش نظارہ",
+    "detect": "بیماری کا پتہ لگائیں۔",
+    "detecting": "پتہ لگا رہا ہے...",
+    "detect_failed": "بیماری کا پتہ لگانے میں ناکام۔",
+    "camera_failed": "کیمرہ کیپچر ناکام ہو گیا۔",
+    "result": "پتہ لگانے کا نتیجہ",
+    "crop": "فصل",
+    "disease": "بیماری",
+    "confidence": "اعتماد",
+    "severity": "شدت",
+    "treatment": "علاج",
+    "prevention": "روک تھام",
+    "organic_solutions": "نامیاتی حل",
+    "recommended_products": "تجویز کردہ مصنوعات",
+    "clarifying_questions": "واضح سوالات"
+  },
+  "weather_widget": {
+    "loading": "موسم لوڈ ہو رہا ہے...",
+    "locating": "تلاش کر رہا ہے...",
+    "unavailable": "موسم دستیاب نہیں ہے۔",
+    "humidity_short": "نمی",
+    "unknown_location": "نامعلوم مقام",
+    "open_details": "موسم کی تفصیلات کھولیں۔",
+    "refresh_location": "مقام کو تازہ کریں۔",
+    "offline_last_updated": "آف لائن موڈ: آخری اپ ڈیٹ شدہ ڈیٹا دکھا رہا ہے۔",
+    "temperature": "درجہ حرارت",
+    "humidity": "نمی",
+    "wind_speed": "ہوا کی رفتار",
+    "condition": "حالت",
+    "aqi": "اے کیو آئی",
+    "manual_hint": "موسم اور قریب ترین منڈی بصیرت کو فعال کرنے کے لیے اپنا مقام درج کریں۔",
+    "manual_placeholder": "شہر، ریاست",
+    "conditions": {
+      "0": "صاف",
+      "1": "بنیادی طور پر واضح",
+      "2": "جزوی طور پر ابر آلود",
+      "3": "ابر آلود",
+      "45": "دھند",
+      "48": "رائم دھند",
+      "51": "ہلکی بوندا باندی",
+      "53": "درمیانی بوندا باندی",
+      "55": "گھنی بوندا باندی",
+      "56": "منجمد بوندا باندی",
+      "57": "منجمد بوندا باندی",
+      "61": "ہلکی بارش",
+      "63": "درمیانی بارش",
+      "65": "تیز بارش",
+      "66": "منجمد بارش",
+      "67": "منجمد بارش",
+      "71": "ہلکی برف",
+      "73": "درمیانی برفباری",
+      "75": "بھاری برفباری",
+      "77": "برف کے دانے",
+      "80": "بارش کی بارش",
+      "81": "موسلا دھار بارش",
+      "82": "پرتشدد بارش",
+      "85": "برف کی بارش",
+      "86": "برف کی بارش",
+      "95": "گرج چمک",
+      "96": "گرج چمک کے ساتھ ژالہ باری۔",
+      "99": "شدید گرج چمک کا طوفان"
+    }
+  },
+  "external_link_warning": {
+    "title": "?????? ??? ?????",
+    "intro": "You are about to open an external website.",
+    "unknown_destination": "Unknown destination",
+    "checking": "Checking...",
+    "safe_link": "Safe link",
+    "blocked": "Blocked",
+    "verified_source": "تصدیق شدہ ذریعہ",
+    "unverified_source": "Unverified source",
+    "inspect_failed": "Unable to inspect link",
+    "cancel": "Cancel",
+    "continue": "???? ?????",
+    "message": "?? ??? ?????? ?????? ?? ?????? ????? ?????? ???? ???? ??? ???? ????? ???",
+    "url_label": "???? URL",
+    "stay": "???? ????"
+  },
+  "categories": {
+    "all": "????",
+    "cereals": "????",
+    "pulses": "?????",
+    "oilseeds": "??? ??? ???",
+    "vegetables": "??????",
+    "fruits": "???",
+    "spices": "??????"
+  },
+  "crops": {
+    "rice": "????",
+    "wheat": "????",
+    "maize": "????",
+    "pulses": "?????",
+    "vegetables": "??????"
   }
 }

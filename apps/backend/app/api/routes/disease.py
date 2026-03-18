@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status,
 from PIL import Image, UnidentifiedImageError
 
 from app.core.database import Database
-from app.core.dependencies import get_db, require_roles
+from app.core.dependencies import get_db, get_disease_detection_service, require_roles
 from app.core.logging import get_logger
 from app.models.user import UserInDB
 from app.schemas.disease import DiseaseHistoryItem, DiseasePredictionResponse
@@ -28,6 +28,7 @@ async def predict_disease(
     image: UploadFile = File(...),
     db: Database = Depends(get_db),
     user: UserInDB = Depends(require_roles(["farmer", "extension_officer", "admin"])),
+    service: DiseaseDetectionService = Depends(get_disease_detection_service),
 ) -> APIResponse[DiseasePredictionResponse]:
     if image.content_type not in ALLOWED_TYPES:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid image type")
@@ -43,7 +44,6 @@ async def predict_disease(
     except (UnidentifiedImageError, OSError) as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Uploaded file is not a valid image") from exc
 
-    service = DiseaseDetectionService()
     try:
         result = service.predict(data)
     except Exception as exc:

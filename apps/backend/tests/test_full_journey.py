@@ -180,6 +180,17 @@ def test_end_to_end_user_journey():
             assert feedback_response.status_code == 200
             assert feedback_response.json()["data"]["sustainability_score"] >= 0
 
+            hero_summary_response = client.get("/api/v1/dashboard/hero-summary", headers=farmer_headers)
+            assert hero_summary_response.status_code == 200
+            hero_summary = hero_summary_response.json()["data"]
+            assert hero_summary["latest_recommendation_id"]
+            assert hero_summary["latest_recommendation_kind"] == "water"
+            assert hero_summary["total_recommendations"] >= 3
+            assert hero_summary["water_recommendation_count"] >= 1
+            assert hero_summary["latest_water_savings_percent"] is not None
+            assert hero_summary["latest_sustainability_score"] is not None
+            assert hero_summary["total_feedback"] >= 1
+
             officer_payload = {
                 "name": "Journey Officer",
                 "phone": officer_phone,

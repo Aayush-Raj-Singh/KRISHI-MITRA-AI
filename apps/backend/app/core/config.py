@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from dotenv import load_dotenv
-from pydantic import Field, field_validator, model_validator
+from pydantic import AliasChoices, Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.core.secrets import load_secrets_into_env
@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     api_v1_prefix: str = "/api/v1"
     environment: str = Field("development", alias="ENVIRONMENT")
     enforce_secure_secrets: bool = Field(False, alias="ENFORCE_SECURE_SECRETS")
-    allow_inmemory_db_fallback: bool = Field(True, alias="ALLOW_INMEMORY_DB_FALLBACK")
+    allow_inmemory_db_fallback: bool = Field(False, alias="ALLOW_INMEMORY_DB_FALLBACK")
     db_connect_max_attempts: int = Field(3, alias="DB_CONNECT_MAX_ATTEMPTS")
     db_connect_retry_delay_seconds: float = Field(1.5, alias="DB_CONNECT_RETRY_DELAY_SECONDS")
 
@@ -38,8 +38,9 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = Field(30, alias="REFRESH_TOKEN_EXPIRE_DAYS")
 
     postgres_dsn: str = Field(
-        "postgresql://postgres:postgres@localhost:5432/krishimitra",
-        alias="POSTGRES_DSN",
+        "postgresql://postgres:password@localhost:5432/krishi_db",
+        alias="DATABASE_URL",
+        validation_alias=AliasChoices("DATABASE_URL", "POSTGRES_DSN"),
     )
     postgres_schema: str = Field("public", alias="POSTGRES_SCHEMA")
     postgres_min_pool_size: int = Field(1, alias="POSTGRES_MIN_POOL_SIZE")
@@ -106,18 +107,9 @@ class Settings(BaseSettings):
 
     log_level: str = Field("INFO", alias="LOG_LEVEL")
 
-    cors_origins: str = Field(
-        "http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174,http://localhost:4173,http://127.0.0.1:4173",
-        alias="CORS_ORIGINS",
-    )
-    cors_allow_methods: str = Field(
-        "GET,POST,PUT,PATCH,DELETE,OPTIONS",
-        alias="CORS_ALLOW_METHODS",
-    )
-    cors_allow_headers: str = Field(
-        "Authorization,Content-Type,Accept,Origin",
-        alias="CORS_ALLOW_HEADERS",
-    )
+    cors_origins: str = Field("*", alias="CORS_ORIGINS")
+    cors_allow_methods: str = Field("*", alias="CORS_ALLOW_METHODS")
+    cors_allow_headers: str = Field("*", alias="CORS_ALLOW_HEADERS")
 
     rate_limit_enabled: bool = Field(True, alias="RATE_LIMIT_ENABLED")
     rate_limit_global_per_minute: int = Field(120, alias="RATE_LIMIT_GLOBAL_PER_MINUTE")
@@ -143,6 +135,8 @@ class Settings(BaseSettings):
         value = (raw_value or "").strip()
         if not value:
             return []
+        if value == "*":
+            return ["*"]
         if value.startswith("["):
             try:
                 parsed = json.loads(value)
@@ -154,15 +148,24 @@ class Settings(BaseSettings):
 
     @property
     def cors_origin_list(self) -> List[str]:
-        return self._parse_list(self.cors_origins) or ["http://localhost:5173"]
+        origins = self._parse_list(self.cors_origins)
+        if not self.is_production and (not origins or origins == ["*"]):
+            return ["*"]
+        return origins or ["http://localhost:5173"]
 
     @property
     def cors_method_list(self) -> List[str]:
-        return self._parse_list(self.cors_allow_methods) or ["GET", "POST", "OPTIONS"]
+        methods = self._parse_list(self.cors_allow_methods)
+        if not self.is_production and (not methods or methods == ["*"]):
+            return ["*"]
+        return methods or ["GET", "POST", "OPTIONS"]
 
     @property
     def cors_header_list(self) -> List[str]:
-        return self._parse_list(self.cors_allow_headers) or ["Authorization", "Content-Type", "Accept"]
+        headers = self._parse_list(self.cors_allow_headers)
+        if not self.is_production and (not headers or headers == ["*"]):
+            return ["*"]
+        return headers or ["Authorization", "Content-Type", "Accept"]
 
     @property
     def public_api_key_list(self) -> List[str]:
@@ -231,7 +234,9 @@ class Settings(BaseSettings):
             raise ValueError("JWT_REFRESH_SECRET_KEY must be set to a strong value (>=32 chars) for secure mode")
         if self.jwt_secret_key == self.jwt_refresh_secret_key:
             raise ValueError("JWT access and refresh secrets must be different")
-        if any("localhost" in origin for origin in self.cors_origin_list):
+        if "*" in self.cors_origin_list:
+            raise ValueError("CORS_ORIGINS must not include wildcard origins in secure mode")
+        if any("localhost" in origin or "127.0.0.1" in origin for origin in self.cors_origin_list):
             raise ValueError("CORS_ORIGINS must not include localhost in secure mode")
         if self.allow_inmemory_db_fallback:
             raise ValueError("ALLOW_INMEMORY_DB_FALLBACK must be false in secure mode")

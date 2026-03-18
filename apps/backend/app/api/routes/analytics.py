@@ -7,7 +7,13 @@ from fastapi import APIRouter, Depends, Query
 from fastapi.responses import Response
 from app.core.database import Database
 
-from app.core.dependencies import get_db, require_roles
+from app.core.dependencies import (
+    get_analytics_service,
+    get_db,
+    get_report_export_service,
+    get_trend_analytics_service,
+    require_roles,
+)
 from app.models.user import UserInDB
 from app.schemas.analytics import (
     AnalyticsOverview,
@@ -34,10 +40,9 @@ async def overview(
     farm_size_max: Optional[float] = Query(default=None, ge=0),
     from_date: Optional[str] = None,
     to_date: Optional[str] = None,
-    db: Database = Depends(get_db),
     user: UserInDB = Depends(require_roles(["extension_officer", "admin"])),
+    service: AnalyticsService = Depends(get_analytics_service),
 ) -> APIResponse[AnalyticsOverview]:
-    service = AnalyticsService(db)
     data = await service.overview(
         location,
         crop,
@@ -55,10 +60,9 @@ async def farmers_needing_attention(
     location: Optional[str] = None,
     consent_safe: bool = Query(default=True),
     limit: int = Query(default=20, ge=1, le=200),
-    db: Database = Depends(get_db),
     user: UserInDB = Depends(require_roles(["extension_officer", "admin"])),
+    service: AnalyticsService = Depends(get_analytics_service),
 ) -> APIResponse[list[FarmerAttentionItem]]:
-    service = AnalyticsService(db)
     data = await service.farmers_needing_attention(
         location=location,
         consent_safe=consent_safe,
@@ -71,10 +75,9 @@ async def farmers_needing_attention(
 @router.get("/feedback-reliability", response_model=APIResponse[FeedbackReliabilityStats])
 async def feedback_reliability(
     location: Optional[str] = None,
-    db: Database = Depends(get_db),
     user: UserInDB = Depends(require_roles(["extension_officer", "admin"])),
+    service: AnalyticsService = Depends(get_analytics_service),
 ) -> APIResponse[FeedbackReliabilityStats]:
-    service = AnalyticsService(db)
     data = await service.feedback_reliability(location=location, actor=user)
     return success_response(data, message="feedback reliability generated")
 
@@ -90,10 +93,9 @@ async def export_analytics_report(
     to_date: Optional[str] = None,
     consent_safe: bool = Query(default=True),
     limit: int = Query(default=20, ge=1, le=200),
-    db: Database = Depends(get_db),
     user: UserInDB = Depends(require_roles(["extension_officer", "admin"])),
+    service: ReportExportService = Depends(get_report_export_service),
 ) -> Response:
-    service = ReportExportService(db)
     content, media_type, filename = await service.export_regional_insights(
         report_format=format,
         location=location,
@@ -126,8 +128,8 @@ async def price_trends(
     grade: Optional[str] = None,
     from_date: Optional[str] = None,
     to_date: Optional[str] = None,
-    db: Database = Depends(get_db),
     user: UserInDB = Depends(require_roles(["farmer", "extension_officer", "admin"])),
+    service: TrendAnalyticsService = Depends(get_trend_analytics_service),
 ) -> APIResponse[TrendAnalyticsResponse]:
     _ = user
     filters = TrendFilters(
@@ -140,7 +142,6 @@ async def price_trends(
         date_from=_parse_date(from_date),
         date_to=_parse_date(to_date),
     )
-    service = TrendAnalyticsService(db)
     data = await service.trends(filters)
     return success_response(data, message="trend analytics")
 

@@ -12,7 +12,7 @@ from fastapi.responses import JSONResponse
 
 from app.core.cache import close_redis, connect_to_redis
 from app.core.config import settings
-from app.core.database import close_postgres, connect_to_postgres
+from app.core.database import DB_HEALTH_REQUIRED_TABLES, close_postgres, connect_to_postgres
 from app.core.memory_database import get_in_memory_database
 from app.core.exception_handlers import register_exception_handlers
 from app.core.exceptions import DatabaseConnectionError
@@ -162,6 +162,35 @@ def create_app(
     @app.get("/health")
     async def health_check() -> APIResponse[dict]:
         return success_response({"status": "ok"}, message="healthy")
+
+    @app.get("/health/db")
+    async def database_health_check(request: Request):
+        db = getattr(request.app.state, "db", None)
+        if db is None:
+            payload = error_response(
+                "database unavailable",
+                data={
+                    "status": "error",
+                    "required_tables": {table: False for table in DB_HEALTH_REQUIRED_TABLES},
+                },
+            )
+            return JSONResponse(status_code=503, content=payload.model_dump())
+
+        try:
+            health = await db.health_status(DB_HEALTH_REQUIRED_TABLES)
+        except Exception as exc:
+            logger.exception("database_health_check_failed", error=str(exc))
+            payload = error_response(
+                "database unavailable",
+                data={
+                    "status": "error",
+                    "error": str(exc),
+                    "required_tables": {table: False for table in DB_HEALTH_REQUIRED_TABLES},
+                },
+            )
+            return JSONResponse(status_code=503, content=payload.model_dump())
+
+        return success_response(health, message="database healthy")
 
     for spec in routers:
         if spec.prefix is None and spec.tags is None:

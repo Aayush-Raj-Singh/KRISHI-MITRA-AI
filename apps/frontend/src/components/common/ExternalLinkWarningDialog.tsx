@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { inspectExternalLink, ExternalLinkCheckResponse } from "../../services/links";
 
@@ -11,6 +12,7 @@ interface ExternalLinkWarningDialogProps {
 }
 
 const ExternalLinkWarningDialog: React.FC<ExternalLinkWarningDialogProps> = ({ open, url, onClose, onConfirm }) => {
+  const { t } = useTranslation();
   const [inspection, setInspection] = useState<ExternalLinkCheckResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +35,7 @@ const ExternalLinkWarningDialog: React.FC<ExternalLinkWarningDialogProps> = ({ o
         }
       } catch (err) {
         if (active) {
-          setError(err instanceof Error ? err.message : "Unable to inspect link");
+          setError(err instanceof Error ? err.message : t("external_link_warning.inspect_failed"));
           setInspection(null);
         }
       } finally {
@@ -46,29 +48,37 @@ const ExternalLinkWarningDialog: React.FC<ExternalLinkWarningDialogProps> = ({ o
     return () => {
       active = false;
     };
-  }, [open, url]);
+  }, [open, t, url]);
 
   const safe = inspection?.safe ?? false;
   const verified = inspection?.verified ?? false;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>External Link Warning</DialogTitle>
+      <DialogTitle>{t("external_link_warning.title")}</DialogTitle>
       <DialogContent>
         <Stack spacing={1.2}>
           <Typography variant="body2" color="text.secondary">
-            You are about to open an external website.
+            {t("external_link_warning.intro")}
           </Typography>
           <Typography variant="body2" sx={{ wordBreak: "break-all" }}>
-            {url || "Unknown destination"}
+            {url || t("external_link_warning.unknown_destination")}
           </Typography>
           <Stack direction="row" spacing={1}>
-            {loading && <Chip label="Checking..." size="small" />}
+            {loading && <Chip label={t("external_link_warning.checking")} size="small" />}
             {!loading && inspection && (
               <>
-                <Chip label={safe ? "Safe link" : "Blocked"} size="small" color={safe ? "success" : "error"} />
                 <Chip
-                  label={verified ? "Verified source" : "Unverified source"}
+                  label={safe ? t("external_link_warning.safe_link") : t("external_link_warning.blocked")}
+                  size="small"
+                  color={safe ? "success" : "error"}
+                />
+                <Chip
+                  label={
+                    verified
+                      ? t("external_link_warning.verified_source")
+                      : t("external_link_warning.unverified_source")
+                  }
                   size="small"
                   color={verified ? "success" : "warning"}
                 />
@@ -89,10 +99,10 @@ const ExternalLinkWarningDialog: React.FC<ExternalLinkWarningDialogProps> = ({ o
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} variant="outlined">
-          Cancel
+          {t("external_link_warning.cancel")}
         </Button>
         <Button onClick={onConfirm} variant="contained" disabled={!safe || loading}>
-          Continue
+          {t("external_link_warning.continue")}
         </Button>
       </DialogActions>
     </Dialog>

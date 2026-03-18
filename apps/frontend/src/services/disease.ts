@@ -1,19 +1,14 @@
-import api, { ApiResponse, unwrap } from "./api";
+import {
+  createDiseaseApi,
+  type DiseasePredictionResponse as DiseasePrediction
+} from "@krishimitra/shared";
+import api, { unwrap } from "./api";
 import { getOfflineRecord, isOnline, listOfflineRecords, removeOfflineRecord, saveOfflineRecord } from "../utils/offlineStorage";
 import { compressImage, dataUrlToFile, fileToDataUrl } from "../utils/imageCompression";
 
-export type DiseasePrediction = {
-  crop: string;
-  disease: string;
-  confidence: number;
-  severity: "low" | "medium" | "high";
-  treatment: string[];
-  prevention: string[];
-  organic_solutions: string[];
-  recommended_products: string[];
-  advisory?: string;
-  clarifying_questions?: string[];
-};
+const diseaseApi = createDiseaseApi({ api, unwrap });
+
+export type { DiseasePrediction };
 
 type QueuedDiseaseItem = {
   id: string;
@@ -73,10 +68,7 @@ export const predictDisease = async (file: File): Promise<DiseasePrediction> => 
   const compressed = await compressImage(file);
   const formData = new FormData();
   formData.append("image", compressed);
-  const response = await api.post<ApiResponse<DiseasePrediction>>("/disease/predict", formData, {
-    headers: { "Content-Type": "multipart/form-data" }
-  });
-  return unwrap(response.data);
+  return diseaseApi.predict(formData);
 };
 
 export const fetchCachedDisease = async (key: string) => {

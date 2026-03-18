@@ -64,6 +64,7 @@ const DashboardPage: React.FC = () => {
     analyticsFilters,
     setAnalyticsFilters,
     analyticsData,
+    heroSummary,
     farmersNeedingAttention,
     feedbackReliability,
     operationsOverview,
@@ -74,6 +75,7 @@ const DashboardPage: React.FC = () => {
     mandiResult,
     showMandiTable,
     setShowMandiTable,
+    heroSummaryMutation,
     analyticsMutation,
     reportExportMutation,
     operationsOverviewMutation,
@@ -97,12 +99,44 @@ const DashboardPage: React.FC = () => {
   } = useDashboardData({ isOfficer, isAdmin, t });
 
   const isOffline = typeof navigator !== "undefined" ? !navigator.onLine : false;
-
-  const latestRecommendation = operationsOverview?.recent_runs?.[0]?.operation
-    ? operationsOverview.recent_runs[0].operation.replace(/_/g, " ")
-    : "--";
-  const waterSavingsValue = "--";
-  const sustainabilityValue = analyticsData ? `${analyticsData.average_sustainability.toFixed(1)}` : "--";
+  const formatHeroDate = (value?: string | null) => {
+    if (!value) return null;
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return null;
+    return new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short" }).format(parsed);
+  };
+  const formatRecommendationKind = (kind?: string | null) => {
+    if (!kind) return null;
+    if (kind === "crop") return t("dashboard.crop");
+    if (kind === "price") return t("dashboard.price");
+    if (kind === "water") return t("dashboard.water");
+    if (kind === "advisory") return t("advisory.title");
+    return kind;
+  };
+  const latestRecommendation = heroSummary?.latest_recommendation_id
+    ? heroSummary.latest_recommendation_id.slice(0, 8).toUpperCase()
+    : t("dashboard_page.hero.no_recommendation");
+  const latestRecommendationCaption = heroSummary?.latest_recommendation_id
+    ? [formatRecommendationKind(heroSummary.latest_recommendation_kind), heroSummary.latest_recommendation_context, formatHeroDate(heroSummary.latest_recommendation_created_at)]
+        .filter(Boolean)
+        .join(" • ")
+    : t("dashboard_page.hero.saved_count", { count: heroSummary?.total_recommendations ?? 0 });
+  const waterSavingsValue =
+    typeof heroSummary?.latest_water_savings_percent === "number"
+      ? `${heroSummary.latest_water_savings_percent.toFixed(1)}%`
+      : t("dashboard_page.hero.no_water_plan");
+  const waterSavingsCaption =
+    typeof heroSummary?.latest_water_savings_percent === "number"
+      ? [heroSummary.latest_water_crop, formatHeroDate(heroSummary.latest_water_created_at)].filter(Boolean).join(" • ")
+      : t("dashboard_page.hero.saved_count", { count: heroSummary?.water_recommendation_count ?? 0 });
+  const sustainabilityValue =
+    typeof heroSummary?.latest_sustainability_score === "number"
+      ? `${heroSummary.latest_sustainability_score.toFixed(1)}`
+      : t("dashboard_page.hero.no_feedback");
+  const sustainabilityCaption =
+    typeof heroSummary?.latest_sustainability_score === "number"
+      ? [heroSummary.latest_sustainability_trend, formatHeroDate(heroSummary.latest_feedback_created_at)].filter(Boolean).join(" • ")
+      : t("dashboard_page.hero.feedback_count", { count: heroSummary?.total_feedback ?? 0 });
   const sectionFallback = (
     <Box
       sx={{
@@ -141,9 +175,14 @@ const DashboardPage: React.FC = () => {
           wsUrl={wsUrl}
           wsStatus={wsStatus}
           isOffline={isOffline}
+          statusCaption={t(`dashboard_page.ws_status.${wsStatus}`, { defaultValue: wsStatus })}
           latestRecommendation={latestRecommendation}
+          latestRecommendationCaption={latestRecommendationCaption}
           waterSavingsValue={waterSavingsValue}
+          waterSavingsCaption={waterSavingsCaption}
           sustainabilityValue={sustainabilityValue}
+          sustainabilityCaption={sustainabilityCaption}
+          heroLoading={heroSummaryMutation.isPending && !heroSummary}
         />
 
         {errorMessage && <Alert severity="error">{errorMessage}</Alert>}

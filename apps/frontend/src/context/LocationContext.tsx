@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-import { geocodeLocation, reverseGeocode } from "../services/locationService";
+import { formatCoordinateLabel, geocodeLocation, reverseGeocode } from "../services/locationService";
 import { getCachedWithMeta, setCached } from "../services/cache";
 
 type Coordinates = {
@@ -37,10 +37,24 @@ const LOCATION_TTL_MS = 1000 * 60 * 60 * 24 * 14;
 
 const LocationContext = createContext<LocationContextValue | undefined>(undefined);
 
-const normalizeLabel = (city?: string, state?: string, fallback?: string) => {
+const normalizeLabel = (city?: string, state?: string, fallback?: string, coords?: Coordinates) => {
   const parts = [city, state].filter(Boolean);
   if (parts.length) return parts.join(", ");
-  return fallback || "";
+  const normalizedFallback = fallback?.trim();
+  if (normalizedFallback && normalizedFallback.toLowerCase() !== "location detected") {
+    return normalizedFallback;
+  }
+  if (coords) {
+    return formatCoordinateLabel(coords.lat, coords.lon);
+  }
+  return "";
+};
+
+const isFallbackLocationLabel = (value?: string) => {
+  const label = (value || "").trim();
+  if (!label) return false;
+  if (label.toLowerCase() === "location detected") return true;
+  return /^Lat\s-?\d+(\.\d+)?,\sLon\s-?\d+(\.\d+)?$/i.test(label);
 };
 
 export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -61,7 +75,7 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setCoords(snapshot.coords);
     setCity(snapshot.city);
     setState(snapshot.state);
-    setLabel(snapshot.label || normalizeLabel(snapshot.city, snapshot.state, manual));
+    setLabel(normalizeLabel(snapshot.city, snapshot.state, snapshot.label || manual, snapshot.coords));
     setSource(fromCache ? "cache" : snapshot.source);
     if (manual) {
       setManualLocation(manual);
@@ -96,13 +110,13 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           applySnapshot(nextSnapshot);
           storeSnapshot(nextSnapshot, "");
         } catch (geoError) {
-          const message = geoError instanceof Error ? geoError.message : "Unable to resolve location.";
+          const fallbackLabel = formatCoordinateLabel(nextCoords.lat, nextCoords.lon);
           setCoords(nextCoords);
-          setLabel("Location detected");
+          setLabel(fallbackLabel);
           setSource("geolocation");
           setStatus("ready");
-          setError(message);
-          storeSnapshot({ coords: nextCoords, source: "geolocation", label: "Location detected" }, "");
+          setError(null);
+          storeSnapshot({ coords: nextCoords, source: "geolocation", label: fallbackLabel }, "");
         }
       },
       (err) => {
@@ -170,6 +184,9 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         cached.value.manualLocation,
         true
       );
+      if (cached.value.coords && isFallbackLocationLabel(cached.value.label)) {
+        requestLocation();
+      }
     } else {
       requestLocation();
     }
@@ -201,4 +218,3 @@ export const useLocationContext = () => {
   }
   return context;
 };
-

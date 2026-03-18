@@ -1,57 +1,28 @@
+import {
+  API_ENDPOINTS,
+  sanitizeOutcomeFeedbackPayload,
+  sanitizeQuickFeedbackPayload,
+  type OutcomeFeedbackRequest,
+  type OutcomeFeedbackResponse,
+  type QuickFeedbackRequest,
+  type QuickFeedbackResponse
+} from "@krishimitra/shared";
+
 import api, { ApiResponse, unwrap, queueOfflineRequest } from "./api";
 
-export interface OutcomeFeedbackRequest {
-  recommendation_id: string;
-  rating: number;
-  yield_kg_per_acre: number;
-  income_inr: number;
-  water_usage_l_per_acre: number;
-  fertilizer_kg_per_acre: number;
-  notes?: string;
-  season?: string;
-}
-
-export interface SustainabilityScores {
-  water_efficiency: number;
-  fertilizer_efficiency: number;
-  yield_optimization: number;
-}
-
-export interface OutcomeFeedbackResponse {
-  feedback_id: string;
-  sustainability_score: number;
-  sub_scores: SustainabilityScores;
-  recommendations: string[];
-  recognition_badge?: string | null;
-  trend?: string | null;
-  regional_comparison?: Record<string, number> | null;
-  queued_for_expert_review?: boolean;
-  retrain_triggered?: boolean;
-  created_at: string;
-}
-
-export interface QuickFeedbackRequest {
-  recommendation_id?: string;
-  rating: number;
-  service: "crop" | "price" | "water" | "advisory";
-  notes?: string;
-  source?: string;
-}
-
-export interface QuickFeedbackResponse {
-  feedback_id: string;
-  recommendation_id?: string | null;
-  rating: number;
-  service: string;
-  notes?: string | null;
-  created_at: string;
-}
+export type {
+  OutcomeFeedbackRequest,
+  OutcomeFeedbackResponse,
+  QuickFeedbackRequest,
+  QuickFeedbackResponse
+} from "@krishimitra/shared";
 
 export const submitOutcomeFeedback = async (
   payload: OutcomeFeedbackRequest
 ): Promise<OutcomeFeedbackResponse> => {
+  const sanitized = sanitizeOutcomeFeedbackPayload(payload);
   if (typeof navigator !== "undefined" && !navigator.onLine) {
-    queueOfflineRequest("/feedback/outcome", payload);
+    queueOfflineRequest(API_ENDPOINTS.feedback.outcome, sanitized);
     return {
       feedback_id: "queued",
       sustainability_score: 0,
@@ -66,8 +37,8 @@ export const submitOutcomeFeedback = async (
     };
   }
   const response = await api.post<ApiResponse<OutcomeFeedbackResponse>>(
-    "/feedback/outcome",
-    payload
+    API_ENDPOINTS.feedback.outcome,
+    sanitized
   );
   return unwrap(response.data);
 };
@@ -75,17 +46,21 @@ export const submitOutcomeFeedback = async (
 export const submitQuickFeedback = async (
   payload: QuickFeedbackRequest
 ): Promise<QuickFeedbackResponse> => {
+  const sanitized = sanitizeQuickFeedbackPayload(payload);
   if (typeof navigator !== "undefined" && !navigator.onLine) {
-    queueOfflineRequest("/feedback/quick", payload);
+    queueOfflineRequest(API_ENDPOINTS.feedback.quick, sanitized);
     return {
       feedback_id: "queued",
-      recommendation_id: payload.recommendation_id,
-      rating: payload.rating,
-      service: payload.service,
-      notes: payload.notes,
+      recommendation_id: sanitized.recommendation_id,
+      rating: sanitized.rating,
+      service: sanitized.service,
+      notes: sanitized.notes,
       created_at: new Date().toISOString()
     };
   }
-  const response = await api.post<ApiResponse<QuickFeedbackResponse>>("/feedback/quick", payload);
+  const response = await api.post<ApiResponse<QuickFeedbackResponse>>(
+    API_ENDPOINTS.feedback.quick,
+    sanitized
+  );
   return unwrap(response.data);
 };

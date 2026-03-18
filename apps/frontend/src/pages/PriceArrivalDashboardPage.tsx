@@ -103,7 +103,7 @@ export const PriceArrivalDashboardContent: React.FC<PriceArrivalDashboardContent
   };
 
   const filterFields: Array<{
-    key: keyof PriceArrivalFilters;
+    key: keyof PriceArrivalFilters & string;
     label: string;
     options: string[];
     disabled?: boolean;

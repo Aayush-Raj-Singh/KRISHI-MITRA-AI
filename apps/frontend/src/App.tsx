@@ -1,6 +1,7 @@
 import React, { Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Box, CircularProgress, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import LoginPage from "./pages/LoginPage";
 import ForbiddenPage from "./pages/ForbiddenPage";
@@ -36,24 +37,28 @@ const LandingRoute: React.FC = () => {
   return <LandingPage />;
 };
 
-const RouteLoadingFallback: React.FC = () => (
-  <Box
-    sx={{
-      minHeight: "100vh",
-      display: "grid",
-      placeItems: "center",
-      background: "linear-gradient(180deg, #f4f1e8 0%, #eef4ed 100%)",
-      px: 3
-    }}
-  >
-    <Box sx={{ textAlign: "center" }}>
-      <CircularProgress size={30} />
-      <Typography variant="body2" sx={{ mt: 1.5, color: "text.secondary" }}>
-        Loading KrishiMitra AI...
-      </Typography>
+const RouteLoadingFallback: React.FC = () => {
+  const { t } = useTranslation();
+
+  return (
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "grid",
+        placeItems: "center",
+        background: "linear-gradient(180deg, #f4f1e8 0%, #eef4ed 100%)",
+        px: 3
+      }}
+    >
+      <Box sx={{ textAlign: "center" }}>
+        <CircularProgress size={30} />
+        <Typography variant="body2" sx={{ mt: 1.5, color: "text.secondary" }}>
+          {`${t("actions.loading", { defaultValue: "Loading..." })} ${t("app.title")}`}
+        </Typography>
+      </Box>
     </Box>
-  </Box>
-);
+  );
+};
 
 const App: React.FC = () => (
   <BrowserRouter>

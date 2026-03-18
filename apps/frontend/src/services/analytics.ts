@@ -109,10 +109,9 @@ export const downloadAnalyticsReport = async (
     params: { ...filters, format, consent_safe: true, limit: 20 },
     responseType: "blob"
   });
-  const contentType =
-    typeof response.headers["content-type"] === "string" ? response.headers["content-type"] : "application/octet-stream";
+  const contentType = response.headers.get("content-type") || "application/octet-stream";
   const filename = extractFilename(
-    typeof response.headers["content-disposition"] === "string" ? response.headers["content-disposition"] : undefined,
+    response.headers.get("content-disposition") || undefined,
     `regional-insights.${format}`
   );
 

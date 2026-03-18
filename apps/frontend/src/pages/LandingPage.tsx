@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useMemo } from "react";
 import {
   Box,
   Button,
@@ -9,6 +9,7 @@ import {
   Typography
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
@@ -21,45 +22,73 @@ import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import Footer from "../components/Footer";
 import { HEADER_BADGES } from "../components/common/layoutPortalData";
 import { useTheme } from "../hooks/useTheme";
+import { useTranslatedStrings } from "../utils/useTranslatedStrings";
 
 const FeatureCard = React.lazy(() => import("../components/FeatureCard"));
 
-const features = [
-  {
-    title: "AI Crop Advisory",
-    description: "Personalized crop recommendations and advisory workflows tailored to farm conditions.",
-    icon: <AutoAwesomeIcon fontSize="small" />
-  },
-  {
-    title: "Smart Mandi Price Intelligence",
-    description: "Live mandi prices, trends, and market insights for smarter selling decisions.",
-    icon: <StorefrontIcon fontSize="small" />
-  },
-  {
-    title: "Weather & AQI Insights",
-    description: "Location-aware forecasts, AQI, and humidity updates for daily planning.",
-    icon: <AirIcon fontSize="small" />
-  },
-  {
-    title: "Water Optimization",
-    description: "Irrigation schedules and water-saving recommendations driven by AI models.",
-    icon: <WaterDropIcon fontSize="small" />
-  },
-  {
-    title: "Market Trend Analytics",
-    description: "Price movement analytics and demand signals across key markets.",
-    icon: <ShowChartIcon fontSize="small" />
-  },
-  {
-    title: "Government Schemes",
-    description: "Discover and track schemes and benefits relevant to your region.",
-    icon: <AccountBalanceIcon fontSize="small" />
-  }
-];
-
 const LandingPage: React.FC = () => {
+  const { t } = useTranslation();
   const { mode, toggle } = useTheme();
   const isDark = mode === "dark";
+  const landingCopy = useTranslatedStrings(
+    useMemo(
+      () => ({
+        featureCropTitle: "AI Crop Advisory",
+        featureCropDescription: "Personalized crop recommendations and advisory workflows tailored to farm conditions.",
+        featureMandiTitle: "Smart Mandi Price Intelligence",
+        featureMandiDescription: "Live mandi prices, trends, and market insights for smarter selling decisions.",
+        featureWeatherTitle: "Weather & AQI Insights",
+        featureWeatherDescription: "Location-aware forecasts, AQI, and humidity updates for daily planning.",
+        featureWaterTitle: "Water Optimization",
+        featureWaterDescription: "Irrigation schedules and water-saving recommendations driven by AI models.",
+        featureTrendTitle: "Market Trend Analytics",
+        featureTrendDescription: "Price movement analytics and demand signals across key markets.",
+        featureSchemeTitle: "Government Schemes",
+        featureSchemeDescription: "Discover and track schemes and benefits relevant to your region.",
+        platformFeatures: "Platform Features",
+        platformFeaturesDescription:
+          "A unified agriculture platform delivering intelligent advisory, market intelligence, and sustainability insights.",
+        loadingFeatures: "Loading features...",
+        toggleTheme: "Toggle theme"
+      }),
+      []
+    )
+  );
+  const features = useMemo(
+    () => [
+      {
+        title: landingCopy.featureCropTitle,
+        description: landingCopy.featureCropDescription,
+        icon: <AutoAwesomeIcon fontSize="small" />
+      },
+      {
+        title: landingCopy.featureMandiTitle,
+        description: landingCopy.featureMandiDescription,
+        icon: <StorefrontIcon fontSize="small" />
+      },
+      {
+        title: landingCopy.featureWeatherTitle,
+        description: landingCopy.featureWeatherDescription,
+        icon: <AirIcon fontSize="small" />
+      },
+      {
+        title: landingCopy.featureWaterTitle,
+        description: landingCopy.featureWaterDescription,
+        icon: <WaterDropIcon fontSize="small" />
+      },
+      {
+        title: landingCopy.featureTrendTitle,
+        description: landingCopy.featureTrendDescription,
+        icon: <ShowChartIcon fontSize="small" />
+      },
+      {
+        title: landingCopy.featureSchemeTitle,
+        description: landingCopy.featureSchemeDescription,
+        icon: <AccountBalanceIcon fontSize="small" />
+      }
+    ],
+    [landingCopy]
+  );
 
   return (
     <Box>
@@ -79,12 +108,15 @@ const LandingPage: React.FC = () => {
         }}
       >
         <Container
-          maxWidth="lg"
+          maxWidth={false}
           sx={{
             position: "absolute",
             top: 0,
             left: 0,
             right: 0,
+            width: "min(100%, var(--app-shell-width))",
+            maxWidth: "var(--app-shell-width)",
+            px: "var(--app-shell-inline-pad) !important",
             py: 2.5,
             display: "flex",
             alignItems: "center",
@@ -111,7 +143,7 @@ const LandingPage: React.FC = () => {
           </Button>
           <IconButton
             onClick={toggle}
-            aria-label="Toggle theme"
+            aria-label={landingCopy.toggleTheme}
             sx={{
               color: "#fff",
               border: "1px solid rgba(255,255,255,0.35)",
@@ -123,7 +155,16 @@ const LandingPage: React.FC = () => {
           </IconButton>
         </Container>
 
-        <Container maxWidth="md" sx={{ textAlign: "center", zIndex: 1 }}>
+        <Container
+          maxWidth={false}
+          sx={{
+            width: "min(100%, var(--app-shell-width-tight))",
+            maxWidth: "var(--app-shell-width-tight)",
+            px: "var(--app-shell-inline-pad) !important",
+            textAlign: "center",
+            zIndex: 1
+          }}
+        >
           <Stack spacing={2.5} alignItems="center">
             <Typography
               variant="h1"
@@ -131,13 +172,15 @@ const LandingPage: React.FC = () => {
                 fontSize: { xs: "2.6rem", sm: "3.4rem", md: "4rem" },
                 fontWeight: 800,
                 letterSpacing: 2,
-                textTransform: "uppercase"
+                textTransform: "uppercase",
+                maxWidth: "100%",
+                overflowWrap: "anywhere"
               }}
             >
-              KrishiMitra-AI
+              {t("app.title")}
             </Typography>
-            <Typography variant="h5" sx={{ fontWeight: 500 }}>
-              AI Powered Agriculture Intelligence
+            <Typography variant="h5" sx={{ fontWeight: 500, maxWidth: "100%", overflowWrap: "anywhere" }}>
+              {t("app.subtitle")}
             </Typography>
             <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ pt: 1 }}>
               <Button
@@ -147,7 +190,7 @@ const LandingPage: React.FC = () => {
                 to="/login"
                 sx={{ minWidth: 160 }}
               >
-                Sign In
+                {t("auth.sign_in")}
               </Button>
               <Button
                 variant="outlined"
@@ -161,7 +204,7 @@ const LandingPage: React.FC = () => {
                   "&:hover": { borderColor: "#fff", bgcolor: "rgba(255,255,255,0.12)" }
                 }}
               >
-                Sign Up
+                {t("auth.sign_up")}
               </Button>
             </Stack>
           </Stack>
@@ -169,21 +212,27 @@ const LandingPage: React.FC = () => {
       </Box>
 
       <Box id="features" sx={{ py: { xs: 6, md: 8 }, bgcolor: isDark ? "#0f2d1e" : "#f6fbf7" }}>
-        <Container maxWidth="lg">
+        <Container
+          maxWidth={false}
+          sx={{
+            width: "min(100%, var(--app-shell-width))",
+            maxWidth: "var(--app-shell-width)",
+            px: "var(--app-shell-inline-pad) !important"
+          }}
+        >
           <Stack spacing={3}>
             <Stack spacing={1} alignItems="center">
               <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                Platform Features
+                {landingCopy.platformFeatures}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ textAlign: "center", maxWidth: 640 }}>
-                A unified agriculture platform delivering intelligent advisory, market intelligence, and
-                sustainability insights.
+                {landingCopy.platformFeaturesDescription}
               </Typography>
             </Stack>
             <Suspense
               fallback={
                 <Box sx={{ textAlign: "center", color: "text.secondary" }}>
-                  <Typography variant="body2">Loading features...</Typography>
+                  <Typography variant="body2">{landingCopy.loadingFeatures}</Typography>
                 </Box>
               }
             >
@@ -200,7 +249,14 @@ const LandingPage: React.FC = () => {
       </Box>
 
       <Box sx={{ py: { xs: 4, md: 5 }, bgcolor: isDark ? "#0b2117" : "#eef6ef" }}>
-        <Container maxWidth="md">
+        <Container
+          maxWidth={false}
+          sx={{
+            width: "min(100%, var(--app-shell-width-tight))",
+            maxWidth: "var(--app-shell-width-tight)",
+            px: "var(--app-shell-inline-pad) !important"
+          }}
+        >
           <Stack direction="row" spacing={3} alignItems="center" justifyContent="center" flexWrap="wrap">
             {HEADER_BADGES.map((badge) => (
               <Box

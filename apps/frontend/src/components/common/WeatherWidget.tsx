@@ -18,18 +18,19 @@ import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import ThermostatIcon from "@mui/icons-material/Thermostat";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 import { useLocationContext } from "../../context/LocationContext";
 import { getAQI, getCurrentWeather } from "../../services/weatherService";
 
 const weatherEmoji = (code: number) => {
-  if (code === 0) return "☀️";
-  if (code <= 3) return "🌤";
-  if (code >= 45 && code <= 48) return "🌫";
-  if (code >= 51 && code <= 67) return "🌧";
-  if (code >= 71 && code <= 86) return "🌨";
-  if (code >= 95) return "⛈";
-  return "🌤";
+  if (code === 0) return "\u2600\uFE0F";
+  if (code <= 3) return "\u26C5";
+  if (code >= 45 && code <= 48) return "\uD83C\uDF2B";
+  if (code >= 51 && code <= 67) return "\uD83C\uDF27";
+  if (code >= 71 && code <= 86) return "\uD83C\uDF28";
+  if (code >= 95) return "\u26C8";
+  return "\u26C5";
 };
 
 const formatNumber = (value?: number, suffix = "") =>
@@ -41,6 +42,7 @@ interface WeatherWidgetProps {
 }
 
 const WeatherWidget: React.FC<WeatherWidgetProps> = ({ compact = false, tone = "light" }) => {
+  const { t } = useTranslation();
   const isMobile = useMediaQuery("(max-width:900px)");
   const { coords, label, status, error, manualLocation, requestLocation, saveManualLocation } = useLocationContext();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -64,18 +66,28 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ compact = false, tone = "
     staleTime: 1000 * 60 * 10
   });
 
+  const translatedCondition = useMemo(() => {
+    const code = weatherQuery.data?.weatherCode;
+    if (typeof code !== "number") {
+      return weatherQuery.data?.condition || "--";
+    }
+    return t(`weather_widget.conditions.${code}`, {
+      defaultValue: weatherQuery.data?.condition || "--"
+    });
+  }, [t, weatherQuery.data?.condition, weatherQuery.data?.weatherCode]);
+
   const summary = useMemo(() => {
     if (weatherQuery.isLoading || aqiQuery.isLoading) {
-      return "Loading weather...";
+      return t("weather_widget.loading");
     }
     if (!weatherQuery.data || !aqiQuery.data) {
-      return status === "locating" ? "Locating..." : "Weather unavailable";
+      return status === "locating" ? t("weather_widget.locating") : t("weather_widget.unavailable");
     }
     const emoji = weatherEmoji(weatherQuery.data.weatherCode);
-    return `${emoji} ${formatNumber(weatherQuery.data.temperatureC, "°C")} | AQI ${formatNumber(
+    return `${emoji} ${formatNumber(weatherQuery.data.temperatureC, "\u00B0C")} | AQI ${formatNumber(
       aqiQuery.data.aqi
-    )} | ${formatNumber(weatherQuery.data.humidity, "%")} Humidity`;
-  }, [aqiQuery.data, status, weatherQuery.data]);
+    )} | ${formatNumber(weatherQuery.data.humidity, "%")} ${t("weather_widget.humidity_short")}`;
+  }, [aqiQuery.data, status, t, weatherQuery.data, weatherQuery.isLoading, aqiQuery.isLoading]);
 
   const offlineMeta = useMemo(() => {
     const weatherOffline = Boolean(weatherQuery.data?.offline || weatherQuery.data?.stale);
@@ -99,13 +111,13 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ compact = false, tone = "
   };
 
   const popoverOpen = Boolean(anchorEl);
-  const locationLabel = label || manualLocation || "Unknown location";
+  const locationLabel = label || manualLocation || t("weather_widget.unknown_location");
 
   return (
     <>
       <ButtonBase
         onClick={handleOpen}
-        aria-label="Open weather details"
+        aria-label={t("weather_widget.open_details")}
         sx={{
           borderRadius: 999,
           px: compact ? 1.1 : 1.4,
@@ -117,7 +129,10 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ compact = false, tone = "
           fontWeight: 700,
           fontSize: compact ? { xs: "0.78rem", md: "0.86rem" } : { xs: "0.8rem", md: "0.9rem" },
           textTransform: "none",
-          whiteSpace: "nowrap",
+          whiteSpace: "normal",
+          textAlign: "left",
+          lineHeight: 1.15,
+          maxWidth: "100%",
           "&:hover": {
             bgcolor: tone === "dark" ? "rgba(11, 44, 24, 0.95)" : "rgba(255,255,255,0.24)"
           }
@@ -145,31 +160,36 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ compact = false, tone = "
         }}
       >
         <Stack spacing={1.4}>
-          <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
-            <Stack direction="row" spacing={1} alignItems="center">
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={1}
+            alignItems={{ xs: "flex-start", sm: "center" }}
+            justifyContent="space-between"
+          >
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0 }}>
               <LocationOnIcon sx={{ color: "#1b6b3a" }} />
-              <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
                 {locationLabel}
               </Typography>
             </Stack>
-            <IconButton size="small" onClick={requestLocation} aria-label="Refresh location">
+            <IconButton size="small" onClick={requestLocation} aria-label={t("weather_widget.refresh_location")}>
               <RefreshIcon fontSize="small" />
             </IconButton>
           </Stack>
 
           {error && (
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0 }}>
               <InfoOutlinedIcon sx={{ color: "#b7602a" }} fontSize="small" />
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.25 }}>
                 {error}
               </Typography>
             </Stack>
           )}
           {offlineMeta.offline && (
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0 }}>
               <InfoOutlinedIcon sx={{ color: "#d07a2b" }} fontSize="small" />
-              <Typography variant="caption" color="text.secondary">
-                Offline Mode - showing last updated data
+              <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.25 }}>
+                {t("weather_widget.offline_last_updated")}
                 {offlineMeta.updatedAt ? ` (${new Date(offlineMeta.updatedAt).toLocaleString()})` : ""}
               </Typography>
             </Stack>
@@ -181,16 +201,16 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ compact = false, tone = "
             <Stack direction="row" spacing={1} alignItems="center">
               <ThermostatIcon sx={{ color: "#c75b22" }} />
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                Temperature
+                {t("weather_widget.temperature")}
               </Typography>
               <Typography variant="body2" sx={{ marginLeft: "auto" }}>
-                {formatNumber(weatherQuery.data?.temperatureC, "°C")}
+                {formatNumber(weatherQuery.data?.temperatureC, "\u00B0C")}
               </Typography>
             </Stack>
             <Stack direction="row" spacing={1} alignItems="center">
               <WaterDropIcon sx={{ color: "#1b6b3a" }} />
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                Humidity
+                {t("weather_widget.humidity")}
               </Typography>
               <Typography variant="body2" sx={{ marginLeft: "auto" }}>
                 {formatNumber(weatherQuery.data?.humidity, "%")}
@@ -199,7 +219,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ compact = false, tone = "
             <Stack direction="row" spacing={1} alignItems="center">
               <AirIcon sx={{ color: "#4b915c" }} />
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                Wind speed
+                {t("weather_widget.wind_speed")}
               </Typography>
               <Typography variant="body2" sx={{ marginLeft: "auto" }}>
                 {formatNumber(weatherQuery.data?.windSpeedKph, " km/h")}
@@ -207,15 +227,15 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ compact = false, tone = "
             </Stack>
             <Stack direction="row" spacing={1} alignItems="center">
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                Condition
+                {t("weather_widget.condition")}
               </Typography>
               <Typography variant="body2" sx={{ marginLeft: "auto" }}>
-                {weatherQuery.data?.condition || "--"}
+                {translatedCondition}
               </Typography>
             </Stack>
             <Stack direction="row" spacing={1} alignItems="center">
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                AQI
+                {t("weather_widget.aqi")}
               </Typography>
               <Typography variant="body2" sx={{ marginLeft: "auto" }}>
                 {formatNumber(aqiQuery.data?.aqi)}
@@ -226,18 +246,18 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ compact = false, tone = "
           {(!coords || status === "denied" || status === "error") && (
             <Box sx={{ pt: 1 }}>
               <Typography variant="caption" color="text.secondary">
-                Enter your location to enable weather and nearest mandi insights.
+                {t("weather_widget.manual_hint")}
               </Typography>
               <Stack direction={isMobile ? "column" : "row"} spacing={1} sx={{ mt: 1 }}>
                 <TextField
                   size="small"
-                  placeholder="City, State"
+                  placeholder={t("weather_widget.manual_placeholder")}
                   value={manualInput}
                   onChange={(event) => setManualInput(event.target.value)}
                   fullWidth
                 />
                 <Button variant="contained" onClick={handleSaveManual} sx={{ minWidth: 120 }}>
-                  Save
+                  {t("actions.save")}
                 </Button>
               </Stack>
             </Box>

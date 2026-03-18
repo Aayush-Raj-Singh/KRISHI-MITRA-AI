@@ -35,7 +35,11 @@
     "default_role": "कृषक",
     "role_admin": "एडमिनिस्ट्री",
     "helpdesk": "हेल्पडेस्क",
-    "helpline": "सहायतारेखा"
+    "helpline": "सहायतारेखा",
+    "season_kharif": "खरिफ",
+    "season_rabi": "रबि",
+    "season_zaid": "जैद",
+    "other_links": "अन्ये लिङ्काः"
   },
   "languages": {
     "en": "आंग्ल",
@@ -52,7 +56,8 @@
     "or": "ओडिया",
     "ur": "उर्दू",
     "ne": "नेपाली",
-    "sa": "संस्कृत"
+    "sa": "संस्कृत",
+    "title": "????"
   },
   "auth": {
     "welcome": "पुनः स्वागतम्",
@@ -81,7 +86,33 @@
     "role_farmer": "कृषक",
     "role_extension_officer": "विस्तार अधिकारी",
     "creating": "सृजति...",
-    "already_have_account": "पूर्वमेव खाता अस्ति वा ?"
+    "already_have_account": "पूर्वमेव खाता अस्ति वा ?",
+    "email": "???? (??????????)",
+    "assigned_regions": "???????????????",
+    "assigned_regions_helper": "???? ????????? ???? ??? ?? ??????? ????????? ????????",
+    "validation": {
+      "name_min": "Name must be at least {{count}} characters.",
+      "phone_digits": "???????????? 10 ?????????? ??????",
+      "phone_digits_helper": "10 digits",
+      "email_invalid": "वैधं ईमेल-सङ्केतं प्रविशतु ।",
+      "password_requirements": "???????? {{issues}} ?????? ??????",
+      "password_issue_min": "minimum 8 characters",
+      "password_issue_max": "maximum 72 characters",
+      "password_issue_upper": "an uppercase letter",
+      "password_issue_lower": "a lowercase letter",
+      "password_issue_number": "a number",
+      "password_issue_special": "a special character",
+      "password_strength_helper": "Min 8 chars, उपरि, निम्न, संख्या, विशेष",
+      "location_required": "Location is required.",
+      "farm_size_positive": "Farm size must be greater than 0.",
+      "soil_type_required": "Soil type is required.",
+      "water_source_required": "Water source is required.",
+      "primary_crops_required": "Add at least one primary crop.",
+      "required": "???? ????????? ?????????",
+      "name_short": "??? ?????????????? 2 ???????? ??????",
+      "phone_invalid": "???? ??????? ????????????????? ???????????",
+      "password_short": "???????? ?????????????? 8 ???????? ??????"
+    }
   },
   "dashboard": {
     "crop": "सस्य अनुशंसा",
@@ -155,7 +186,8 @@
     "subtitle": "DBT लाभाः, AI अनुशंसाः, स्थायित्वस्य अन्वेषणं च अनलॉक् कर्तुं एकवारं पञ्जीकरणं कुर्वन्तु।",
     "feature_irrigation": "कार्यानुष्ठानयोग्यकार्यक्रमयुक्ताः स्मार्टसिञ्चनयोजनाः",
     "feature_price": "सस्यमूल्यप्रवृत्तिपूर्वसूचना तथा विपण्यसंकेता",
-    "feature_sustainability": "स्थायित्व-अङ्कीकरणेन सह परिणामप्रतिक्रिया"
+    "feature_sustainability": "स्थायित्व-अङ्कीकरणेन सह परिणामप्रतिक्रिया",
+    "success_redirect": "????????? ?????? ?????? ????????? ????? ??????????..."
   },
   "reset_password": {
     "title": "गुप्तशब्दं पुनः सेट् कुर्वन्तु",
@@ -171,10 +203,14 @@
     "new_password": "नवीनं गुप्तशब्दम्",
     "update_password": "गुप्तशब्दं अद्यतनं कुर्वन्तु",
     "updating": "अद्यतनं कुर्वन्...",
-    "back_to_login": "प्रवेशं प्रति पुनः"
+    "back_to_login": "प्रवेशं प्रति पुनः",
+    "point_secure": "?????? KrishiMitra AI ???????? ????????????? ????????????????",
+    "point_otp": "?????????????????? ?? ????? OTP ??????????",
+    "point_agri": "?????? ???? ????????????, ??????, ??????????????? ? ?????????????????"
   },
   "common": {
-    "request_failed": "अनुरोधः असफलः अभवत्"
+    "request_failed": "अनुरोधः असफलः अभवत्",
+    "invalid_value": "??????? ??????"
   },
   "status": {
     "assigned": "नियुक्तः",
@@ -193,7 +229,12 @@
   "dashboard_page": {
     "hero": {
       "title": "__ब्र०__ २.",
-      "description": "सस्यनियोजनाय, विपण्यपूर्वसूचनार्थं, जलस्य अनुकूलनार्थं च एकीकृतनिर्णयगुप्तचरद्वारम् । कृषकाणां क्षेत्राधिकारिणां च कृते विनिर्मितम्।"
+      "description": "सस्यनियोजनाय, विपण्यपूर्वसूचनार्थं, जलस्य अनुकूलनार्थं च एकीकृतनिर्णयगुप्तचरद्वारम् । कृषकाणां क्षेत्राधिकारिणां च कृते विनिर्मितम्।",
+      "no_recommendation": "??????? ??????? ??????",
+      "no_water_plan": "??????? ??????? ??????",
+      "no_feedback": "??????? ???????????? ??????",
+      "saved_count": "{{count}} ????????",
+      "feedback_count": "{{count}} ???????????????????"
     },
     "live_updates": "लाइव अपडेट",
     "realtime_connected": "वास्तविकसमयचैनलः सम्बद्धः",
@@ -292,7 +333,21 @@
       "title": "मण्डी मूल्य",
       "load_error": "मण्डी मूल्यानि लोड् कर्तुं असफलम्",
       "empty": "अद्यतनविपण्यप्रवृत्तिः द्रष्टुं मण्डीमूल्यानि आनयन्तु।",
-      "price_label": "मूल्य"
+      "price_label": "मूल्य",
+      "market_intelligence": "?????-?????-???????????",
+      "subtitle": "?????? ???-, ?????-, ??????????????????????",
+      "nearest_markets": "???? ????????? ???????",
+      "location_hint": "??????????? ???????? ??????????? ?????????? ?????????????",
+      "category_label": "?????",
+      "days_option": "{{count}} ??????",
+      "crops_count": "{{count}} ?????",
+      "km_away": "{{distance}} ??.??.",
+      "min_label": "???????",
+      "max_label": "??????",
+      "modal_label": "????????",
+      "latest_label": "??????",
+      "source_label": "??????",
+      "price_trend": "???????????????"
     },
     "market_data": {
       "table": "पीठिका",
@@ -399,7 +454,9 @@
     "market_intelligence_description": "एकस्मिन् कार्यक्षेत्रे पूर्वानुमानं, आगमनं, प्रवृत्तिः, सचेतनासंकेताः च ।",
     "market_directory_description": "mandi प्रोफाइल, सुविधाः, सम्पर्कविवरणं च ब्राउज् कुर्वन्तु।",
     "helpdesk_description": "समर्थनटिकटं उत्थापयन्तु प्रतिक्रियाः च अनुसरणं कुर्वन्तु।",
-    "modern_farming_description": "२५० सस्यशाकमार्गदर्शकानां कृते व्यावहारिकाः आधुनिककृषियोजनाः।"
+    "modern_farming_description": "२५० सस्यशाकमार्गदर्शकानां कृते व्यावहारिकाः आधुनिककृषियोजनाः।",
+    "disease_detection_title": "रोगपरिचयः",
+    "disease_detection_description": "?????????????? ????????? ???????? ???????????????? ??????????"
   },
   "filters": {
     "title": "फ़िल्टर",
@@ -607,5 +664,120 @@
     "by_severity": "तीव्रतापूर्वकम्",
     "latest_findings": "नवीनतम निष्कर्ष",
     "recent_issues": "अद्यतन अंक"
+  },
+  "ui": {
+    "light_mode": "प्रकाश मोड",
+    "dark_mode": "डार्क मोड",
+    "toggle_dark_mode": "अन्धकारमोडं टॉगलं कुर्वन्तु",
+    "connected_to_internet": "अन्तर्जालसङ्गणकेन सह सम्बद्धः",
+    "you_are_offline": "भवान् अफलाइन अस्ति",
+    "change_language": "भाषा परिवर्तयतु",
+    "open_profile": "प्रोफाइल उद्घाटयन्तु",
+    "open_navigation": "उद्घाटितं नेविगेशनम्",
+    "go_to_dashboard": "डैशबोर्डं प्रति गच्छन्तु",
+    "retry": "पुनः प्रयासं कुर्वन्तु",
+    "please_review_fields": "कृपया प्रकाशितक्षेत्राणां समीक्षां कुर्वन्तु।"
+  },
+  "disease_page": {
+    "title": "सस्यरोगपरिचयः",
+    "subtitle": "सम्भाव्यसस्यरोगाणां अनुशंसितचिकित्सानां च ज्ञातुं स्पष्टपत्रप्रतिबिम्बं अपलोड् कुर्वन्तु।",
+    "offline_notice": "अफलाइन मोड: अपलोड् पश्चात् अन्वेषणार्थं पङ्क्तिबद्धाः भविष्यन्ति।",
+    "offline_queue_success": "अफलाइन मोड: यदा अन्तर्जालः उपलब्धः भवति तदा अन्वेषणं चालयिष्यति।",
+    "upload": "क्रॉप इमेज अपलोड करें",
+    "use_camera": "Camera इत्यस्य उपयोगं कुर्वन्तु",
+    "preview_alt": "सस्यपूर्वावलोकनम्",
+    "detect": "रोगस्य अन्वेषणं कुर्वन्तु",
+    "detecting": "अन्वेषणं...",
+    "detect_failed": "रोगस्य अन्वेषणं कर्तुं असफलः अभवत्।",
+    "camera_failed": "कॅमेरा-ग्रहणं विफलम् अभवत् ।",
+    "result": "अन्वेषण परिणाम",
+    "crop": "अन्नग्रह",
+    "disease": "रोगः",
+    "confidence": "आत्मविश्वास",
+    "severity": "तीव्रता",
+    "treatment": "उपचार",
+    "prevention": "निवारणम्",
+    "organic_solutions": "जैविक समाधान",
+    "recommended_products": "अनुशंसित उत्पाद",
+    "clarifying_questions": "स्पष्टीकरणप्रश्ना"
+  },
+  "weather_widget": {
+    "loading": "लोडिंग मौसम...",
+    "locating": "स्थानं ज्ञात्वा...",
+    "unavailable": "मौसमः अनुपलब्धः",
+    "humidity_short": "आर्द्रता",
+    "unknown_location": "अज्ञात स्थान",
+    "open_details": "मौसमस्य विवरणं उद्घाटयन्तु",
+    "refresh_location": "स्थानं ताजगीं कुर्वन्तु",
+    "offline_last_updated": "अफलाइन मोड: अन्तिम अद्यतनं दत्तांशं दर्शयति",
+    "temperature": "तापमान",
+    "humidity": "आर्द्रता",
+    "wind_speed": "वायुवेगः",
+    "condition": "दशा",
+    "aqi": "अकि",
+    "manual_hint": "मौसमस्य समीपस्थं मण्डी अन्वेषणं च सक्षमं कर्तुं स्वस्थानं प्रविशतु।",
+    "manual_placeholder": "नगर, राज्य",
+    "conditions": {
+      "0": "स्पष्टः",
+      "1": "मुख्यतः स्पष्टम्",
+      "2": "आंशिकरूपेण मेघयुक्तः",
+      "3": "मेघयुक्तः",
+      "45": "धूमिका",
+      "48": "रिमे नीहारः",
+      "51": "हल्की बूंदाबांदी",
+      "53": "मध्यम बूंदाबांदी",
+      "55": "सघन बूंदाबांदी",
+      "56": "हिमवत् बूंदाबांदी",
+      "57": "हिमवत् बूंदाबांदी",
+      "61": "किञ्चित् वर्षा",
+      "63": "मध्यम वर्षा",
+      "65": "प्रचण्डवृष्टिः",
+      "66": "हिमवृष्टिः",
+      "67": "हिमवृष्टिः",
+      "71": "लघु हिम",
+      "73": "मध्यमः हिमः",
+      "75": "गुरु हिम",
+      "77": "हिमकणिकाः",
+      "80": "वर्षा वर्षा",
+      "81": "प्रचण्डवृष्टिः",
+      "82": "हिंसकवृष्टिः",
+      "85": "हिमवृष्टिः",
+      "86": "हिमवृष्टिः",
+      "95": "वज्रपातः",
+      "96": "अश्मपातेन सह वज्रपातः",
+      "99": "भयंकरः वज्रपातः"
+    }
+  },
+  "external_link_warning": {
+    "title": "??????????????????",
+    "intro": "You are about to open an external website.",
+    "unknown_destination": "Unknown destination",
+    "checking": "Checking...",
+    "safe_link": "Safe link",
+    "blocked": "Blocked",
+    "verified_source": "सत्यापितः स्रोतः",
+    "unverified_source": "Unverified source",
+    "inspect_failed": "Unable to inspect link",
+    "cancel": "Cancel",
+    "continue": "???????????",
+    "message": "????? ?????? ??????? ?? ??????-??????? ??????????? ??????? ??? ??????????",
+    "url_label": "??????? URL",
+    "stay": "?????? ???????"
+  },
+  "categories": {
+    "all": "?????",
+    "cereals": "????????",
+    "pulses": "??????????",
+    "oilseeds": "?????????",
+    "vegetables": "??????",
+    "fruits": "?????",
+    "spices": "??????"
+  },
+  "crops": {
+    "rice": "??????",
+    "wheat": "?????",
+    "maize": "???",
+    "pulses": "??????????",
+    "vegetables": "??????"
   }
 }

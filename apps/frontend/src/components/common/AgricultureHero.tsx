@@ -87,7 +87,7 @@ const AgricultureHero: React.FC<AgricultureHeroProps> = ({
             <Typography
               variant="h3"
               sx={{
-                fontFamily: '"Prata", serif',
+                fontFamily: 'var(--app-heading-font), var(--app-body-font), serif',
                 fontWeight: 600,
                 letterSpacing: 0.2,
                 fontSize: { xs: "1.7rem", md: "2.05rem" }

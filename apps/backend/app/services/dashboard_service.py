@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
 from collections import defaultdict
@@ -11,6 +12,7 @@ from app.core.database import Database
 from app.core.cache import Cache
 from app.core.logging import get_logger
 from app.schemas.dashboard import (
+    DashboardHeroSummary,
     PriceArrivalDashboardResponse,
     PriceArrivalFilters,
     PriceArrivalPoint,
@@ -47,6 +49,89 @@ class DashboardService:
             return float(value or 0.0)
         except (TypeError, ValueError):
             return 0.0
+
+    @staticmethod
+    def _compact_text(value: Any) -> Optional[str]:
+        text = str(value or "").strip()
+        return text or None
+
+    def _recommendation_context(self, document: Optional[dict]) -> Optional[str]:
+        if not document:
+            return None
+
+        kind = self._compact_text(document.get("kind"))
+        request_payload = document.get("request_payload") or {}
+        response_payload = document.get("response_payload") or {}
+
+        if kind == "crop":
+            recommendations = response_payload.get("recommendations") or []
+            if recommendations:
+                top_crop = self._compact_text(recommendations[0].get("crop"))
+                if top_crop:
+                    return top_crop
+        if kind == "price":
+            crop = self._compact_text(response_payload.get("crop") or request_payload.get("crop"))
+            market = self._compact_text(response_payload.get("market") or request_payload.get("market"))
+            return " · ".join(part for part in [crop, market] if part) or None
+        if kind == "water":
+            crop = self._compact_text(response_payload.get("crop") or request_payload.get("crop"))
+            growth_stage = self._compact_text(request_payload.get("growth_stage"))
+            return " · ".join(part for part in [crop, growth_stage] if part) or crop
+        if kind == "advisory":
+            message = self._compact_text(request_payload.get("message"))
+            if message:
+                return message[:60] + ("..." if len(message) > 60 else "")
+        return None
+
+    async def hero_summary(self, user_id: str) -> DashboardHeroSummary:
+        recommendations = self._db["recommendations"]
+        feedback = self._db["feedback"]
+
+        (
+            latest_recommendation,
+            latest_water_recommendation,
+            latest_feedback,
+            total_recommendations,
+            total_feedback,
+            water_recommendation_count,
+        ) = await asyncio.gather(
+            recommendations.find_one({"user_id": user_id}, sort=[("created_at", -1)]),
+            recommendations.find_one({"user_id": user_id, "kind": "water"}, sort=[("created_at", -1)]),
+            feedback.find_one({"user_id": user_id}, sort=[("created_at", -1)]),
+            recommendations.count_documents({"user_id": user_id}),
+            feedback.count_documents({"user_id": user_id}),
+            recommendations.count_documents({"user_id": user_id, "kind": "water"}),
+        )
+
+        latest_water_payload = (latest_water_recommendation or {}).get("response_payload") or {}
+        latest_water_crop = self._compact_text(
+            latest_water_payload.get("crop")
+            or (latest_water_recommendation or {}).get("request_payload", {}).get("crop")
+        )
+
+        return DashboardHeroSummary(
+            latest_recommendation_id=str(latest_recommendation.get("_id")) if latest_recommendation else None,
+            latest_recommendation_kind=self._compact_text((latest_recommendation or {}).get("kind")),
+            latest_recommendation_context=self._recommendation_context(latest_recommendation),
+            latest_recommendation_created_at=(latest_recommendation or {}).get("created_at"),
+            total_recommendations=total_recommendations,
+            water_recommendation_count=water_recommendation_count,
+            latest_water_savings_percent=(
+                round(self._as_float(latest_water_payload.get("water_savings_percent")), 1)
+                if latest_water_recommendation and latest_water_payload.get("water_savings_percent") is not None
+                else None
+            ),
+            latest_water_crop=latest_water_crop,
+            latest_water_created_at=(latest_water_recommendation or {}).get("created_at"),
+            latest_sustainability_score=(
+                round(self._as_float((latest_feedback or {}).get("sustainability_score")), 1)
+                if latest_feedback and (latest_feedback or {}).get("sustainability_score") is not None
+                else None
+            ),
+            latest_sustainability_trend=self._compact_text((latest_feedback or {}).get("trend")),
+            latest_feedback_created_at=(latest_feedback or {}).get("created_at"),
+            total_feedback=total_feedback,
+        )
 
     async def _grouped_rows(self, filters: PriceArrivalFilters) -> List[dict]:
         if getattr(self._db, "pool", None) is not None:

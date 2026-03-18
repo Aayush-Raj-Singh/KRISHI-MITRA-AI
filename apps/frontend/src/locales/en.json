@@ -35,7 +35,11 @@
     "default_role": "Farmer",
     "role_admin": "Admin",
     "helpdesk": "Helpdesk",
-    "helpline": "Helpline"
+    "helpline": "Helpline",
+    "season_kharif": "Kharif",
+    "season_rabi": "Rabi",
+    "season_zaid": "Zaid",
+    "other_links": "Other Links"
   },
   "languages": {
     "en": "English",
@@ -52,7 +56,8 @@
     "or": "Odia",
     "ur": "Urdu",
     "ne": "Nepali",
-    "sa": "Sanskrit"
+    "sa": "Sanskrit",
+    "title": "Language"
   },
   "auth": {
     "welcome": "Welcome back",
@@ -81,7 +86,29 @@
     "role_farmer": "Farmer",
     "role_extension_officer": "Extension Officer",
     "creating": "Creating...",
-    "already_have_account": "Already have an account? "
+    "already_have_account": "Already have an account? ",
+    "email": "Email (optional)",
+    "assigned_regions": "Assigned regions (officer/admin)",
+    "assigned_regions_helper": "Comma-separated districts/states",
+    "validation": {
+      "name_min": "Name must be at least {{count}} characters.",
+      "phone_digits": "Phone number must be 10 digits.",
+      "phone_digits_helper": "10 digits",
+      "email_invalid": "Enter a valid email address.",
+      "password_requirements": "Password must include {{issues}}.",
+      "password_issue_min": "minimum 8 characters",
+      "password_issue_max": "maximum 72 characters",
+      "password_issue_upper": "an uppercase letter",
+      "password_issue_lower": "a lowercase letter",
+      "password_issue_number": "a number",
+      "password_issue_special": "a special character",
+      "password_strength_helper": "Min 8 chars, upper, lower, number, special",
+      "location_required": "Location is required.",
+      "farm_size_positive": "Farm size must be greater than 0.",
+      "soil_type_required": "Soil type is required.",
+      "water_source_required": "Water source is required.",
+      "primary_crops_required": "Add at least one primary crop."
+    }
   },
   "dashboard": {
     "crop": "Crop Recommendation",
@@ -107,6 +134,19 @@
     "open": "Open",
     "save": "Save",
     "saving": "Saving..."
+  },
+  "ui": {
+    "light_mode": "Light mode",
+    "dark_mode": "Dark mode",
+    "toggle_dark_mode": "Toggle dark mode",
+    "connected_to_internet": "Connected to internet",
+    "you_are_offline": "You are offline",
+    "change_language": "Change language",
+    "open_profile": "Open profile",
+    "open_navigation": "Open navigation",
+    "go_to_dashboard": "Go to dashboard",
+    "retry": "Retry",
+    "please_review_fields": "Please review the highlighted fields."
   },
   "advisory": {
     "title": "Advisory Chat",
@@ -155,7 +195,8 @@
     "subtitle": "Register once to unlock DBT benefits, AI recommendations, and sustainability insights.",
     "feature_irrigation": "Smart irrigation plans with actionable schedules",
     "feature_price": "Crop price trend forecasting and market signals",
-    "feature_sustainability": "Outcome feedback with sustainability scoring"
+    "feature_sustainability": "Outcome feedback with sustainability scoring",
+    "success_redirect": "Registration successful. Redirecting to dashboard..."
   },
   "reset_password": {
     "title": "Reset password",
@@ -171,10 +212,14 @@
     "new_password": "New password",
     "update_password": "Update password",
     "updating": "Updating...",
-    "back_to_login": "Back to login"
+    "back_to_login": "Back to login",
+    "point_secure": "Secure account recovery workflow",
+    "point_otp": "OTP verification through SMS or email",
+    "point_agri": "Continue smart irrigation and crop planning without downtime"
   },
   "common": {
-    "request_failed": "Request failed"
+    "request_failed": "Request failed",
+    "invalid_value": "Invalid value"
   },
   "status": {
     "assigned": "Assigned",
@@ -193,7 +238,12 @@
   "dashboard_page": {
     "hero": {
       "title": "KrishiMitra-AI",
-      "description": "A unified decision intelligence portal for crop planning, market forecasting, and water optimization. Designed for farmers and field officers."
+      "description": "A unified decision intelligence portal for crop planning, market forecasting, and water optimization. Designed for farmers and field officers.",
+      "no_recommendation": "No recommendation yet",
+      "no_water_plan": "No water plan yet",
+      "no_feedback": "No feedback yet",
+      "saved_count": "{{count}} records",
+      "feedback_count": "{{count}} feedback entries"
     },
     "live_updates": "Live updates",
     "realtime_connected": "Realtime channel connected",
@@ -292,7 +342,21 @@
       "title": "Mandi Prices",
       "load_error": "Failed to load mandi prices",
       "empty": "Fetch mandi prices to view recent market trends.",
-      "price_label": "Price"
+      "price_label": "Price",
+      "market_intelligence": "Mandi Market Intelligence",
+      "subtitle": "Live crop, mandi, and price trend signals.",
+      "nearest_markets": "Nearest Markets Near You",
+      "location_hint": "Enable location to auto-detect the nearest mandis.",
+      "category_label": "Category",
+      "days_option": "{{count}} days",
+      "crops_count": "{{count}} crops",
+      "km_away": "{{distance}} km",
+      "min_label": "Min",
+      "max_label": "Max",
+      "modal_label": "Modal",
+      "latest_label": "Latest",
+      "source_label": "Source",
+      "price_trend": "Price trend"
     },
     "market_data": {
       "table": "Table",
@@ -397,9 +461,81 @@
     "farm_operations_description": "Crop planning and irrigation optimization with shared farm inputs.",
     "market_intelligence_title": "Market Intelligence",
     "market_intelligence_description": "Forecasts, arrivals, trends, and alert signals in one workspace.",
+    "disease_detection_title": "Disease Detection",
     "market_directory_description": "Browse mandi profiles, facilities, and contact details.",
     "helpdesk_description": "Raise support tickets and track responses.",
-    "modern_farming_description": "Practical modern farming plans for 250 crop and vegetable guides."
+    "modern_farming_description": "Practical modern farming plans for 250 crop and vegetable guides.",
+    "disease_detection_description": "Detect crop diseases from leaf images and get treatment guidance."
+  },
+  "disease_page": {
+    "title": "Crop Disease Detection",
+    "subtitle": "Upload a clear leaf image to detect possible crop diseases and recommended treatments.",
+    "offline_notice": "Offline mode: uploads will be queued for later detection.",
+    "offline_queue_success": "Offline mode: detection will run when internet is available.",
+    "upload": "Upload Crop Image",
+    "use_camera": "Use Camera",
+    "preview_alt": "Crop preview",
+    "detect": "Detect Disease",
+    "detecting": "Detecting...",
+    "detect_failed": "Failed to detect disease.",
+    "camera_failed": "Camera capture failed.",
+    "result": "Detection Result",
+    "crop": "Crop",
+    "disease": "Disease",
+    "confidence": "Confidence",
+    "severity": "Severity",
+    "treatment": "Treatment",
+    "prevention": "Prevention",
+    "organic_solutions": "Organic Solutions",
+    "recommended_products": "Recommended Products",
+    "clarifying_questions": "Clarifying Questions"
+  },
+  "weather_widget": {
+    "loading": "Loading weather...",
+    "locating": "Locating...",
+    "unavailable": "Weather unavailable",
+    "humidity_short": "Humidity",
+    "unknown_location": "Unknown location",
+    "open_details": "Open weather details",
+    "refresh_location": "Refresh location",
+    "offline_last_updated": "Offline mode: showing last updated data",
+    "temperature": "Temperature",
+    "humidity": "Humidity",
+    "wind_speed": "Wind speed",
+    "condition": "Condition",
+    "aqi": "AQI",
+    "manual_hint": "Enter your location to enable weather and nearest mandi insights.",
+    "manual_placeholder": "City, State",
+    "conditions": {
+      "0": "Clear",
+      "1": "Mainly clear",
+      "2": "Partly cloudy",
+      "3": "Overcast",
+      "45": "Fog",
+      "48": "Rime fog",
+      "51": "Light drizzle",
+      "53": "Moderate drizzle",
+      "55": "Dense drizzle",
+      "56": "Freezing drizzle",
+      "57": "Freezing drizzle",
+      "61": "Slight rain",
+      "63": "Moderate rain",
+      "65": "Heavy rain",
+      "66": "Freezing rain",
+      "67": "Freezing rain",
+      "71": "Light snow",
+      "73": "Moderate snow",
+      "75": "Heavy snow",
+      "77": "Snow grains",
+      "80": "Rain showers",
+      "81": "Heavy showers",
+      "82": "Violent showers",
+      "85": "Snow showers",
+      "86": "Snow showers",
+      "95": "Thunderstorm",
+      "96": "Thunderstorm with hail",
+      "99": "Severe thunderstorm"
+    }
   },
   "filters": {
     "title": "Filters",
@@ -607,5 +743,34 @@
     "by_severity": "By severity",
     "latest_findings": "Latest findings",
     "recent_issues": "Recent issues"
+  },
+  "external_link_warning": {
+    "title": "External Link Warning",
+    "intro": "You are about to open an external website.",
+    "unknown_destination": "Unknown destination",
+    "checking": "Checking...",
+    "safe_link": "Safe link",
+    "blocked": "Blocked",
+    "verified_source": "Verified source",
+    "unverified_source": "Unverified source",
+    "inspect_failed": "Unable to inspect link",
+    "cancel": "Cancel",
+    "continue": "Continue"
+  },
+  "categories": {
+    "all": "All",
+    "cereals": "Cereals",
+    "pulses": "Pulses",
+    "oilseeds": "Oilseeds",
+    "vegetables": "Vegetables",
+    "fruits": "Fruits",
+    "spices": "Spices"
+  },
+  "crops": {
+    "rice": "Rice",
+    "wheat": "Wheat",
+    "maize": "Maize",
+    "pulses": "Pulses",
+    "vegetables": "Vegetables"
   }
 }

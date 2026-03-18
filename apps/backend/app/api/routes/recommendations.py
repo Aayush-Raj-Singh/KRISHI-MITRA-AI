@@ -8,7 +8,15 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.core.database import Database
 
 from app.core.cache import Cache, get_cache
-from app.core.dependencies import get_db, require_roles
+from app.core.dependencies import (
+    get_crop_recommender,
+    get_db,
+    get_external_data_service,
+    get_price_forecaster,
+    get_recommendation_service,
+    get_water_optimizer,
+    require_roles,
+)
 from app.core.config import settings
 from app.models.user import UserInDB
 from app.schemas.recommendations import (
@@ -31,11 +39,6 @@ from app.utils.responses import success_response
 router = APIRouter()
 
 
-crop_model = CropRecommender()
-price_model = PriceForecaster()
-water_model = WaterOptimizer()
-
-
 def _cache_key(prefix: str, user_id: str, payload: dict) -> str:
     digest = hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode("utf-8")).hexdigest()
     return f"{prefix}:{user_id}:{digest}"
@@ -44,9 +47,10 @@ def _cache_key(prefix: str, user_id: str, payload: dict) -> str:
 @router.post("/crop", response_model=APIResponse[CropRecommendationResponse])
 async def crop_recommendations(
     payload: CropRecommendationRequest,
-    db: Database = Depends(get_db),
     user: UserInDB = Depends(require_roles(["farmer", "extension_officer", "admin"])),
     cache: Cache = Depends(get_cache),
+    recommendation_service: RecommendationService = Depends(get_recommendation_service),
+    crop_model: CropRecommender = Depends(get_crop_recommender),
 ) -> APIResponse[CropRecommendationResponse]:
     cache_key = _cache_key("crop", user.id, payload.model_dump())
     cached = await cache.get(cache_key)
@@ -54,7 +58,6 @@ async def crop_recommendations(
         cached_payload = json.loads(cached)
         return success_response(CropRecommendationResponse(**cached_payload, cached=True), message="cache hit")
 
-    recommendation_service = RecommendationService(db)
     personalization_context = await recommendation_service.get_crop_personalization_context(
         user_id=user.id,
         season=payload.season,
@@ -94,9 +97,10 @@ async def crop_recommendations(
 @router.post("/price-forecast", response_model=APIResponse[PriceForecastResponse])
 async def price_forecast(
     payload: PriceForecastRequest,
-    db: Database = Depends(get_db),
     user: UserInDB = Depends(require_roles(["farmer", "extension_officer", "admin"])),
     cache: Cache = Depends(get_cache),
+    recommendation_service: RecommendationService = Depends(get_recommendation_service),
+    price_model: PriceForecaster = Depends(get_price_forecaster),
 ) -> APIResponse[PriceForecastResponse]:
     cache_key = _cache_key("price", user.id, payload.model_dump())
     cached = await cache.get(cache_key)
@@ -114,7 +118,6 @@ async def price_forecast(
             response = price_model.forecast(payload)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
-    recommendation_service = RecommendationService(db)
     price_request = payload.model_dump()
     price_request["crop_key"] = payload.crop.strip().lower()
     price_request["market_key"] = payload.market.strip().lower()
@@ -127,9 +130,11 @@ async def price_forecast(
 @router.post("/water-optimization", response_model=APIResponse[WaterOptimizationResponse])
 async def water_optimization(
     payload: WaterOptimizationRequest,
-    db: Database = Depends(get_db),
     user: UserInDB = Depends(require_roles(["farmer", "extension_officer", "admin"])),
     cache: Cache = Depends(get_cache),
+    recommendation_service: RecommendationService = Depends(get_recommendation_service),
+    external_data_service: ExternalDataService = Depends(get_external_data_service),
+    water_model: WaterOptimizer = Depends(get_water_optimizer),
 ) -> APIResponse[WaterOptimizationResponse]:
     effective_payload = payload
     weather_context = None
@@ -137,8 +142,7 @@ async def water_optimization(
         location = (payload.location or user.location or "").strip()
         if not location:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Location is required to fetch weather data")
-        service = ExternalDataService(db)
-        weather = await service.fetch_weather(location, days=payload.days)
+        weather = await external_data_service.fetch_weather(location, days=payload.days)
         effective_payload = payload.model_copy(update={"forecast": weather.forecast, "location": location})
         weather_context = weather
 
@@ -157,7 +161,6 @@ async def water_optimization(
         response.weather_source = weather_context.source
         response.weather_cached = weather_context.cached
         response.weather_fetched_at = weather_context.fetched_at
-    recommendation_service = RecommendationService(db)
     rec_id = await recommendation_service.store(user.id, "water", effective_payload.model_dump(), response.model_dump())
     response.recommendation_id = rec_id
     await cache.set(cache_key, json.dumps(response.model_dump(), default=str), ttl_seconds=60 * 60 * 24)

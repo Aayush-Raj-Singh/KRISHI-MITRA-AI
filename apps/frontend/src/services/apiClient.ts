@@ -1,4 +1,4 @@
-import type { AxiosRequestConfig } from "axios";
+import type { ApiRequestOptions } from "@krishimitra/shared";
 import api, { ApiResponse, queueOfflineRequest, unwrap } from "./api";
 import { getOfflineRecord, isOnline, saveOfflineRecord } from "../utils/offlineStorage";
 
@@ -50,7 +50,7 @@ const withRetry = async <T>(fn: () => Promise<T>, retry = 1): Promise<T> => {
 
 export const cachedGet = async <T>(
   url: string,
-  config?: AxiosRequestConfig,
+  config?: ApiRequestOptions,
   options?: CacheOptions
 ): Promise<CachedResult<T>> => {
   const store = options?.store || "api";
@@ -108,7 +108,7 @@ export const initApiClientSync = () => {
 export const cachedPost = async <T, P>(
   url: string,
   payload: P,
-  config?: AxiosRequestConfig,
+  config?: ApiRequestOptions,
   options?: CacheOptions
 ): Promise<CachedResult<T>> => {
   const store = options?.store || "api";

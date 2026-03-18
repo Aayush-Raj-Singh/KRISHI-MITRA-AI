@@ -4,19 +4,32 @@ from datetime import date
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
-from app.core.database import Database
 
 from app.core.cache import Cache, get_cache
-from app.core.dependencies import get_db, require_roles
+from app.core.dependencies import get_analytics_service, get_dashboard_service, require_roles
 from app.models.user import UserInDB
 from app.schemas.analytics import AnalyticsOverview
-from app.schemas.dashboard import PriceArrivalDashboardResponse, PriceArrivalFilters, RegionalInsightsResponse
+from app.schemas.dashboard import (
+    DashboardHeroSummary,
+    PriceArrivalDashboardResponse,
+    PriceArrivalFilters,
+    RegionalInsightsResponse,
+)
 from app.schemas.response import APIResponse
 from app.services.analytics_service import AnalyticsService
 from app.services.dashboard_service import DashboardService
 from app.utils.responses import success_response
 
 router = APIRouter()
+
+
+@router.get("/hero-summary", response_model=APIResponse[DashboardHeroSummary])
+async def dashboard_hero_summary(
+    user: UserInDB = Depends(require_roles(["farmer", "extension_officer", "admin"])),
+    service: DashboardService = Depends(get_dashboard_service),
+) -> APIResponse[DashboardHeroSummary]:
+    summary = await service.hero_summary(user.id)
+    return success_response(summary, message="dashboard hero summary")
 
 
 @router.get("/price-arrival", response_model=APIResponse[PriceArrivalDashboardResponse])
@@ -29,9 +42,9 @@ async def price_arrival_dashboard(
     grade: Optional[str] = None,
     date_from: Optional[date] = Query(default=None),
     date_to: Optional[date] = Query(default=None),
-    db: Database = Depends(get_db),
     cache: Cache = Depends(get_cache),
     __: str = Depends(require_roles(["farmer", "extension_officer", "admin"])),
+    service: DashboardService = Depends(get_dashboard_service),
 ) -> APIResponse[PriceArrivalDashboardResponse]:
     filters = PriceArrivalFilters(
         state=state,
@@ -43,7 +56,6 @@ async def price_arrival_dashboard(
         date_from=date_from,
         date_to=date_to,
     )
-    service = DashboardService(db, cache)
     result = await service.price_arrival_dashboard(filters)
     return success_response(result, message="price arrival dashboard")
 
@@ -56,10 +68,9 @@ async def dashboard_metrics(
     farm_size_max: Optional[float] = Query(default=None, ge=0),
     from_date: Optional[str] = None,
     to_date: Optional[str] = None,
-    db: Database = Depends(get_db),
     user: UserInDB = Depends(require_roles(["extension_officer", "admin"])),
+    service: AnalyticsService = Depends(get_analytics_service),
 ) -> APIResponse[AnalyticsOverview]:
-    service = AnalyticsService(db)
     overview = await service.overview(
         location,
         crop,
@@ -82,10 +93,9 @@ async def regional_insights(
     to_date: Optional[str] = None,
     consent_safe: bool = Query(default=True),
     limit: int = Query(default=20, ge=1, le=200),
-    db: Database = Depends(get_db),
     user: UserInDB = Depends(require_roles(["extension_officer", "admin"])),
+    service: AnalyticsService = Depends(get_analytics_service),
 ) -> APIResponse[RegionalInsightsResponse]:
-    service = AnalyticsService(db)
     response = await service.regional_insights(
         location,
         crop,

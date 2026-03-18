@@ -35,7 +35,11 @@
     "default_role": "రైతు",
     "role_admin": "అడ్మిన్",
     "helpdesk": "హెల్ప్‌డెస్క్",
-    "helpline": "హెల్ప్‌లైన్"
+    "helpline": "హెల్ప్‌లైన్",
+    "season_kharif": "ఖరీఫ్",
+    "season_rabi": "రబీ",
+    "season_zaid": "జైద్",
+    "other_links": "ఇతర లింకులు"
   },
   "languages": {
     "en": "ఇంగ్లీష్",
@@ -52,7 +56,8 @@
     "or": "ఒడియా",
     "ur": "ఉర్దూ",
     "ne": "నేపాలీ",
-    "sa": "సంస్కృతం"
+    "sa": "సంస్కృతం",
+    "title": "???"
   },
   "auth": {
     "welcome": "తిరిగి స్వాగతం",
@@ -81,7 +86,33 @@
     "role_farmer": "రైతు",
     "role_extension_officer": "విస్తరణ అధికారి",
     "creating": "సృష్టిస్తోంది...",
-    "already_have_account": "ఇప్పటికే ఖాతా ఉందా?"
+    "already_have_account": "ఇప్పటికే ఖాతా ఉందా?",
+    "email": "??????? (???????)",
+    "assigned_regions": "?????????? ?????????",
+    "assigned_regions_helper": "? ????????? ???? ???? ??????? ?????? ?????????? ?????????",
+    "validation": {
+      "name_min": "Name must be at least {{count}} characters.",
+      "phone_digits": "???? ????? 10 ?????? ??????.",
+      "phone_digits_helper": "10 digits",
+      "email_invalid": "చెల్లుబాటు అయ్యే ఇమెయిల్ చిరునామాను నమోదు చేయండి.",
+      "password_requirements": "???????????? {{issues}} ??????.",
+      "password_issue_min": "minimum 8 characters",
+      "password_issue_max": "maximum 72 characters",
+      "password_issue_upper": "an uppercase letter",
+      "password_issue_lower": "a lowercase letter",
+      "password_issue_number": "a number",
+      "password_issue_special": "a special character",
+      "password_strength_helper": "కనిష్ట 8 అక్షరాలు, ఎగువ, దిగువ, సంఖ్య, ప్రత్యేకం",
+      "location_required": "Location is required.",
+      "farm_size_positive": "Farm size must be greater than 0.",
+      "soil_type_required": "Soil type is required.",
+      "water_source_required": "Water source is required.",
+      "primary_crops_required": "Add at least one primary crop.",
+      "required": "? ?????? ?????????.",
+      "name_short": "???? ????? 2 ???????? ??????.",
+      "phone_invalid": "?????????? ????? ?????? ?????? ????? ????? ??????.",
+      "password_short": "????????? ????? 8 ???????? ??????."
+    }
   },
   "dashboard": {
     "crop": "పంట సిఫార్సు",
@@ -155,7 +186,8 @@
     "subtitle": "DBT ప్రయోజనాలు, AI సిఫార్సులు మరియు సుస్థిరత అంతర్దృష్టులను అన్‌లాక్ చేయడానికి ఒకసారి నమోదు చేసుకోండి.",
     "feature_irrigation": "కార్యాచరణ షెడ్యూల్‌లతో స్మార్ట్ నీటిపారుదల ప్రణాళికలు",
     "feature_price": "పంట ధరల ధోరణి అంచనా మరియు మార్కెట్ సంకేతాలు",
-    "feature_sustainability": "సుస్థిరత స్కోరింగ్‌తో ఫలిత అభిప్రాయం"
+    "feature_sustainability": "సుస్థిరత స్కోరింగ్‌తో ఫలిత అభిప్రాయం",
+    "success_redirect": "????? ????????????. ???????????????? ??????????????????..."
   },
   "reset_password": {
     "title": "పాస్వర్డ్ను రీసెట్ చేయండి",
@@ -171,10 +203,14 @@
     "new_password": "కొత్త పాస్‌వర్డ్",
     "update_password": "పాస్వర్డ్ను నవీకరించండి",
     "updating": "నవీకరిస్తోంది...",
-    "back_to_login": "తిరిగి లాగిన్‌కి"
+    "back_to_login": "తిరిగి లాగిన్‌కి",
+    "point_secure": "?? KrishiMitra AI ???????????? ??????????? ?????? ??????.",
+    "point_otp": "?? ????? ????? ???? ???? ?????????? OTP ???????.",
+    "point_agri": "???, ???????? ????? ???? ???????? ?????? ?????? ????????."
   },
   "common": {
-    "request_failed": "అభ్యర్థన విఫలమైంది"
+    "request_failed": "అభ్యర్థన విఫలమైంది",
+    "invalid_value": "??????? ?????"
   },
   "status": {
     "assigned": "కేటాయించబడింది",
@@ -193,7 +229,12 @@
   "dashboard_page": {
     "hero": {
       "title": "KrishiMitra-AI",
-      "description": "పంట ప్రణాళిక, మార్కెట్ అంచనా మరియు నీటి ఆప్టిమైజేషన్ కోసం ఏకీకృత నిర్ణయం ఇంటెలిజెన్స్ పోర్టల్. రైతులు మరియు ఫీల్డ్ ఆఫీసర్ల కోసం రూపొందించబడింది."
+      "description": "పంట ప్రణాళిక, మార్కెట్ అంచనా మరియు నీటి ఆప్టిమైజేషన్ కోసం ఏకీకృత నిర్ణయం ఇంటెలిజెన్స్ పోర్టల్. రైతులు మరియు ఫీల్డ్ ఆఫీసర్ల కోసం రూపొందించబడింది.",
+      "no_recommendation": "???? ???????? ????",
+      "no_water_plan": "???? ???? ???????? ????",
+      "no_feedback": "???? ????????? ????",
+      "saved_count": "{{count}} ??????????",
+      "feedback_count": "{{count}} ???????? ???????"
     },
     "live_updates": "ప్రత్యక్ష నవీకరణలు",
     "realtime_connected": "రియల్ టైమ్ ఛానెల్ కనెక్ట్ చేయబడింది",
@@ -292,7 +333,21 @@
       "title": "మండి ధరలు",
       "load_error": "మండి ధరలను లోడ్ చేయడంలో విఫలమైంది",
       "empty": "ఇటీవలి మార్కెట్ ట్రెండ్‌లను వీక్షించడానికి మండి ధరలను పొందండి.",
-      "price_label": "ధర"
+      "price_label": "ధర",
+      "market_intelligence": "???? ???????? ????????????",
+      "subtitle": "????????? ???, ???? ????? ?? ????? ????????.",
+      "nearest_markets": "???? ????????? ??????????",
+      "location_hint": "???? ???? ??????????? ????? ?????????????? ?????????? ??? ??????.",
+      "category_label": "?????",
+      "days_option": "{{count}} ??????",
+      "crops_count": "{{count}} ?????",
+      "km_away": "{{distance}} ??.??",
+      "min_label": "???????",
+      "max_label": "???????",
+      "modal_label": "?????",
+      "latest_label": "????",
+      "source_label": "????",
+      "price_trend": "?? ?????"
     },
     "market_data": {
       "table": "పట్టిక",
@@ -399,7 +454,9 @@
     "market_intelligence_description": "ఒక కార్యస్థలంలో అంచనాలు, రాకపోకలు, ట్రెండ్‌లు మరియు హెచ్చరిక సంకేతాలు.",
     "market_directory_description": "మండి ప్రొఫైల్‌లు, సౌకర్యాలు మరియు సంప్రదింపు వివరాలను బ్రౌజ్ చేయండి.",
     "helpdesk_description": "మద్దతు టిక్కెట్లను పెంచండి మరియు ప్రతిస్పందనలను ట్రాక్ చేయండి.",
-    "modern_farming_description": "250 పంట మరియు కూరగాయల మార్గదర్శకాల కోసం ఆచరణాత్మక ఆధునిక వ్యవసాయ ప్రణాళికలు."
+    "modern_farming_description": "250 పంట మరియు కూరగాయల మార్గదర్శకాల కోసం ఆచరణాత్మక ఆధునిక వ్యవసాయ ప్రణాళికలు.",
+    "disease_detection_title": "వ్యాధి గుర్తింపు",
+    "disease_detection_description": "??? ??????? ?????? ??? ??????? ????????? ??????? ??????????????? ???????."
   },
   "filters": {
     "title": "ఫిల్టర్లు",
@@ -607,5 +664,120 @@
     "by_severity": "తీవ్రత ద్వారా",
     "latest_findings": "తాజా పరిశోధనలు",
     "recent_issues": "ఇటీవలి సమస్యలు"
+  },
+  "ui": {
+    "light_mode": "లైట్ మోడ్",
+    "dark_mode": "డార్క్ మోడ్",
+    "toggle_dark_mode": "డార్క్ మోడ్‌ని టోగుల్ చేయండి",
+    "connected_to_internet": "ఇంటర్నెట్‌కి కనెక్ట్ చేయబడింది",
+    "you_are_offline": "మీరు ఆఫ్‌లైన్‌లో ఉన్నారు",
+    "change_language": "భాషను మార్చండి",
+    "open_profile": "ప్రొఫైల్ తెరవండి",
+    "open_navigation": "నావిగేషన్ తెరవండి",
+    "go_to_dashboard": "డాష్‌బోర్డ్‌కి వెళ్లండి",
+    "retry": "మళ్లీ ప్రయత్నించండి",
+    "please_review_fields": "దయచేసి హైలైట్ చేసిన ఫీల్డ్‌లను సమీక్షించండి."
+  },
+  "disease_page": {
+    "title": "పంట వ్యాధుల గుర్తింపు",
+    "subtitle": "సాధ్యమయ్యే పంట వ్యాధులు మరియు సిఫార్సు చేసిన చికిత్సలను గుర్తించడానికి స్పష్టమైన ఆకు చిత్రాన్ని అప్‌లోడ్ చేయండి.",
+    "offline_notice": "ఆఫ్‌లైన్ మోడ్: అప్‌లోడ్‌లు తర్వాత గుర్తించడం కోసం క్యూలో ఉంచబడతాయి.",
+    "offline_queue_success": "ఆఫ్‌లైన్ మోడ్: ఇంటర్నెట్ అందుబాటులో ఉన్నప్పుడు డిటెక్షన్ రన్ అవుతుంది.",
+    "upload": "క్రాప్ చిత్రాన్ని అప్‌లోడ్ చేయండి",
+    "use_camera": "కెమెరా ఉపయోగించండి",
+    "preview_alt": "క్రాప్ ప్రివ్యూ",
+    "detect": "వ్యాధిని గుర్తించండి",
+    "detecting": "గుర్తిస్తోంది...",
+    "detect_failed": "వ్యాధిని గుర్తించడంలో విఫలమైంది.",
+    "camera_failed": "కెమెరా క్యాప్చర్ విఫలమైంది.",
+    "result": "గుర్తింపు ఫలితం",
+    "crop": "పంట",
+    "disease": "వ్యాధి",
+    "confidence": "విశ్వాసం",
+    "severity": "తీవ్రత",
+    "treatment": "చికిత్స",
+    "prevention": "నివారణ",
+    "organic_solutions": "సేంద్రీయ పరిష్కారాలు",
+    "recommended_products": "సిఫార్సు చేయబడిన ఉత్పత్తులు",
+    "clarifying_questions": "స్పష్టీకరణ ప్రశ్నలు"
+  },
+  "weather_widget": {
+    "loading": "వాతావరణం లోడ్ అవుతోంది...",
+    "locating": "గుర్తించడం...",
+    "unavailable": "వాతావరణం అందుబాటులో లేదు",
+    "humidity_short": "తేమ",
+    "unknown_location": "తెలియని స్థానం",
+    "open_details": "వాతావరణ వివరాలను తెరవండి",
+    "refresh_location": "స్థానాన్ని రిఫ్రెష్ చేయండి",
+    "offline_last_updated": "ఆఫ్‌లైన్ మోడ్: చివరిగా నవీకరించబడిన డేటాను చూపుతోంది",
+    "temperature": "ఉష్ణోగ్రత",
+    "humidity": "తేమ",
+    "wind_speed": "గాలి వేగం",
+    "condition": "పరిస్థితి",
+    "aqi": "AQI",
+    "manual_hint": "వాతావరణం మరియు సమీప మండి అంతర్దృష్టులను ప్రారంభించడానికి మీ స్థానాన్ని నమోదు చేయండి.",
+    "manual_placeholder": "నగరం, రాష్ట్రం",
+    "conditions": {
+      "0": "క్లియర్",
+      "1": "ప్రధానంగా స్పష్టంగా",
+      "2": "పాక్షికంగా మేఘావృతమై ఉంది",
+      "3": "మేఘావృతమైంది",
+      "45": "పొగమంచు",
+      "48": "రిమ్ పొగమంచు",
+      "51": "తేలికపాటి చినుకులు",
+      "53": "మోస్తరు చినుకులు",
+      "55": "దట్టమైన చినుకులు",
+      "56": "గడ్డకట్టే చినుకులు",
+      "57": "గడ్డకట్టే చినుకులు",
+      "61": "చిన్నపాటి వర్షం",
+      "63": "మోస్తరు వర్షం",
+      "65": "భారీ వర్షం",
+      "66": "గడ్డకట్టే వర్షం",
+      "67": "గడ్డకట్టే వర్షం",
+      "71": "తేలికపాటి మంచు",
+      "73": "మితమైన మంచు",
+      "75": "విపరీతమైన మంచు",
+      "77": "మంచు ధాన్యాలు",
+      "80": "వాన జల్లులు",
+      "81": "భారీ జల్లులు",
+      "82": "హింసాత్మక జల్లులు",
+      "85": "మంచు జల్లులు",
+      "86": "మంచు జల్లులు",
+      "95": "పిడుగుపాటు",
+      "96": "వడగళ్లతో కూడిన ఉరుములతో కూడిన వర్షం",
+      "99": "తీవ్రమైన ఉరుములతో కూడిన వర్షం"
+    }
+  },
+  "external_link_warning": {
+    "title": "????? ????? ????????",
+    "intro": "You are about to open an external website.",
+    "unknown_destination": "Unknown destination",
+    "checking": "Checking...",
+    "safe_link": "Safe link",
+    "blocked": "Blocked",
+    "verified_source": "ధృవీకరించబడిన మూలం",
+    "unverified_source": "Unverified source",
+    "inspect_failed": "Unable to inspect link",
+    "cancel": "Cancel",
+    "continue": "??????????",
+    "message": "???? ????? ???????? ???? ????????? ?????? ??????????????. ??????????",
+    "url_label": "????????? URL",
+    "stay": "?????? ??????"
+  },
+  "categories": {
+    "all": "?????",
+    "cereals": "????????",
+    "pulses": "???????",
+    "oilseeds": "??????????",
+    "vegetables": "????????",
+    "fruits": "??????",
+    "spices": "???????"
+  },
+  "crops": {
+    "rice": "??????",
+    "wheat": "?????",
+    "maize": "??????????",
+    "pulses": "???????",
+    "vegetables": "????????"
   }
 }

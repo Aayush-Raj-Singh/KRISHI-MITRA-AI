@@ -38,6 +38,7 @@ COLLECTIONS = [
     "model_events",
     "msp_rates",
     "operations_runs",
+    "outcomes",
     "password_resets",
     "price_accuracy",
     "price_actuals",
@@ -50,6 +51,8 @@ COLLECTIONS = [
     "users",
     "varieties",
 ]
+
+DB_HEALTH_REQUIRED_TABLES = ("users", "recommendations", "feedback", "conversations", "outcomes")
 
 DATE_FIELDS = {
     "created_at",
@@ -452,6 +455,40 @@ class Database:
     def schema(self) -> str:
         return self._schema
 
+    async def health_status(self, required_tables: Sequence[str] = DB_HEALTH_REQUIRED_TABLES) -> dict:
+        async with self._pool.acquire() as conn:
+            summary = await conn.fetchrow(
+                """
+                SELECT
+                    current_database() AS database_name,
+                    current_schema() AS current_schema,
+                    NOW() AT TIME ZONE 'UTC' AS checked_at
+                """
+            )
+            rows = await conn.fetch(
+                """
+                SELECT table_name
+                FROM information_schema.tables
+                WHERE table_schema = $1 AND table_type = 'BASE TABLE'
+                ORDER BY table_name
+                """,
+                self._schema,
+            )
+
+        existing_tables = [str(row["table_name"]) for row in rows]
+        return {
+            "status": "ok",
+            "database": str(summary["database_name"]),
+            "schema": self._schema,
+            "checked_at": summary["checked_at"].isoformat() if summary["checked_at"] else None,
+            "pool": {
+                "min_size": settings.postgres_min_pool_size,
+                "max_size": settings.postgres_max_pool_size,
+            },
+            "tables": existing_tables,
+            "required_tables": {table: table in existing_tables for table in required_tables},
+        }
+
 
 class Cursor:
     def __init__(self, collection: "Collection", filter_spec: dict, projection: Optional[dict]) -> None:
@@ -798,13 +835,20 @@ async def connect_to_postgres() -> Database:
     if _pool is not None:
         return Database(_pool, settings.postgres_schema)
 
+    dsn = settings.postgres_dsn.strip()
+    if not dsn:
+        raise DatabaseConnectionError("DATABASE_URL is not configured")
+
     last_error: Exception | None = None
     for attempt in range(1, settings.db_connect_max_attempts + 1):
         try:
             _pool = await asyncpg.create_pool(
-                dsn=settings.postgres_dsn,
+                dsn=dsn,
                 min_size=settings.postgres_min_pool_size,
                 max_size=settings.postgres_max_pool_size,
+                command_timeout=30,
+                max_inactive_connection_lifetime=300,
+                server_settings={"application_name": "krishimitra-backend"},
             )
             async with _pool.acquire() as conn:
                 await conn.execute("SELECT 1")

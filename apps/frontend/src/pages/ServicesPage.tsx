@@ -166,7 +166,7 @@ const ServicesPage: React.FC = () => {
                     sx={{
                       fontWeight: 700,
                       color: "#1b1f1d",
-                      fontFamily: '"Prata", serif',
+                      fontFamily: 'var(--app-heading-font), var(--app-body-font), serif',
                       letterSpacing: 0.2
                     }}
                   >

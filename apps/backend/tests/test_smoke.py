@@ -22,6 +22,19 @@ def test_health_endpoint_response_format():
     assert payload["data"]["status"] == "ok"
 
 
+def test_database_health_endpoint_response_format():
+    with TestClient(app) as client:
+        response = client.get("/health/db")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["success"] is True
+    assert payload["message"] == "database healthy"
+    assert payload["data"]["status"] == "ok"
+    for table in ("users", "recommendations", "feedback", "conversations", "outcomes"):
+        assert payload["data"]["required_tables"][table] is True
+
+
 def test_required_routes_registered():
     routes = {route.path for route in app.routes}
     expected_routes = {
@@ -33,6 +46,7 @@ def test_required_routes_registered():
         "/api/v1/advisory/chat",
         "/api/v1/feedback/outcome",
         "/health",
+        "/health/db",
     }
     missing = expected_routes - routes
     assert not missing, f"Missing required routes: {missing}"

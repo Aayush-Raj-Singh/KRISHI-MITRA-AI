@@ -148,6 +148,8 @@ class CropRecommender:
 
         feature_values = self._feature_row(request)
         model = self._bundle.model
+        if hasattr(model, "n_jobs"):
+            setattr(model, "n_jobs", 1)
 
         probabilities = model.predict_proba(feature_values)[0]
         labels = [str(item) for item in model.classes_]

@@ -20,14 +20,18 @@ const headerBadges = [
     logoSrc: "https://www.nfsm.gov.in/assets/img/clients/degitalindia.png"
   }
 ];
-const authMaxWidth = 1320;
+const authMaxWidth = "var(--app-shell-width)";
 const authShellContainerSx = {
-  width: "100%",
+  width: "min(100%, var(--app-shell-width))",
   maxWidth: authMaxWidth,
-  mx: "auto"
+  mx: "auto",
+  minWidth: 0,
+  "& > *": {
+    minWidth: 0
+  }
 } as const;
 const authHorizontalPaddingSx = {
-  px: { xs: 2, md: 4 }
+  px: "var(--app-shell-inline-pad)"
 } as const;
 
 type AuthShellProps = {

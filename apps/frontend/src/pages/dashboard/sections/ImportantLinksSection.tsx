@@ -49,7 +49,7 @@ const ImportantLinksSection: React.FC<ImportantLinksSectionProps> = ({ t }) => {
               <Typography variant="overline" sx={{ color: "text.secondary", letterSpacing: 0.6, fontWeight: 700 }}>
                 {t("layout.govt_caption")}
               </Typography>
-              <Typography variant="h4" sx={{ fontFamily: '"Prata", serif' }}>
+              <Typography variant="h4" sx={{ fontFamily: 'var(--app-heading-font), var(--app-body-font), serif' }}>
                 {t("dashboard_page.links.title")}
               </Typography>
               <Typography variant="body2" color="text.secondary">

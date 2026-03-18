@@ -1,0 +1,24 @@
+{
+  "name": "krishimitra-ai",
+  "private": true,
+  "workspaces": [
+    "apps/frontend",
+    "apps/mobile",
+    "packages/shared"
+  ],
+  "scripts": {
+    "backend:dev": ".\\.venv\\Scripts\\python.exe -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 --app-dir apps/backend",
+    "frontend:dev": "npm --prefix apps/frontend run dev",
+    "frontend:build": "npm --prefix apps/frontend run build",
+    "frontend:preview": "npm --prefix apps/frontend run preview",
+    "mobile:start": "npm --prefix apps/mobile run start",
+    "mobile:android": "npm --prefix apps/mobile run android",
+    "mobile:ios": "npm --prefix apps/mobile run ios",
+    "mobile:run:android": "npm --prefix apps/mobile run run:android",
+    "mobile:run:ios": "npm --prefix apps/mobile run run:ios",
+    "shared:typecheck": "npm --prefix packages/shared run typecheck"
+  },
+  "devDependencies": {
+    "vite": "^5.4.2"
+  }
+}

@@ -52,3 +52,19 @@ class RegionalInsightsResponse(BaseModel):
     farmers_needing_attention: List[FarmerAttentionItem]
     feedback_reliability: FeedbackReliabilityStats
     generated_at: datetime
+
+
+class DashboardHeroSummary(BaseModel):
+    latest_recommendation_id: Optional[str] = None
+    latest_recommendation_kind: Optional[str] = None
+    latest_recommendation_context: Optional[str] = None
+    latest_recommendation_created_at: Optional[datetime] = None
+    total_recommendations: int = 0
+    water_recommendation_count: int = 0
+    latest_water_savings_percent: Optional[float] = None
+    latest_water_crop: Optional[str] = None
+    latest_water_created_at: Optional[datetime] = None
+    latest_sustainability_score: Optional[float] = None
+    latest_sustainability_trend: Optional[str] = None
+    latest_feedback_created_at: Optional[datetime] = None
+    total_feedback: int = 0

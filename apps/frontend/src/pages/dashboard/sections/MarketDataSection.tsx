@@ -81,7 +81,12 @@ const sectionTitleSx = {
   letterSpacing: 0.2
 } as const;
 
-const formatCurrency = (value: number) => `₹${value.toFixed(0)}`;
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0
+  }).format(value);
 
 const MarketDataSection: React.FC<MarketDataSectionProps> = ({
   t,
@@ -105,6 +110,29 @@ const MarketDataSection: React.FC<MarketDataSectionProps> = ({
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
+  const translateCategory = (value: string) => {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === "all") return t("categories.all", { defaultValue: "All" });
+    if (normalized === "cereals") return t("categories.cereals", { defaultValue: "Cereals" });
+    if (normalized === "pulses") return t("categories.pulses", { defaultValue: "Pulses" });
+    if (normalized === "oilseeds") return t("categories.oilseeds", { defaultValue: "Oilseeds" });
+    if (normalized === "vegetables") return t("categories.vegetables", { defaultValue: "Vegetables" });
+    if (normalized === "fruits") return t("categories.fruits", { defaultValue: "Fruits" });
+    if (normalized === "spices") return t("categories.spices", { defaultValue: "Spices" });
+    return value;
+  };
+  const quickFilters = [
+    { key: "rice", label: t("crops.rice", { defaultValue: "Rice" }), crop: "Rice", category: "all" },
+    { key: "wheat", label: t("crops.wheat", { defaultValue: "Wheat" }), crop: "Wheat", category: "all" },
+    { key: "maize", label: t("crops.maize", { defaultValue: "Maize" }), crop: "Maize", category: "all" },
+    { key: "pulses", label: t("crops.pulses", { defaultValue: "Pulses" }), crop: null, category: "pulses" },
+    {
+      key: "vegetables",
+      label: t("crops.vegetables", { defaultValue: "Vegetables" }),
+      crop: null,
+      category: "vegetables"
+    }
+  ];
 
   const cardSx = {
     border: isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid #dde6d4",
@@ -221,7 +249,7 @@ const MarketDataSection: React.FC<MarketDataSectionProps> = ({
               >
                 <TextField
                   select
-                  label="Category"
+                  label={t("dashboard_page.mandi.category_label", { defaultValue: "Category" })}
                   value={mandiCategory}
                   onChange={(event) => setMandiCategory(String(event.target.value))}
                   size="small"
@@ -229,7 +257,7 @@ const MarketDataSection: React.FC<MarketDataSectionProps> = ({
                 >
                   {mandiCategoryOptions.map((category) => (
                     <MenuItem key={category} value={category}>
-                      {category === "all" ? "All" : category}
+                      {translateCategory(category)}
                     </MenuItem>
                   ))}
                 </TextField>
@@ -271,7 +299,10 @@ const MarketDataSection: React.FC<MarketDataSectionProps> = ({
                 >
                   {[7, 15, 30].map((days) => (
                     <MenuItem key={days} value={days}>
-                      {days} days
+                      {t("dashboard_page.mandi.days_option", {
+                        defaultValue: "{{count}} days",
+                        count: days
+                      })}
                     </MenuItem>
                   ))}
                 </TextField>
@@ -292,20 +323,20 @@ const MarketDataSection: React.FC<MarketDataSectionProps> = ({
               </Stack>
 
               <Stack direction="row" spacing={1} flexWrap="wrap">
-                {["Rice", "Wheat", "Maize", "Pulses", "Vegetables"].map((chip) => (
+                {quickFilters.map((chip) => (
                   <Chip
-                    key={chip}
-                    label={chip}
+                    key={chip.key}
+                    label={chip.label}
                     clickable
                     size="small"
-                    variant={mandiForm.crop === chip ? "filled" : "outlined"}
-                    color={mandiForm.crop === chip ? "secondary" : "default"}
+                    variant={mandiForm.crop === chip.crop || (!chip.crop && mandiCategory === chip.category) ? "filled" : "outlined"}
+                    color={mandiForm.crop === chip.crop || (!chip.crop && mandiCategory === chip.category) ? "secondary" : "default"}
                     onClick={() => {
-                      if (chip === "Pulses" || chip === "Vegetables") {
-                        setMandiCategory(chip.toLowerCase());
+                      if (!chip.crop) {
+                        setMandiCategory(chip.category);
                       } else {
                         setMandiCategory("all");
-                        setMandiForm((prev) => ({ ...prev, crop: chip }));
+                        setMandiForm((prev) => ({ ...prev, crop: chip.crop }));
                       }
                     }}
                     sx={{ mb: 1, borderRadius: 999, fontWeight: 600 }}
@@ -314,7 +345,10 @@ const MarketDataSection: React.FC<MarketDataSectionProps> = ({
                 <Chip
                   size="small"
                   variant="outlined"
-                  label={`${filteredMandiCrops.length} crops`}
+                  label={t("dashboard_page.mandi.crops_count", {
+                    defaultValue: "{{count}} crops",
+                    count: filteredMandiCrops.length
+                  })}
                   sx={{ mb: 1, borderRadius: 999, fontWeight: 600 }}
                 />
               </Stack>
@@ -328,7 +362,10 @@ const MarketDataSection: React.FC<MarketDataSectionProps> = ({
                     {nearestMarkets.map((market) => (
                       <Chip
                         key={market.name}
-                        label={`${market.name} ?? ${market.distanceKm.toFixed(0)} km`}
+                        label={`${market.name} | ${t("dashboard_page.mandi.km_away", {
+                          defaultValue: "{{distance}} km",
+                          distance: market.distanceKm.toFixed(0)
+                        })}`}
                         clickable
                         color={mandiForm.market === market.name ? "secondary" : "default"}
                         onClick={() => setMandiForm((prev) => ({ ...prev, market: market.name }))}
@@ -376,7 +413,10 @@ const MarketDataSection: React.FC<MarketDataSectionProps> = ({
                                 {typeof card.distanceKm === "number" && (
                                   <Chip
                                     size="small"
-                                    label={`${card.distanceKm.toFixed(0)} km`}
+                                    label={t("dashboard_page.mandi.km_away", {
+                                      defaultValue: "{{distance}} km",
+                                      distance: card.distanceKm.toFixed(0)
+                                    })}
                                     sx={{ borderRadius: 999, fontWeight: 700 }}
                                   />
                                 )}
@@ -384,7 +424,7 @@ const MarketDataSection: React.FC<MarketDataSectionProps> = ({
                               <Stack direction="row" spacing={2} justifyContent="space-between">
                                 <Box>
                                   <Typography variant="caption" color="text.secondary">
-                                    Min
+                                    {t("dashboard_page.mandi.min_label", { defaultValue: "Min" })}
                                   </Typography>
                                   <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                                     {formatCurrency(card.min)}
@@ -392,7 +432,7 @@ const MarketDataSection: React.FC<MarketDataSectionProps> = ({
                                 </Box>
                                 <Box>
                                   <Typography variant="caption" color="text.secondary">
-                                    Max
+                                    {t("dashboard_page.mandi.max_label", { defaultValue: "Max" })}
                                   </Typography>
                                   <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                                     {formatCurrency(card.max)}
@@ -400,7 +440,7 @@ const MarketDataSection: React.FC<MarketDataSectionProps> = ({
                                 </Box>
                                 <Box>
                                   <Typography variant="caption" color="text.secondary">
-                                    Modal
+                                    {t("dashboard_page.mandi.modal_label", { defaultValue: "Modal" })}
                                   </Typography>
                                   <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                                     {formatCurrency(card.modal)}
@@ -432,10 +472,32 @@ const MarketDataSection: React.FC<MarketDataSectionProps> = ({
 
               {mandiSummary && (
                 <Stack direction="row" spacing={1} flexWrap="wrap">
-                  <Chip size="small" label={`Latest ${mandiSummary.latest.toFixed(1)}`} sx={chipPillSx} />
-                  <Chip size="small" label={`Min ${mandiSummary.min.toFixed(1)}`} sx={chipPillSx} />
-                  <Chip size="small" label={`Max ${mandiSummary.max.toFixed(1)}`} sx={chipPillSx} />
-                  <Chip size="small" variant="outlined" label={`Source: ${mandiResult?.source || "stub"}`} />
+                  <Chip
+                    size="small"
+                    label={`${t("dashboard_page.mandi.latest_label", { defaultValue: "Latest" })} ${formatCurrency(
+                      mandiSummary.latest
+                    )}`}
+                    sx={chipPillSx}
+                  />
+                  <Chip
+                    size="small"
+                    label={`${t("dashboard_page.mandi.min_label", { defaultValue: "Min" })} ${formatCurrency(
+                      mandiSummary.min
+                    )}`}
+                    sx={chipPillSx}
+                  />
+                  <Chip
+                    size="small"
+                    label={`${t("dashboard_page.mandi.max_label", { defaultValue: "Max" })} ${formatCurrency(
+                      mandiSummary.max
+                    )}`}
+                    sx={chipPillSx}
+                  />
+                  <Chip
+                    size="small"
+                    variant="outlined"
+                    label={`${t("dashboard_page.mandi.source_label", { defaultValue: "Source" })}: ${mandiResult?.source || "stub"}`}
+                  />
                   <Chip
                     size="small"
                     color={mandiSummary.changePct >= 0 ? "success" : "warning"}

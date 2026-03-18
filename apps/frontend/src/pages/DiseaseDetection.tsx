@@ -9,12 +9,14 @@ import {
   Stack,
   Typography
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import AppLayout from "../components/common/AppLayout";
 import { isOnline } from "../utils/offlineStorage";
 import { predictDisease, queueDiseaseDetection, DiseasePrediction } from "../services/disease";
 import { captureDiseaseImage, isNativePlatform } from "../services/native";
 
 const DiseaseDetection: React.FC = () => {
+  const { t } = useTranslation();
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [result, setResult] = useState<DiseasePrediction | null>(null);
@@ -53,13 +55,13 @@ const DiseaseDetection: React.FC = () => {
     try {
       if (!isOnline()) {
         await queueDiseaseDetection(file);
-        setMessage("Offline Mode - detection will run when internet is available.");
+        setMessage(t("disease_page.offline_queue_success"));
         return;
       }
       const response = await predictDisease(file);
       setResult(response);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Failed to detect disease.");
+      setMessage(error instanceof Error ? error.message : t("disease_page.detect_failed"));
     } finally {
       setLoading(false);
     }
@@ -74,7 +76,7 @@ const DiseaseDetection: React.FC = () => {
       setFile(capture.file);
       setPreviewUrl(capture.previewUrl);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Camera capture failed.");
+      setMessage(error instanceof Error ? error.message : t("disease_page.camera_failed"));
     }
   };
 
@@ -85,22 +87,22 @@ const DiseaseDetection: React.FC = () => {
           <CardContent>
             <Stack spacing={2}>
               <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                Crop Disease Detection
+                {t("disease_page.title")}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Upload a clear leaf image to detect possible crop diseases and recommended treatments.
+                {t("disease_page.subtitle")}
               </Typography>
               {offline && (
-                <Alert severity="warning">Offline Mode - uploads will be queued for later detection.</Alert>
+                <Alert severity="warning">{t("disease_page.offline_notice")}</Alert>
               )}
               <Box>
                 <Button variant="outlined" component="label">
-                  Upload Crop Image
+                  {t("disease_page.upload")}
                   <input type="file" hidden accept="image/*" onChange={handleFileChange} />
                 </Button>
                 {nativeReady && (
                   <Button sx={{ ml: 2 }} variant="outlined" onClick={handleCapture}>
-                    Use Camera
+                    {t("disease_page.use_camera")}
                   </Button>
                 )}
               </Box>
@@ -108,12 +110,12 @@ const DiseaseDetection: React.FC = () => {
                 <Box
                   component="img"
                   src={previewUrl}
-                  alt="Crop preview"
+                  alt={t("disease_page.preview_alt")}
                   sx={{ maxWidth: 360, borderRadius: 2, border: "1px solid rgba(0,0,0,0.1)" }}
                 />
               )}
               <Button variant="contained" disabled={!file || loading} onClick={handleDetect}>
-                {loading ? "Detecting..." : "Detect Disease"}
+                {loading ? t("disease_page.detecting") : t("disease_page.detect")}
               </Button>
               {message && <Alert severity="info">{message}</Alert>}
             </Stack>
@@ -125,17 +127,21 @@ const DiseaseDetection: React.FC = () => {
             <CardContent>
               <Stack spacing={2}>
                 <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                  Detection Result
+                  {t("disease_page.result")}
                 </Typography>
                 <Divider />
                 <Typography variant="subtitle1">
-                  Crop: <strong>{result.crop}</strong>
+                  {t("disease_page.crop")}: <strong>{result.crop}</strong>
                 </Typography>
                 <Typography variant="subtitle1">
-                  Disease: <strong>{result.disease}</strong>
+                  {t("disease_page.disease")}: <strong>{result.disease}</strong>
                 </Typography>
-                <Typography variant="subtitle2">Confidence: {(result.confidence * 100).toFixed(1)}%</Typography>
-                <Typography variant="subtitle2">Severity: {result.severity}</Typography>
+                <Typography variant="subtitle2">
+                  {t("disease_page.confidence")}: {(result.confidence * 100).toFixed(1)}%
+                </Typography>
+                <Typography variant="subtitle2">
+                  {t("disease_page.severity")}: {result.severity}
+                </Typography>
 
                 {result.advisory && (
                   <Alert severity="info">
@@ -145,7 +151,7 @@ const DiseaseDetection: React.FC = () => {
 
                 <Box>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                    Treatment
+                    {t("disease_page.treatment")}
                   </Typography>
                   <Stack spacing={0.5}>
                     {result.treatment.map((item) => (
@@ -157,7 +163,7 @@ const DiseaseDetection: React.FC = () => {
                 </Box>
                 <Box>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                    Prevention
+                    {t("disease_page.prevention")}
                   </Typography>
                   <Stack spacing={0.5}>
                     {result.prevention.map((item) => (
@@ -169,7 +175,7 @@ const DiseaseDetection: React.FC = () => {
                 </Box>
                 <Box>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                    Organic Solutions
+                    {t("disease_page.organic_solutions")}
                   </Typography>
                   <Stack spacing={0.5}>
                     {result.organic_solutions.map((item) => (
@@ -181,7 +187,7 @@ const DiseaseDetection: React.FC = () => {
                 </Box>
                 <Box>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                    Recommended Products
+                    {t("disease_page.recommended_products")}
                   </Typography>
                   <Stack spacing={0.5}>
                     {result.recommended_products.map((item) => (
@@ -194,7 +200,7 @@ const DiseaseDetection: React.FC = () => {
                 {result.clarifying_questions && result.clarifying_questions.length > 0 && (
                   <Box>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                      Clarifying Questions
+                      {t("disease_page.clarifying_questions")}
                     </Typography>
                     <Stack spacing={0.5}>
                       {result.clarifying_questions.map((item) => (

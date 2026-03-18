@@ -40,6 +40,13 @@ const supportedLanguages = Object.keys(resources);
 const storedLangRaw = (localStorage.getItem("language") || "en").toLowerCase();
 const storedLang = supportedLanguages.includes(storedLangRaw) ? storedLangRaw : "en";
 
+const syncDocumentLanguage = (language: string) => {
+  if (typeof document === "undefined") return;
+  const short = String(language || "en").toLowerCase().split("-")[0];
+  document.documentElement.lang = short;
+  document.documentElement.setAttribute("data-language", short);
+};
+
 const sanitizeMojibake: PostProcessorModule = {
   name: "sanitizeMojibake",
   type: "postProcessor",
@@ -54,9 +61,13 @@ i18n.use(sanitizeMojibake).use(initReactI18next).init({
   lng: storedLang,
   fallbackLng: "en",
   postProcess: ["sanitizeMojibake"],
+  returnNull: false,
   interpolation: {
     escapeValue: false
   }
 });
+
+syncDocumentLanguage(storedLang);
+i18n.on("languageChanged", syncDocumentLanguage);
 
 export default i18n;

@@ -15,6 +15,8 @@ from app.data.mandi_catalog import MANDI_CROP_CATEGORIES, MANDI_MARKETS, crop_to
 from app.schemas.integrations import (
     MandiCatalogResponse,
     MandiCropCatalogItem,
+    LocationLookupResponse,
+    LocationSearchResponse,
     MandiPricePoint,
     MandiPriceResponse,
     WeatherResponse,
@@ -27,6 +29,7 @@ logger = get_logger(__name__)
 
 class ExternalDataService:
     DEFAULT_MANDI_API_URL = "https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070"
+    LOCATION_USER_AGENT = "KrishiMitra-AI/1.0"
 
     def __init__(self, db: Database | None = None) -> None:
         self._db = db
@@ -131,6 +134,98 @@ class ExternalDataService:
             stale_data_warning="Live weather feed unavailable. Showing cached/stub weather data.",
         )
 
+    async def reverse_geocode(self, lat: float, lon: float) -> LocationLookupResponse:
+        coordinate_label = self._coordinate_label(lat, lon)
+        providers = [
+            (
+                "open-meteo",
+                "https://geocoding-api.open-meteo.com/v1/reverse",
+                {"latitude": lat, "longitude": lon, "count": 1, "language": "en", "format": "json"},
+                self._parse_open_meteo_reverse,
+            ),
+            (
+                "bigdatacloud",
+                "https://api.bigdatacloud.net/data/reverse-geocode-client",
+                {"latitude": lat, "longitude": lon, "localityLanguage": "en"},
+                self._parse_bigdatacloud_reverse,
+            ),
+            (
+                "nominatim",
+                "https://nominatim.openstreetmap.org/reverse",
+                {"lat": lat, "lon": lon, "format": "jsonv2", "accept-language": "en"},
+                self._parse_nominatim_reverse,
+            ),
+        ]
+
+        async with httpx.AsyncClient(
+            timeout=settings.external_http_timeout_seconds,
+            headers={"User-Agent": self.LOCATION_USER_AGENT},
+        ) as client:
+            for source, url, params, parser in providers:
+                try:
+                    response = await client.get(url, params=params)
+                    response.raise_for_status()
+                    payload = parser(response.json(), lat=lat, lon=lon, fallback_label=coordinate_label)
+                    if payload.label:
+                        await self._audit_event(
+                            "reverse_geocode",
+                            {"latitude": lat, "longitude": lon, "source": source, "label": payload.label, "status": "success"},
+                        )
+                        return payload.model_copy(update={"source": source})
+                except Exception as exc:
+                    logger.warning("reverse_geocode_provider_failed", source=source, error=str(exc), latitude=lat, longitude=lon)
+
+        await self._audit_event(
+            "reverse_geocode",
+            {"latitude": lat, "longitude": lon, "source": "coordinates", "label": coordinate_label, "status": "fallback"},
+        )
+        return LocationLookupResponse(
+            latitude=lat,
+            longitude=lon,
+            label=coordinate_label,
+            source="coordinates",
+        )
+
+    async def geocode_location(self, query: str) -> LocationSearchResponse:
+        safe_query = (query or "").strip()
+        if not safe_query:
+            raise ValueError("Location query is required")
+
+        providers = [
+            (
+                "open-meteo",
+                "https://geocoding-api.open-meteo.com/v1/search",
+                {"name": safe_query, "count": 1, "language": "en", "format": "json"},
+                self._parse_open_meteo_search,
+            ),
+            (
+                "nominatim",
+                "https://nominatim.openstreetmap.org/search",
+                {"q": safe_query, "format": "jsonv2", "limit": 1, "accept-language": "en"},
+                self._parse_nominatim_search,
+            ),
+        ]
+
+        async with httpx.AsyncClient(
+            timeout=settings.external_http_timeout_seconds,
+            headers={"User-Agent": self.LOCATION_USER_AGENT},
+        ) as client:
+            for source, url, params, parser in providers:
+                try:
+                    response = await client.get(url, params=params)
+                    response.raise_for_status()
+                    payload = parser(response.json(), fallback_label=safe_query)
+                    if payload.label:
+                        await self._audit_event(
+                            "forward_geocode",
+                            {"query": safe_query, "source": source, "label": payload.label, "status": "success"},
+                        )
+                        return payload.model_copy(update={"source": source})
+                except Exception as exc:
+                    logger.warning("forward_geocode_provider_failed", source=source, error=str(exc), query=safe_query)
+
+        raise ValueError("Unable to resolve location name")
+
     async def fetch_mandi_prices(self, crop: str, market: str, days: int = 7) -> MandiPriceResponse:
         prices: List[MandiPricePoint] = []
         source = ""
@@ -229,6 +324,165 @@ class ExternalDataService:
             items = items[:limit]
 
         return MandiCatalogResponse(crops=items, markets=sorted(MANDI_MARKETS))
+
+    @staticmethod
+    def _coordinate_label(lat: float, lon: float) -> str:
+        return f"Lat {lat:.4f}, Lon {lon:.4f}"
+
+    @staticmethod
+    def _build_location_label(city: Optional[str], state: Optional[str], country: Optional[str], fallback: str) -> str:
+        parts = [part.strip() for part in [city, state, country] if part and part.strip()]
+        if not parts:
+            return fallback
+        return ", ".join(parts[:3])
+
+    def _build_lookup_response(
+        self,
+        *,
+        lat: float,
+        lon: float,
+        city: Optional[str],
+        state: Optional[str],
+        country: Optional[str],
+        source: str,
+        fallback_label: str,
+    ) -> LocationLookupResponse:
+        return LocationLookupResponse(
+            latitude=lat,
+            longitude=lon,
+            city=city,
+            state=state,
+            country=country,
+            label=self._build_location_label(city, state, country, fallback_label),
+            source=source,
+        )
+
+    def _build_search_response(
+        self,
+        *,
+        lat: float,
+        lon: float,
+        city: Optional[str],
+        state: Optional[str],
+        country: Optional[str],
+        source: str,
+        fallback_label: str,
+    ) -> LocationSearchResponse:
+        return LocationSearchResponse(
+            latitude=lat,
+            longitude=lon,
+            city=city,
+            state=state,
+            country=country,
+            label=self._build_location_label(city, state, country, fallback_label),
+            source=source,
+        )
+
+    def _parse_open_meteo_reverse(
+        self,
+        payload: dict,
+        *,
+        lat: float,
+        lon: float,
+        fallback_label: str,
+    ) -> LocationLookupResponse:
+        result = payload.get("results", [None])[0] if isinstance(payload.get("results"), list) else None
+        if not result:
+            raise ValueError("No reverse geocode result")
+        return self._build_lookup_response(
+            lat=lat,
+            lon=lon,
+            city=str(result.get("name") or result.get("city") or result.get("admin2") or "").strip() or None,
+            state=str(result.get("admin1") or "").strip() or None,
+            country=str(result.get("country") or "").strip() or None,
+            source="open-meteo",
+            fallback_label=fallback_label,
+        )
+
+    def _parse_bigdatacloud_reverse(
+        self,
+        payload: dict,
+        *,
+        lat: float,
+        lon: float,
+        fallback_label: str,
+    ) -> LocationLookupResponse:
+        locality_info = payload.get("localityInfo") or {}
+        administrative = locality_info.get("administrative") if isinstance(locality_info, dict) else []
+        admin_name = None
+        if isinstance(administrative, list) and len(administrative) > 2 and isinstance(administrative[2], dict):
+            admin_name = administrative[2].get("name")
+        return self._build_lookup_response(
+            lat=lat,
+            lon=lon,
+            city=str(payload.get("city") or payload.get("locality") or admin_name or "").strip() or None,
+            state=str(payload.get("principalSubdivision") or "").strip() or None,
+            country=str(payload.get("countryName") or "").strip() or None,
+            source="bigdatacloud",
+            fallback_label=fallback_label,
+        )
+
+    def _parse_nominatim_reverse(
+        self,
+        payload: dict,
+        *,
+        lat: float,
+        lon: float,
+        fallback_label: str,
+    ) -> LocationLookupResponse:
+        address = payload.get("address") if isinstance(payload.get("address"), dict) else {}
+        city = (
+            address.get("city")
+            or address.get("town")
+            or address.get("village")
+            or address.get("hamlet")
+            or payload.get("name")
+        )
+        state = address.get("state") or address.get("county")
+        country = address.get("country")
+        return self._build_lookup_response(
+            lat=lat,
+            lon=lon,
+            city=str(city or "").strip() or None,
+            state=str(state or "").strip() or None,
+            country=str(country or "").strip() or None,
+            source="nominatim",
+            fallback_label=fallback_label,
+        )
+
+    def _parse_open_meteo_search(self, payload: dict, *, fallback_label: str) -> LocationSearchResponse:
+        result = payload.get("results", [None])[0] if isinstance(payload.get("results"), list) else None
+        if not result:
+            raise ValueError("No geocode result")
+        lat = float(result.get("latitude"))
+        lon = float(result.get("longitude"))
+        return self._build_search_response(
+            lat=lat,
+            lon=lon,
+            city=str(result.get("name") or "").strip() or None,
+            state=str(result.get("admin1") or "").strip() or None,
+            country=str(result.get("country") or "").strip() or None,
+            source="open-meteo",
+            fallback_label=fallback_label,
+        )
+
+    def _parse_nominatim_search(self, payload: object, *, fallback_label: str) -> LocationSearchResponse:
+        result = payload[0] if isinstance(payload, list) and payload else None
+        if not isinstance(result, dict):
+            raise ValueError("No geocode result")
+        address = result.get("address") if isinstance(result.get("address"), dict) else {}
+        city = address.get("city") or address.get("town") or address.get("village") or address.get("hamlet")
+        state = address.get("state") or address.get("county")
+        country = address.get("country")
+        return self._build_search_response(
+            lat=float(result.get("lat")),
+            lon=float(result.get("lon")),
+            city=str(city or result.get("name") or "").strip() or None,
+            state=str(state or "").strip() or None,
+            country=str(country or "").strip() or None,
+            source="nominatim",
+            fallback_label=fallback_label,
+        )
 
     def _parse_weather(self, payload: dict, days: int) -> List[WeatherDay]:
         forecast = []

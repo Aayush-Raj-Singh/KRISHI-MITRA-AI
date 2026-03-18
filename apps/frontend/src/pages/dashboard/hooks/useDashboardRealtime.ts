@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { resolveWsUrl } from "../../../services/runtimeConfig";
+import { useTranslatedStrings } from "../../../utils/useTranslatedStrings";
 import { useWebSocket } from "../../../utils/useWebSocket";
 
 export interface DashboardRealtimeEvent {
@@ -16,31 +17,49 @@ const useDashboardRealtime = (accessToken?: string | null) => {
   const wsAuthMessage = accessToken ? JSON.stringify({ type: "auth", token: accessToken }) : undefined;
   const { status: wsStatus, lastEvent } = useWebSocket(wsUrl, wsAuthMessage);
   const [realtimeEvents, setRealtimeEvents] = useState<DashboardRealtimeEvent[]>([]);
+  const realtimeCopy = useTranslatedStrings(
+    useMemo(
+      () => ({
+        eventFallback: "event",
+        operationPrefix: "Operation",
+        scheduled: "scheduled",
+        triggered: "triggered",
+        feedbackRecorded: "Outcome feedback recorded",
+        quickRatingReceived: "Quick rating received for",
+        serviceFallback: "service",
+        realtimeConnected: "Realtime channel connected"
+      }),
+      []
+    )
+  );
 
   useEffect(() => {
     if (!lastEvent || typeof lastEvent !== "object") return;
     const eventType = String(lastEvent.event || "");
     const timestamp = String(lastEvent.server_time || lastEvent.triggered_at || new Date().toISOString());
 
-    let summary = eventType || "event";
+    let summary = eventType || realtimeCopy.eventFallback;
     let severity: "info" | "success" | "warning" = "info";
     if (eventType.startsWith("operation")) {
       const operation = String(lastEvent.operation || "");
-      summary = `Operation ${operation.replace(/_/g, " ")} ${eventType.includes("scheduled") ? "scheduled" : "triggered"}`;
+      summary = `${realtimeCopy.operationPrefix} ${operation.replace(/_/g, " ")} ${
+        eventType.includes("scheduled") ? realtimeCopy.scheduled : realtimeCopy.triggered
+      }`;
       severity = "success";
     } else if (eventType === "feedback.submitted") {
-      summary = `Outcome feedback recorded (rating ${String(lastEvent.rating || "-")})`;
+      summary = `${realtimeCopy.feedbackRecorded} (rating ${String(lastEvent.rating || "-")})`;
       severity = "info";
     } else if (eventType === "feedback.quick_submitted") {
-      summary = `Quick rating received for ${String(lastEvent.service || "service")}`;
+      summary = `${realtimeCopy.quickRatingReceived} ${String(lastEvent.service || realtimeCopy.serviceFallback)}`;
       severity = "info";
     } else if (eventType === "connected") {
-      summary = "Realtime channel connected";
+      summary = realtimeCopy.realtimeConnected;
       severity = "success";
     }
 
-    setRealtimeEvents((prev) => [{ id: `${eventType}-${timestamp}`, summary, time: timestamp, severity }, ...prev].slice(0, 6));
-  }, [lastEvent]);
+    const nextId = `${eventType}-${timestamp}`;
+    setRealtimeEvents((prev) => [{ id: nextId, summary, time: timestamp, severity }, ...prev.filter((item) => item.id !== nextId)].slice(0, 6));
+  }, [lastEvent, realtimeCopy]);
 
   return {
     wsStatus,

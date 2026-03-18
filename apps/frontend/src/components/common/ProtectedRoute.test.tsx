@@ -1,20 +1,19 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import ProtectedRoute from "./ProtectedRoute";
 import authReducer from "../../store/authSlice";
+import type { UserPublic } from "../../services/auth";
 
 const { fetchCurrentUserMock } = vi.hoisted(() => ({
   fetchCurrentUserMock: vi.fn()
 }));
 
 vi.mock("../../services/auth", async () => {
-  const actual = await vi.importActual<typeof import("../../services/auth")>("../../services/auth");
   return {
-    ...actual,
     fetchCurrentUser: fetchCurrentUserMock
   };
 });
@@ -22,26 +21,14 @@ vi.mock("../../services/auth", async () => {
 const renderProtectedRoute = (authState: {
   accessToken: string | null;
   refreshToken: string | null;
-  user: {
-    id: string;
-    name: string;
-    phone: string;
-    role: string;
-    location: string;
-    farm_size: number;
-    soil_type: string;
-    water_source: string;
-    primary_crops: string[];
-    language: string;
-    created_at: string;
-  } | null;
+  user: UserPublic | null;
 }) => {
   const store = configureStore({
     reducer: { auth: authReducer },
     preloadedState: { auth: authState }
   });
 
-  render(
+  const utils = render(
     <Provider store={store}>
       <MemoryRouter initialEntries={["/dashboard"]}>
         <Routes>
@@ -54,7 +41,7 @@ const renderProtectedRoute = (authState: {
     </Provider>
   );
 
-  return store;
+  return { store, ...utils };
 };
 
 describe("ProtectedRoute", () => {
@@ -63,13 +50,13 @@ describe("ProtectedRoute", () => {
   });
 
   it("redirects to login when there is no access token", async () => {
-    renderProtectedRoute({
+    const { findByText } = renderProtectedRoute({
       accessToken: null,
       refreshToken: null,
       user: null
     });
 
-    expect(await screen.findByText("Login Screen")).toBeInTheDocument();
+    expect(await findByText("Login Screen")).toBeInTheDocument();
     expect(fetchCurrentUserMock).not.toHaveBeenCalled();
   });
 
@@ -85,17 +72,19 @@ describe("ProtectedRoute", () => {
       water_source: "canal",
       primary_crops: ["rice"],
       language: "en",
+      assigned_regions: [],
+      risk_view_consent: false,
       created_at: new Date().toISOString()
     });
 
-    const store = renderProtectedRoute({
+    const { findByText, store } = renderProtectedRoute({
       accessToken: "token",
       refreshToken: "refresh",
       user: null
     });
 
-    expect(await screen.findByText("Dashboard Screen")).toBeInTheDocument();
-    await waitFor(() => {
+    expect(await findByText("Dashboard Screen")).toBeInTheDocument();
+    await vi.waitFor(() => {
       expect(fetchCurrentUserMock).toHaveBeenCalledTimes(1);
     });
     expect(store.getState().auth.user?.name).toBe("Officer One");
@@ -104,14 +93,14 @@ describe("ProtectedRoute", () => {
   it("logs out and redirects when bootstrap fails", async () => {
     fetchCurrentUserMock.mockRejectedValue(new Error("unauthorized"));
 
-    const store = renderProtectedRoute({
+    const { findByText, store } = renderProtectedRoute({
       accessToken: "token",
       refreshToken: "refresh",
       user: null
     });
 
-    expect(await screen.findByText("Login Screen")).toBeInTheDocument();
-    await waitFor(() => {
+    expect(await findByText("Login Screen")).toBeInTheDocument();
+    await vi.waitFor(() => {
       expect(fetchCurrentUserMock).toHaveBeenCalledTimes(1);
     });
     expect(store.getState().auth.accessToken).toBeNull();

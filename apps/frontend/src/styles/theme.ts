@@ -1,6 +1,11 @@
 import { createTheme } from "@mui/material/styles";
 import type { PaletteMode } from "@mui/material";
 
+const bodyFontFamily =
+  'var(--app-body-font), "Mukta", "Noto Sans Devanagari", "Noto Sans Bengali", "Noto Sans Gurmukhi", "Noto Sans Gujarati", "Noto Sans Kannada", "Noto Sans Malayalam", "Noto Sans Oriya", "Noto Sans Tamil", "Noto Sans Telugu", "Noto Naskh Arabic", sans-serif';
+const headingFontFamily =
+  'var(--app-heading-font), var(--app-body-font), "Mukta", "Noto Sans Devanagari", "Noto Sans Bengali", "Noto Sans Gurmukhi", "Noto Sans Gujarati", "Noto Sans Kannada", "Noto Sans Malayalam", "Noto Sans Oriya", "Noto Sans Tamil", "Noto Sans Telugu", "Noto Naskh Arabic", serif';
+
 export const createAppTheme = (mode: PaletteMode) => {
   const isDark = mode === "dark";
 
@@ -50,23 +55,20 @@ export const createAppTheme = (mode: PaletteMode) => {
       divider: isDark ? "rgba(255,255,255,0.12)" : "rgba(21, 86, 45, 0.16)"
     },
     typography: {
-      fontFamily:
-        '"Mukta", "Noto Sans Devanagari", "Noto Sans Bengali", "Noto Sans Gurmukhi", "Noto Sans Gujarati", "Noto Sans Kannada", "Noto Sans Malayalam", "Noto Sans Oriya", "Noto Sans Tamil", "Noto Sans Telugu", "Noto Naskh Arabic", sans-serif',
+      fontFamily: bodyFontFamily,
       h1: {
         fontWeight: 700,
         fontSize: "3.1rem",
         lineHeight: 1.08,
         letterSpacing: 0.2,
-        fontFamily:
-          '"Prata", "Mukta", "Noto Sans Devanagari", "Noto Sans Bengali", "Noto Sans Gurmukhi", "Noto Sans Gujarati", "Noto Sans Kannada", "Noto Sans Malayalam", "Noto Sans Oriya", "Noto Sans Tamil", "Noto Sans Telugu", "Noto Naskh Arabic", serif'
+        fontFamily: headingFontFamily
       },
       h2: {
         fontWeight: 700,
         fontSize: "2.5rem",
         lineHeight: 1.12,
         letterSpacing: 0.15,
-        fontFamily:
-          '"Prata", "Mukta", "Noto Sans Devanagari", "Noto Sans Bengali", "Noto Sans Gurmukhi", "Noto Sans Gujarati", "Noto Sans Kannada", "Noto Sans Malayalam", "Noto Sans Oriya", "Noto Sans Tamil", "Noto Sans Telugu", "Noto Naskh Arabic", serif'
+        fontFamily: headingFontFamily
       },
       h3: { fontWeight: 700, fontSize: "1.85rem", lineHeight: 1.2 },
       h4: { fontWeight: 700, fontSize: "1.48rem", lineHeight: 1.25 },
@@ -188,6 +190,17 @@ export const createAppTheme = (mode: PaletteMode) => {
       MuiTextField: {
         defaultProps: {
           size: "small"
+        }
+      },
+      MuiContainer: {
+        styleOverrides: {
+          root: {
+            width: "min(100%, var(--app-shell-width))",
+            maxWidth: "var(--app-shell-width) !important",
+            marginInline: "auto",
+            paddingLeft: "var(--app-shell-inline-pad) !important",
+            paddingRight: "var(--app-shell-inline-pad) !important"
+          }
         }
       },
       MuiStack: {
