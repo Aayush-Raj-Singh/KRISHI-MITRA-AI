@@ -51,7 +51,6 @@ services:
   - name: krishimitra-ai-web
     type: web
     runtime: static
-    plan: free
     autoDeployTrigger: commit
     buildCommand: npm install --legacy-peer-deps && npm run frontend:build
     staticPublishPath: apps/frontend/dist
