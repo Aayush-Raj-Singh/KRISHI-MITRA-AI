@@ -17,8 +17,14 @@ services:
     envVars:
       - key: ENVIRONMENT
         value: development
+      - key: DATABASE_URL
+        value: ""
       - key: ALLOW_INMEMORY_DB_FALLBACK
         value: "true"
+      - key: DB_CONNECT_MAX_ATTEMPTS
+        value: "1"
+      - key: DB_CONNECT_RETRY_DELAY_SECONDS
+        value: "0.1"
       - key: ENFORCE_SECURE_SECRETS
         value: "false"
       - key: CORS_ORIGINS
