@@ -1,5 +1,5 @@
-import React, { Suspense } from "react";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import React, { Suspense, useEffect } from "react";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
@@ -9,35 +9,35 @@ import RegisterPage from "./pages/RegisterPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import { useAppSelector } from "./store/hooks";
-
-const LandingPage = React.lazy(() => import("./pages/LandingPage"));
-const AdvisoryPage = React.lazy(() => import("./pages/AdvisoryPage"));
-const AdminMasterDataPage = React.lazy(() => import("./pages/AdminMasterDataPage"));
-const AuditLogsPage = React.lazy(() => import("./pages/AuditLogsPage"));
-const DashboardPage = React.lazy(() => import("./pages/DashboardPage"));
-const DataQualityPage = React.lazy(() => import("./pages/DataQualityPage"));
-const DiseaseDetection = React.lazy(() => import("./pages/DiseaseDetection"));
-const HelpdeskPage = React.lazy(() => import("./pages/HelpdeskPage"));
-const MarketDirectoryPage = React.lazy(() => import("./pages/MarketDirectoryPage"));
-const MarketIntelligencePage = React.lazy(() => import("./pages/MarketIntelligencePage"));
-const NoticesPage = React.lazy(() => import("./pages/NoticesPage"));
-const OfficerWorkflowPage = React.lazy(() => import("./pages/OfficerWorkflowPage"));
-const OutcomeFeedbackPage = React.lazy(() => import("./pages/OutcomeFeedbackPage"));
-const PortalPage = React.lazy(() => import("./pages/PortalPage"));
-const ProfilePage = React.lazy(() => import("./pages/ProfilePage"));
-const ModernFarmingPage = React.lazy(() => import("./pages/ModernFarmingPage"));
-const ServicesPage = React.lazy(() => import("./pages/ServicesPage"));
-const FarmOperationsPage = React.lazy(() => import("./pages/FarmOperationsPage"));
-const NationalAgricultureIntelligencePage = React.lazy(
-  () => import("./pages/NationalAgricultureIntelligencePage"),
-);
+import {
+  AdminMasterDataPageLazy,
+  AdvisoryPageLazy,
+  AuditLogsPageLazy,
+  DashboardPageLazy,
+  DataQualityPageLazy,
+  DiseaseDetectionPageLazy,
+  FarmOperationsPageLazy,
+  HelpdeskPageLazy,
+  LandingPageLazy,
+  MarketDirectoryPageLazy,
+  MarketIntelligencePageLazy,
+  ModernFarmingPageLazy,
+  NationalAgricultureIntelligencePageLazy,
+  NoticesPageLazy,
+  OfficerWorkflowPageLazy,
+  OutcomeFeedbackPageLazy,
+  PortalPageLazy,
+  primeRouteModules,
+  ProfilePageLazy,
+  ServicesPageLazy,
+} from "./routes/routeModules";
 
 const LandingRoute: React.FC = () => {
   const accessToken = useAppSelector((state) => state.auth.accessToken);
   if (accessToken) {
     return <Navigate to="/dashboard" replace />;
   }
-  return <LandingPage />;
+  return <LandingPageLazy />;
 };
 
 const RouteLoadingFallback: React.FC = () => {
@@ -63,9 +63,15 @@ const RouteLoadingFallback: React.FC = () => {
   );
 };
 
-const App: React.FC = () => (
-  <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
-    <Suspense fallback={<RouteLoadingFallback />}>
+const AppRoutes: React.FC = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    primeRouteModules();
+  }, []);
+
+  return (
+    <Suspense key={location.pathname} fallback={<RouteLoadingFallback />}>
       <Routes>
         <Route path="/" element={<LandingRoute />} />
         <Route path="/login" element={<LoginPage />} />
@@ -73,7 +79,7 @@ const App: React.FC = () => (
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/403" element={<ForbiddenPage />} />
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/dashboard" element={<DashboardPageLazy />} />
           <Route
             path="/dashboard/price-arrival"
             element={<Navigate to="/services/market-intelligence?tab=arrivals" replace />}
@@ -82,22 +88,25 @@ const App: React.FC = () => (
             path="/analytics/trends"
             element={<Navigate to="/services/market-intelligence?tab=trends" replace />}
           />
-          <Route path="/mandi-directory" element={<MarketDirectoryPage />} />
-          <Route path="/helpdesk" element={<HelpdeskPage />} />
+          <Route path="/mandi-directory" element={<MarketDirectoryPageLazy />} />
+          <Route path="/helpdesk" element={<HelpdeskPageLazy />} />
           <Route
             path="/alerts/market"
             element={<Navigate to="/services/market-intelligence?tab=alerts" replace />}
           />
-          <Route path="/portal" element={<PortalPage />} />
-          <Route path="/advisory" element={<AdvisoryPage />} />
-          <Route path="/notices" element={<NoticesPage />} />
-          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/portal" element={<PortalPageLazy />} />
+          <Route path="/advisory" element={<AdvisoryPageLazy />} />
+          <Route path="/notices" element={<NoticesPageLazy />} />
+          <Route path="/services" element={<ServicesPageLazy />} />
           <Route
             path="/services/national-intelligence"
-            element={<NationalAgricultureIntelligencePage />}
+            element={<NationalAgricultureIntelligencePageLazy />}
           />
-          <Route path="/services/market-intelligence" element={<MarketIntelligencePage />} />
-          <Route path="/services/farm-operations" element={<FarmOperationsPage />} />
+          <Route
+            path="/services/market-intelligence"
+            element={<MarketIntelligencePageLazy />}
+          />
+          <Route path="/services/farm-operations" element={<FarmOperationsPageLazy />} />
           <Route
             path="/services/crop"
             element={<Navigate to="/services/farm-operations?tab=crop" replace />}
@@ -110,22 +119,28 @@ const App: React.FC = () => (
             path="/services/water"
             element={<Navigate to="/services/farm-operations?tab=water" replace />}
           />
-          <Route path="/services/feedback" element={<OutcomeFeedbackPage />} />
-          <Route path="/services/modern-farming" element={<ModernFarmingPage />} />
-          <Route path="/disease-detection" element={<DiseaseDetection />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/services/feedback" element={<OutcomeFeedbackPageLazy />} />
+          <Route path="/services/modern-farming" element={<ModernFarmingPageLazy />} />
+          <Route path="/disease-detection" element={<DiseaseDetectionPageLazy />} />
+          <Route path="/profile" element={<ProfilePageLazy />} />
         </Route>
         <Route element={<ProtectedRoute roles={["extension_officer", "admin"]} />}>
-          <Route path="/officer/workflow" element={<OfficerWorkflowPage />} />
+          <Route path="/officer/workflow" element={<OfficerWorkflowPageLazy />} />
         </Route>
         <Route element={<ProtectedRoute roles={["admin"]} />}>
-          <Route path="/admin/master-data" element={<AdminMasterDataPage />} />
-          <Route path="/admin/audit-logs" element={<AuditLogsPage />} />
-          <Route path="/admin/quality" element={<DataQualityPage />} />
+          <Route path="/admin/master-data" element={<AdminMasterDataPageLazy />} />
+          <Route path="/admin/audit-logs" element={<AuditLogsPageLazy />} />
+          <Route path="/admin/quality" element={<DataQualityPageLazy />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>
+  );
+};
+
+const App: React.FC = () => (
+  <BrowserRouter>
+    <AppRoutes />
   </BrowserRouter>
 );
 

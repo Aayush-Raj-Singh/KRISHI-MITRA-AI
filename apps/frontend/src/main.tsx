@@ -18,7 +18,16 @@ import { initPushNotifications } from "./services/native";
 import { LocationProvider } from "./context/LocationContext";
 import "./styles/global.css";
 
-registerSW({ immediate: true });
+if (import.meta.env.DEV && "serviceWorker" in navigator) {
+  void navigator.serviceWorker
+    .getRegistrations()
+    .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+    .catch(() => undefined);
+}
+
+if (import.meta.env.PROD) {
+  registerSW({ immediate: false });
+}
 initOfflineSync();
 initApiClientSync();
 initDiseaseQueueSync();

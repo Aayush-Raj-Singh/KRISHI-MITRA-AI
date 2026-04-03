@@ -47,6 +47,7 @@ import { EXTERNAL_PORTALS, HEADER_BADGES } from "./layoutPortalData";
 import WeatherWidget from "./WeatherWidget";
 import { useWebSocket } from "../../utils/useWebSocket";
 import { useAppTheme } from "../../hooks/useTheme";
+import { preloadRouteModule } from "../../routes/routeModules";
 
 const drawerWidth = 280;
 const spacingScale = {
@@ -339,6 +340,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
   };
 
   const handleNav = (path: string) => {
+    void preloadRouteModule(path);
     navigate(path);
     setMobileOpen(false);
   };
