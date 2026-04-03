@@ -665,7 +665,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
         <Divider />
         <List>
           {navItems.map((item) => (
-            <ListItemButton key={item.path} onClick={() => handleNav(item.path)}>
+            <ListItemButton
+              key={item.path}
+              onClick={() => handleNav(item.path)}
+              onMouseEnter={() => void preloadRouteModule(item.path)}
+              onFocus={() => void preloadRouteModule(item.path)}
+            >
               <ListItemText
                 primary={item.label}
                 primaryTypographyProps={{
@@ -684,7 +689,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
         </Typography>
         <List>
           {serviceItems.map((item) => (
-            <ListItemButton key={item.path} onClick={() => handleNav(item.path)}>
+            <ListItemButton
+              key={item.path}
+              onClick={() => handleNav(item.path)}
+              onMouseEnter={() => void preloadRouteModule(item.path)}
+              onFocus={() => void preloadRouteModule(item.path)}
+            >
               <ListItemText
                 primary={item.label}
                 primaryTypographyProps={{
@@ -1083,6 +1093,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
                         key={item.path}
                         color="inherit"
                         onClick={() => handleNav(item.path)}
+                        onMouseEnter={() => void preloadRouteModule(item.path)}
+                        onFocus={() => void preloadRouteModule(item.path)}
                         sx={{
                           ...navButtonSx,
                           borderBottom:
@@ -1097,6 +1109,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
                     <Button
                       color="inherit"
                       onClick={handleServicesOpen}
+                      onMouseEnter={() =>
+                        serviceMenuItems.forEach((item) => {
+                          void preloadRouteModule(item.path);
+                        })
+                      }
                       endIcon={<KeyboardArrowDownIcon />}
                       aria-controls={servicesMenuOpen ? "services-menu" : undefined}
                       aria-haspopup="true"
@@ -1236,6 +1253,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
           <MenuItem
             key={item.path}
             onClick={() => handleServiceNavigate(item.path)}
+            onMouseEnter={() => void preloadRouteModule(item.path)}
+            onFocus={() => void preloadRouteModule(item.path)}
             sx={{
               whiteSpace: "normal",
               lineHeight: 1.2,

@@ -65,14 +65,16 @@ const RouteLoadingFallback: React.FC = () => {
 
 const AppRoutes: React.FC = () => {
   const location = useLocation();
+  const routeSignature = `${location.pathname}${location.search}`;
 
   useEffect(() => {
     primeRouteModules();
   }, []);
 
   return (
-    <Suspense key={location.pathname} fallback={<RouteLoadingFallback />}>
-      <Routes>
+    <Suspense key={routeSignature} fallback={<RouteLoadingFallback />}>
+      <Box key={routeSignature} className="route-transition-shell route-transition-shell--field">
+        <Routes>
         <Route path="/" element={<LandingRoute />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -133,7 +135,8 @@ const AppRoutes: React.FC = () => {
           <Route path="/admin/quality" element={<DataQualityPageLazy />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+        </Routes>
+      </Box>
     </Suspense>
   );
 };

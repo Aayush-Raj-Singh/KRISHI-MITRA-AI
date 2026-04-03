@@ -235,6 +235,103 @@ html[data-language="ur"] {
   animation: appFadeSlideIn 320ms ease-out both;
 }
 
+@keyframes routeFieldIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0) scale(0.988);
+    filter: blur(8px);
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes routeFieldSheen {
+  0% {
+    opacity: 0;
+    transform: translate3d(-3%, 0, 0) scaleX(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scaleX(1);
+  }
+}
+
+@keyframes routeViewOld {
+  from {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.992);
+    filter: blur(5px);
+  }
+}
+
+@keyframes routeViewNew {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0) scale(0.992);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.route-transition-shell {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  animation: routeFieldIn 420ms cubic-bezier(0.2, 0.8, 0.22, 1) both;
+  will-change: opacity, transform, filter;
+}
+
+.route-transition-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      118deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.1) 18%,
+      rgba(171, 210, 157, 0.12) 44%,
+      rgba(255, 255, 255, 0.04) 68%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  opacity: 0;
+  animation: routeFieldSheen 480ms ease-out both;
+}
+
+.route-transition-shell--field {
+  transform-origin: top center;
+}
+
+@supports (view-transition-name: route-shell) {
+  .route-transition-shell {
+    view-transition-name: route-shell;
+  }
+
+  ::view-transition-old(route-shell) {
+    animation: routeViewOld 180ms ease both;
+  }
+
+  ::view-transition-new(route-shell) {
+    animation: routeViewNew 300ms cubic-bezier(0.2, 0.8, 0.22, 1) both;
+  }
+}
+
 @media (max-width: 900px) {
   #app-loading img {
     height: 36px;
@@ -295,6 +392,13 @@ img {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .route-transition-shell,
+  .route-transition-shell::before {
+    animation: none !important;
+    filter: none !important;
+    transform: none !important;
+  }
+
   .external-links-track,
   .notice-scroll-track,
   .notice-gallery-track {
