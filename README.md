@@ -2,6 +2,16 @@
 
 KrishiMitra AI is an agriculture decision-support platform with a FastAPI backend, a React web app, and a React Native mobile app. The existing business flows stay intact while the runtime wiring is cleaned up around PostgreSQL, shared API contracts, and mobile-first environment configuration.
 
+## Render deployment
+
+The repository now includes a Render Blueprint at [render.yaml](render.yaml) for a free demo deployment:
+
+- frontend static site on Render
+- FastAPI backend web service on Render
+- in-memory backend fallback enabled by default for zero-cost setup
+
+Deployment steps are documented in [render-deployment.md](docs/render-deployment.md).
+
 ## Overview
 
 KrishiMitra AI supports farmers, extension officers, and administrators with:
