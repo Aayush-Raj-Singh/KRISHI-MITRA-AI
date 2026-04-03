@@ -7,6 +7,32 @@ export interface PortalBadge {
   verified?: boolean;
 }
 
+const TRUSTED_PORTAL_DOMAINS = [
+  "agmarknet.gov.in",
+  "amritmahotsav.nic.in",
+  "data.gov.in",
+  "digitalindia.gov.in",
+  "enam.gov.in",
+  "farmer.gov.in",
+  "g20.org",
+  "india.gov.in",
+  "mkisan.gov.in",
+  "mygov.in",
+  "pgportal.gov.in",
+  "pmfby.gov.in",
+  "pmkisan.gov.in",
+  "soilhealth.dac.gov.in",
+] as const;
+
+export const isTrustedPortalUrl = (url: string) => {
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+    return TRUSTED_PORTAL_DOMAINS.some((domain) => host === domain || host.endsWith(`.${domain}`));
+  } catch {
+    return false;
+  }
+};
+
 export const EXTERNAL_PORTALS: PortalBadge[] = [
   {
     name: "Data Gov",
@@ -119,3 +145,11 @@ export const HEADER_BADGES: PortalBadge[] = [
     verified: true,
   },
 ];
+
+export const TRUSTED_EXTERNAL_PORTALS = EXTERNAL_PORTALS.filter(
+  (portal) => Boolean(portal.verified) && isTrustedPortalUrl(portal.url),
+);
+
+export const TRUSTED_HEADER_BADGES = HEADER_BADGES.filter(
+  (portal) => Boolean(portal.verified) && isTrustedPortalUrl(portal.url),
+);

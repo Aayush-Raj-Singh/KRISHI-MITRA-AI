@@ -37,14 +37,12 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { logout } from "../../store/authSlice";
 import { logoutAuthSession } from "../../services/auth";
 import { getRefreshToken } from "../../services/authStorage";
-import { buildRedirectUrl } from "../../services/links";
 import { resolveWsUrl } from "../../services/runtimeConfig";
 import { useTranslatedStrings } from "../../utils/useTranslatedStrings";
 import { navigateWithViewTransition } from "../../utils/viewTransitions";
 import ExternalPortalsMarquee from "./ExternalPortalsMarquee";
-import ExternalLinkWarningDialog from "./ExternalLinkWarningDialog";
 import LayoutFooterLinks from "./LayoutFooterLinks";
-import { EXTERNAL_PORTALS, HEADER_BADGES } from "./layoutPortalData";
+import { TRUSTED_EXTERNAL_PORTALS, TRUSTED_HEADER_BADGES } from "./layoutPortalData";
 import WeatherWidget from "./WeatherWidget";
 import { useWebSocket } from "../../utils/useWebSocket";
 import { useAppTheme } from "../../hooks/useTheme";
@@ -105,8 +103,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
   const isMobile = useMediaQuery("(max-width:900px)");
 
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [externalLinkUrl, setExternalLinkUrl] = useState<string | null>(null);
-  const [externalLinkOpen, setExternalLinkOpen] = useState(false);
   const [servicesAnchorEl, setServicesAnchorEl] = useState<null | HTMLElement>(null);
   const [languageAnchorEl, setLanguageAnchorEl] = useState<null | HTMLElement>(null);
   const [liveAnchorEl, setLiveAnchorEl] = useState<null | HTMLElement>(null);
@@ -248,12 +244,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
       [],
     ),
   );
-  const externalPortals = EXTERNAL_PORTALS;
+  const externalPortals = TRUSTED_EXTERNAL_PORTALS;
   const slidingExternalPortals = useMemo(
     () => [...externalPortals, ...externalPortals],
     [externalPortals],
   );
-  const headerBadges = HEADER_BADGES;
+  const headerBadges = TRUSTED_HEADER_BADGES;
   const wsBaseUrl = resolveWsUrl(import.meta.env.VITE_WS_URL as string | undefined);
   const wsUrl = accessToken ? wsBaseUrl : undefined;
   const wsAuthMessage = accessToken
@@ -390,26 +386,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
 
   const handleThemeToggle = () => {
     toggleTheme();
-  };
-
-  const handleExternalLink = (url: string) => {
-    setExternalLinkUrl(url);
-    setExternalLinkOpen(true);
-  };
-
-  const handleExternalClose = () => {
-    setExternalLinkOpen(false);
-    setExternalLinkUrl(null);
-  };
-
-  const handleExternalConfirm = () => {
-    const url = externalLinkUrl;
-    setExternalLinkOpen(false);
-    setExternalLinkUrl(null);
-    if (url) {
-      const redirectUrl = buildRedirectUrl(url);
-      window.open(redirectUrl, "_blank", "noopener,noreferrer");
-    }
   };
 
   const userInitials =
@@ -1009,8 +985,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
                   {headerBadges.map((badge) => (
                     <ButtonBase
                       key={badge.name}
-                      component="button"
-                      onClick={() => handleExternalLink(badge.url)}
+                      component="a"
+                      href={badge.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       sx={{
                         borderRadius: 1,
                         px: 0.25,
@@ -1391,7 +1369,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
         slidingExternalPortals={slidingExternalPortals}
         horizontalSectionPaddingSx={horizontalSectionPaddingSx}
         contentShellSx={contentShellSx}
-        onExternalLink={handleExternalLink}
       />
 
       <Box sx={{ ...horizontalSectionPaddingSx, py: 2.5 }}>
@@ -1422,13 +1399,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
         onNavigate={handleNav}
         horizontalSectionPaddingSx={horizontalSectionPaddingSx}
         contentShellSx={contentShellSx}
-      />
-
-      <ExternalLinkWarningDialog
-        open={externalLinkOpen}
-        url={externalLinkUrl}
-        onClose={handleExternalClose}
-        onConfirm={handleExternalConfirm}
       />
     </Box>
   );

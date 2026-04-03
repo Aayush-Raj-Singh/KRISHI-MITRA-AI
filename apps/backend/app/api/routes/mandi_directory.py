@@ -42,7 +42,7 @@ async def list_mandi_directory(
     district: Optional[str] = None,
     mandi: Optional[str] = None,
     commodity: Optional[str] = None,
-    limit: int = Query(default=50, ge=1, le=200),
+    limit: int = Query(default=50, ge=1, le=1000),
     db: Database = Depends(get_db),
     __: str = Depends(require_roles(["farmer", "extension_officer", "admin"])),
 ) -> APIResponse[list[MandiDirectoryItem]]:

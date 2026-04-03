@@ -60,7 +60,13 @@ const ExternalPortalsMarquee: React.FC<ExternalPortalsMarqueeProps> = ({
           >
             {marqueeItems.map((portal, index) => {
               const isDuplicate = shouldAnimate && index >= externalPortals.length;
-              const previewImage = portal.imageSrc || portal.logoSrc;
+              let fallbackLogoSrc: string | undefined;
+              try {
+                fallbackLogoSrc = `${new URL(portal.url).origin}/favicon.ico`;
+              } catch {
+                fallbackLogoSrc = undefined;
+              }
+              const logoSrc = portal.logoSrc || fallbackLogoSrc;
 
               return (
                 <Tooltip
@@ -77,117 +83,62 @@ const ExternalPortalsMarquee: React.FC<ExternalPortalsMarqueeProps> = ({
                     rel={onExternalLink ? undefined : "noopener noreferrer"}
                     onClick={onExternalLink ? () => onExternalLink(portal.url) : undefined}
                     sx={{
-                      minWidth: { xs: 196, sm: 220, md: 244 },
-                      height: { xs: 112, sm: 122, md: 132 },
-                      borderRadius: 2.25,
-                      bgcolor: "rgba(255,255,255,0.88)",
+                      minWidth: { xs: 168, sm: 184, md: 208 },
+                      height: { xs: 74, sm: 82, md: 90 },
+                      borderRadius: 2,
+                      bgcolor: "rgba(255,255,255,0.96)",
                       border: "1px solid rgba(70, 106, 62, 0.12)",
-                      boxShadow: "0 14px 24px rgba(31, 69, 37, 0.10)",
+                      boxShadow: "0 10px 20px rgba(31, 69, 37, 0.08)",
                       display: "flex",
-                      flexDirection: "column",
-                      alignItems: "stretch",
-                      justifyContent: "flex-start",
+                      alignItems: "center",
+                      justifyContent: "center",
                       overflow: "hidden",
                       position: "relative",
                       scrollSnapAlign: "start",
-                      textAlign: "left",
+                      textAlign: "center",
                       transition: "transform 180ms ease, box-shadow 180ms ease",
                       "&:hover": {
                         transform: "translateY(-2px)",
-                        boxShadow: "0 18px 30px rgba(31, 69, 37, 0.14)",
+                        boxShadow: "0 14px 28px rgba(31, 69, 37, 0.12)",
                       },
                     }}
                     aria-label={`Open ${portal.name}`}
                   >
-                    <Box
-                      sx={{
-                        position: "relative",
-                        height: { xs: 62, sm: 70, md: 76 },
-                        overflow: "hidden",
-                        borderBottom: "1px solid rgba(70, 106, 62, 0.08)",
-                      }}
-                    >
-                      {previewImage && (
-                        <Box
-                          component="img"
-                          src={previewImage}
-                          alt={portal.name}
-                          loading="lazy"
-                          decoding="async"
-                          sx={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                            display: "block",
-                          }}
-                        />
-                      )}
+                    {logoSrc ? (
                       <Box
+                        component="img"
+                        src={logoSrc}
+                        alt={portal.name}
+                        loading="lazy"
+                        decoding="async"
                         sx={{
-                          position: "absolute",
-                          inset: 0,
-                          background:
-                            "linear-gradient(90deg, rgba(247,250,243,0.16), rgba(247,250,243,0.02) 38%, rgba(20,52,30,0.28))",
+                          width: "min(84%, 180px)",
+                          height: "min(54%, 46px)",
+                          objectFit: "contain",
+                          display: "block",
+                        }}
+                        onError={(event: React.SyntheticEvent<HTMLImageElement>) => {
+                          event.currentTarget.style.display = "none";
+                          const fallback = event.currentTarget.nextElementSibling as HTMLElement | null;
+                          if (fallback) {
+                            fallback.style.display = "block";
+                          }
                         }}
                       />
-                      {portal.logoSrc && (
-                        <Box
-                          sx={{
-                            position: "absolute",
-                            top: 8,
-                            left: 8,
-                            width: 40,
-                            height: 40,
-                            borderRadius: 2,
-                            bgcolor: "rgba(255,255,255,0.92)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            boxShadow: "0 8px 18px rgba(16, 34, 22, 0.16)",
-                            p: 0.8,
-                          }}
-                        >
-                          <Box
-                            component="img"
-                            src={portal.logoSrc}
-                            alt={portal.name}
-                            loading="lazy"
-                            decoding="async"
-                            sx={{
-                              width: "100%",
-                              height: "100%",
-                              objectFit: "contain",
-                            }}
-                          />
-                        </Box>
-                      )}
-                    </Box>
-
-                    <Box sx={{ px: 1.35, py: 1.1 }}>
-                      <Typography
-                        variant="subtitle2"
-                        sx={{
-                          fontWeight: 800,
-                          color: "#1d4027",
-                          lineHeight: 1.1,
-                        }}
-                      >
-                        {portal.name}
-                      </Typography>
-                      {portal.caption && (
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            display: "block",
-                            mt: 0.35,
-                            color: "rgba(29, 64, 39, 0.72)",
-                            fontWeight: 700,
-                          }}
-                        >
-                          {portal.caption}
-                        </Typography>
-                      )}
-                    </Box>
+                    ) : null}
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
+                        display: logoSrc ? "none" : "block",
+                        px: 1.5,
+                        fontWeight: 800,
+                        color: "#1d4027",
+                        letterSpacing: 0.2,
+                        lineHeight: 1.05,
+                      }}
+                    >
+                      {portal.name}
+                    </Typography>
                   </ButtonBase>
                 </Tooltip>
               );

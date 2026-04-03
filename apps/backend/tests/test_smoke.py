@@ -59,6 +59,12 @@ def test_required_routes_registered():
     assert not missing, f"Missing required routes: {missing}"
 
 
+def test_mandi_directory_high_limit_no_longer_fails_validation():
+    with TestClient(app) as client:
+        response = client.get("/api/v1/mandi-directory", params={"limit": 800})
+    assert response.status_code in {401, 403}
+
+
 def test_jwt_token_claims_include_type_and_jti():
     access_token = create_access_token("user123", "farmer")
     refresh_token = create_refresh_token("user123", "farmer")

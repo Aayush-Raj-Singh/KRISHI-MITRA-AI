@@ -85,6 +85,27 @@ const extractErrorMessage = (error: unknown): string => {
   const apiError = error as ApiError;
   const responseData = apiError?.response?.data as any;
   const detail = responseData?.detail;
+  const validationErrors = responseData?.data?.errors || responseData?.errors || detail;
+
+  if (Array.isArray(validationErrors)) {
+    const messages = validationErrors
+      .map((item) => {
+        const message = typeof item?.msg === "string" ? item.msg : null;
+        if (!message) return null;
+        const location = Array.isArray(item?.loc)
+          ? item.loc.filter((part: unknown) => typeof part === "string" || typeof part === "number")
+          : [];
+        const fieldPath = location
+          .filter((part: unknown) => part !== "query" && part !== "body")
+          .map((part: unknown) => String(part))
+          .join(".");
+        return fieldPath ? `${fieldPath}: ${message}` : message;
+      })
+      .filter(Boolean);
+    if (messages.length > 0) {
+      return messages.join("; ");
+    }
+  }
 
   if (typeof responseData?.message === "string" && responseData.message) {
     return responseData.message;
