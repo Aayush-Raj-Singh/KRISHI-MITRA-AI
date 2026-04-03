@@ -48,6 +48,43 @@ services:
       - key: PUBLIC_WS_URL
         sync: false
 
+  - name: krishimitra-ai-advisor
+    type: web
+    runtime: node
+    plan: free
+    region: singapore
+    autoDeployTrigger: commit
+    buildCommand: npm install --prefix apps/ai-advisor-service
+    startCommand: npm --prefix apps/ai-advisor-service run start
+    healthCheckPath: /readyz
+    buildFilter:
+      paths:
+        - apps/ai-advisor-service/**
+        - render.yaml
+        - README.md
+        - docs/render-deployment.md
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: AWS_REGION
+        value: ap-south-1
+      - key: BEDROCK_MODEL_ID
+        value: openai.gpt-oss-20b-1:0
+      - key: BEDROCK_FALLBACK_MODEL_ID
+        value: openai.gpt-oss-120b-1:0
+      - key: ADVISOR_DEFAULT_LANGUAGE
+        value: en
+      - key: ADVISOR_RATE_LIMIT_WINDOW_MS
+        value: "900000"
+      - key: ADVISOR_RATE_LIMIT_MAX
+        value: "30"
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_SESSION_TOKEN
+        sync: false
+
   - name: krishimitra-ai-web
     type: web
     runtime: static
