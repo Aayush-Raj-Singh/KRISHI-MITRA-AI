@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
@@ -90,10 +90,16 @@ class KnowledgeBaseRetriever:
         self._chunks = chunks
         corpus = [item.text for item in chunks]
 
-        self._tfidf_vectorizer = TfidfVectorizer(stop_words="english", max_features=12000, ngram_range=(1, 2))
+        self._tfidf_vectorizer = TfidfVectorizer(
+            stop_words="english", max_features=12000, ngram_range=(1, 2)
+        )
         self._tfidf_matrix = self._tfidf_vectorizer.fit_transform(corpus)
 
-        logger.info("rag_documents_loaded", total_documents=len({item.name for item in chunks}), total_chunks=len(chunks))
+        logger.info(
+            "rag_documents_loaded",
+            total_documents=len({item.name for item in chunks}),
+            total_chunks=len(chunks),
+        )
 
     def _ensure_semantic_model(self) -> bool:
         if self._semantic_model is not None and self._semantic_matrix is not None:
@@ -107,7 +113,9 @@ class KnowledgeBaseRetriever:
             model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
             self._semantic_model = SentenceTransformer(model_name)
             corpus = [item.text for item in self._chunks]
-            self._semantic_matrix = self._semantic_model.encode(corpus, convert_to_numpy=True, normalize_embeddings=True)
+            self._semantic_matrix = self._semantic_model.encode(
+                corpus, convert_to_numpy=True, normalize_embeddings=True
+            )
             logger.info("rag_semantic_model_loaded", model_name=model_name, embeddings=len(corpus))
             return True
         except Exception as exc:
@@ -144,7 +152,9 @@ class KnowledgeBaseRetriever:
         if not self._ensure_semantic_model():
             return []
 
-        query_embedding = self._semantic_model.encode([query], convert_to_numpy=True, normalize_embeddings=True)
+        query_embedding = self._semantic_model.encode(
+            [query], convert_to_numpy=True, normalize_embeddings=True
+        )
         similarities = cosine_similarity(self._semantic_matrix, query_embedding).flatten()
         top_indices = np.argsort(similarities)[::-1][:top_k]
 

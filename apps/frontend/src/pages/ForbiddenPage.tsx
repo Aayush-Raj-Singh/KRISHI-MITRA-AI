@@ -20,7 +20,7 @@ const ForbiddenPage: React.FC = () => {
           </Typography>
           <Typography variant="body1" color="text.secondary" align="center">
             {t("forbidden_page.description", {
-              defaultValue: "Your account does not have permission to view this page."
+              defaultValue: "Your account does not have permission to view this page.",
             })}
           </Typography>
           <Button variant="contained" onClick={() => navigate("/dashboard")}>

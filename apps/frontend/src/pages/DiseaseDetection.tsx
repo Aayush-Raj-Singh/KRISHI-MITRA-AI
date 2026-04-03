@@ -1,14 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Divider,
-  Stack,
-  Typography
-} from "@mui/material";
+import { Alert, Box, Button, Card, CardContent, Divider, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import AppLayout from "../components/common/AppLayout";
 import { isOnline } from "../utils/offlineStorage";
@@ -92,9 +83,7 @@ const DiseaseDetection: React.FC = () => {
               <Typography variant="body2" color="text.secondary">
                 {t("disease_page.subtitle")}
               </Typography>
-              {offline && (
-                <Alert severity="warning">{t("disease_page.offline_notice")}</Alert>
-              )}
+              {offline && <Alert severity="warning">{t("disease_page.offline_notice")}</Alert>}
               <Box>
                 <Button variant="outlined" component="label">
                   {t("disease_page.upload")}
@@ -143,11 +132,7 @@ const DiseaseDetection: React.FC = () => {
                   {t("disease_page.severity")}: {result.severity}
                 </Typography>
 
-                {result.advisory && (
-                  <Alert severity="info">
-                    {result.advisory}
-                  </Alert>
-                )}
+                {result.advisory && <Alert severity="info">{result.advisory}</Alert>}
 
                 <Box>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>

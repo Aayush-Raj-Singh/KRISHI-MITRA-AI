@@ -33,7 +33,7 @@ const resources = {
   or: { translation: or },
   ur: { translation: ur },
   ne: { translation: ne },
-  sa: { translation: sa }
+  sa: { translation: sa },
 };
 
 const supportedLanguages = Object.keys(resources);
@@ -42,7 +42,9 @@ const storedLang = supportedLanguages.includes(storedLangRaw) ? storedLangRaw : 
 
 const syncDocumentLanguage = (language: string) => {
   if (typeof document === "undefined") return;
-  const short = String(language || "en").toLowerCase().split("-")[0];
+  const short = String(language || "en")
+    .toLowerCase()
+    .split("-")[0];
   document.documentElement.lang = short;
   document.documentElement.setAttribute("data-language", short);
 };
@@ -50,22 +52,30 @@ const syncDocumentLanguage = (language: string) => {
 const sanitizeMojibake: PostProcessorModule = {
   name: "sanitizeMojibake",
   type: "postProcessor",
-  process: (value: string, _key: string, options: Record<string, unknown>, translator: typeof i18n) => {
+  process: (
+    value: string,
+    _key: string,
+    options: Record<string, unknown>,
+    translator: typeof i18n,
+  ) => {
     const lang = String(options?.lng || translator.language || "en");
     return repairMojibake(value, lang);
-  }
+  },
 };
 
-i18n.use(sanitizeMojibake).use(initReactI18next).init({
-  resources,
-  lng: storedLang,
-  fallbackLng: "en",
-  postProcess: ["sanitizeMojibake"],
-  returnNull: false,
-  interpolation: {
-    escapeValue: false
-  }
-});
+i18n
+  .use(sanitizeMojibake)
+  .use(initReactI18next)
+  .init({
+    resources,
+    lng: storedLang,
+    fallbackLng: "en",
+    postProcess: ["sanitizeMojibake"],
+    returnNull: false,
+    interpolation: {
+      escapeValue: false,
+    },
+  });
 
 syncDocumentLanguage(storedLang);
 i18n.on("languageChanged", syncDocumentLanguage);

@@ -47,14 +47,14 @@ data "aws_iam_policy_document" "ecs_task_policy" {
   }
 
   statement {
-    sid     = "TranslateText"
-    actions = ["translate:TranslateText"]
+    sid       = "TranslateText"
+    actions   = ["translate:TranslateText"]
     resources = ["*"]
   }
 
   statement {
-    sid     = "SageMakerInvoke"
-    actions = ["sagemaker:InvokeEndpoint"]
+    sid       = "SageMakerInvoke"
+    actions   = ["sagemaker:InvokeEndpoint"]
     resources = ["*"]
   }
 }

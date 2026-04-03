@@ -46,7 +46,9 @@ class UserInDB(BaseModel):
 
 def default_user_document(payload: Dict[str, Any]) -> Dict[str, Any]:
     now = datetime.now(timezone.utc)
-    assigned_regions = [str(item).strip() for item in payload.get("assigned_regions", []) if str(item).strip()]
+    assigned_regions = [
+        str(item).strip() for item in payload.get("assigned_regions", []) if str(item).strip()
+    ]
     return {
         "name": payload["name"],
         "phone": payload["phone"],

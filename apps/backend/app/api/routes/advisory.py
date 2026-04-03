@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends
 
-from app.core.logging import get_logger
 from app.core.config import settings
-from app.core.exceptions import ExternalServiceUnavailableError
 from app.core.dependencies import (
     get_advisory_service,
     get_translation_service,
     require_roles,
 )
+from app.core.exceptions import ExternalServiceUnavailableError
+from app.core.logging import get_logger
 from app.models.user import UserInDB
 from app.schemas.advisory import (
     AdvisorySlaTelemetry,
@@ -55,7 +55,9 @@ async def advisory_sla_telemetry(
     _: UserInDB = Depends(require_roles(["extension_officer", "admin"])),
     service: AdvisoryService = Depends(get_advisory_service),
 ) -> APIResponse[AdvisorySlaTelemetry]:
-    telemetry = await service.advisory_sla_telemetry(window_minutes=window_minutes, sla_target_ms=sla_target_ms)
+    telemetry = await service.advisory_sla_telemetry(
+        window_minutes=window_minutes, sla_target_ms=sla_target_ms
+    )
     return success_response(telemetry, message="advisory telemetry loaded")
 
 
@@ -75,7 +77,9 @@ async def translate(
     except ExternalServiceUnavailableError:
         raise
     except Exception as exc:
-        logger.warning("translate_service_failed", error=str(exc), target_language=payload.target_language)
+        logger.warning(
+            "translate_service_failed", error=str(exc), target_language=payload.target_language
+        )
         if settings.is_production:
             raise ExternalServiceUnavailableError("Translation service is unavailable") from exc
         translations = {text: text for text in payload.texts}

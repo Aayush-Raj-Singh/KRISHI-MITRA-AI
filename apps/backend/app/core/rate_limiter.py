@@ -26,17 +26,38 @@ class RateLimiter:
         self._memory_counters: dict[str, tuple[int, float]] = {}
         self._memory_lock = asyncio.Lock()
         self._rules = (
-            ("/api/v1/auth/login", RateLimitRule("auth_login", settings.rate_limit_auth_per_minute)),
-            ("/api/v1/auth/register", RateLimitRule("auth_register", settings.rate_limit_auth_per_minute)),
+            (
+                "/api/v1/auth/login",
+                RateLimitRule("auth_login", settings.rate_limit_auth_per_minute),
+            ),
+            (
+                "/api/v1/auth/register",
+                RateLimitRule("auth_register", settings.rate_limit_auth_per_minute),
+            ),
             (
                 "/api/v1/auth/request-password-reset",
                 RateLimitRule("auth_reset_request", settings.rate_limit_auth_per_minute),
             ),
-            ("/api/v1/auth/reset-password", RateLimitRule("auth_reset_confirm", settings.rate_limit_auth_per_minute)),
-            ("/api/v1/auth/refresh", RateLimitRule("auth_refresh", settings.rate_limit_auth_per_minute)),
-            ("/api/v1/advisory/chat", RateLimitRule("advisory_chat", settings.rate_limit_advisory_per_minute)),
-            ("/api/v1/disease/predict", RateLimitRule("disease_predict", settings.rate_limit_upload_per_minute)),
-            ("/api/v1/analytics/export", RateLimitRule("analytics_export", settings.rate_limit_export_per_minute)),
+            (
+                "/api/v1/auth/reset-password",
+                RateLimitRule("auth_reset_confirm", settings.rate_limit_auth_per_minute),
+            ),
+            (
+                "/api/v1/auth/refresh",
+                RateLimitRule("auth_refresh", settings.rate_limit_auth_per_minute),
+            ),
+            (
+                "/api/v1/advisory/chat",
+                RateLimitRule("advisory_chat", settings.rate_limit_advisory_per_minute),
+            ),
+            (
+                "/api/v1/disease/predict",
+                RateLimitRule("disease_predict", settings.rate_limit_upload_per_minute),
+            ),
+            (
+                "/api/v1/analytics/export",
+                RateLimitRule("analytics_export", settings.rate_limit_export_per_minute),
+            ),
             ("/api/v1/public", RateLimitRule("public_api", settings.rate_limit_public_per_minute)),
         )
         self._default_rule = RateLimitRule("global", settings.rate_limit_global_per_minute)
@@ -46,7 +67,7 @@ class RateLimiter:
         path = request.url.path
         if request.method == "OPTIONS":
             return True
-        return path in {"/health", "/docs", "/openapi.json", "/redoc"}
+        return path in {"/health", "/ready", "/readyz", "/docs", "/openapi.json", "/redoc"}
 
     @staticmethod
     def _client_identifier(request: Request) -> str:
@@ -79,7 +100,9 @@ class RateLimiter:
         retry_after = max(int(reset_at - now), 1)
         return count, retry_after
 
-    async def _redis_increment(self, redis_client: Redis, key: str, window_seconds: int) -> tuple[int, int]:
+    async def _redis_increment(
+        self, redis_client: Redis, key: str, window_seconds: int
+    ) -> tuple[int, int]:
         pipe = redis_client.pipeline()
         pipe.incr(key)
         pipe.ttl(key)
@@ -105,7 +128,9 @@ class RateLimiter:
 
         try:
             if redis_client is not None:
-                hits, retry_after = await self._redis_increment(redis_client, bucket_key, rule.window_seconds)
+                hits, retry_after = await self._redis_increment(
+                    redis_client, bucket_key, rule.window_seconds
+                )
             else:
                 hits, retry_after = await self._memory_increment(bucket_key, rule.window_seconds)
         except Exception as exc:

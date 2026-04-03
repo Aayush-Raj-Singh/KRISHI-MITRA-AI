@@ -86,6 +86,7 @@ class ChatSource(StrictSchema):
 class ChatResponse(StrictSchema):
     reply: str
     language: str
+    provider: str
     model: str
     sources: List[ChatSource]
     is_fallback: bool

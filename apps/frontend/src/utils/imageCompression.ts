@@ -13,7 +13,9 @@ export const compressImage = async (file: File, maxSize = 1024, quality = 0.8): 
   }
   ctx.drawImage(imageBitmap, 0, 0, width, height);
 
-  const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", quality));
+  const blob: Blob | null = await new Promise((resolve) =>
+    canvas.toBlob(resolve, "image/jpeg", quality),
+  );
   if (!blob) return file;
   return new File([blob], file.name.replace(/\.(png|webp)$/i, ".jpg"), { type: "image/jpeg" });
 };

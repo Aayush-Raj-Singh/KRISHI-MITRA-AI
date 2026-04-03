@@ -1,22 +1,20 @@
 from __future__ import annotations
 
 import asyncio
-import hashlib
-import math
 from datetime import date, datetime, timedelta, timezone
 from typing import Dict, List, Optional
 
 import httpx
-from app.core.database import Database
 
 from app.core.config import settings
+from app.core.database import Database
 from app.core.logging import get_logger
-from app.data.mandi_catalog import MANDI_CROP_CATEGORIES, MANDI_MARKETS, crop_to_category_map
+from app.data.mandi_catalog import MANDI_CROP_CATEGORIES, MANDI_MARKETS
 from app.schemas.integrations import (
-    MandiCatalogResponse,
-    MandiCropCatalogItem,
     LocationLookupResponse,
     LocationSearchResponse,
+    MandiCatalogResponse,
+    MandiCropCatalogItem,
     MandiPricePoint,
     MandiPriceResponse,
     WeatherResponse,
@@ -34,6 +32,8 @@ class ExternalDataService:
     def __init__(self, db: Database | None = None) -> None:
         self._db = db
         self._audit_collection = db["integration_audit"] if db is not None else None
+        self._price_actuals_collection = db["price_actuals"] if db is not None else None
+        self._mandi_entries_collection = db["mandi_entries"] if db is not None else None
 
     async def _audit_event(self, event: str, payload: dict) -> None:
         if self._audit_collection is None:
@@ -68,19 +68,102 @@ class ExternalDataService:
             valid.append(item)
         return valid
 
+    @staticmethod
+    def _normalize_lookup_key(value: str) -> str:
+        return (value or "").strip().lower()
+
+    @staticmethod
+    def _coerce_datetime(value: object) -> datetime | None:
+        if isinstance(value, datetime):
+            return value if value.tzinfo is not None else value.replace(tzinfo=timezone.utc)
+        if not value:
+            return None
+        raw = str(value).strip()
+        if not raw:
+            return None
+        try:
+            parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+        except ValueError:
+            return None
+        return parsed if parsed.tzinfo is not None else parsed.replace(tzinfo=timezone.utc)
+
+    def _resolved_mandi_api_key(self) -> str | None:
+        configured_key = (settings.mandi_api_key or "").strip()
+        if configured_key:
+            return configured_key
+        demo_key = (settings.mandi_demo_api_key or "").strip()
+        if demo_key and not settings.is_production:
+            return demo_key
+        if not settings.is_production:
+            return None
+        return None
+
+    @staticmethod
+    def _is_retryable_http_error(exc: Exception) -> bool:
+        if isinstance(
+            exc, (httpx.TimeoutException, httpx.TransportError, httpx.RemoteProtocolError)
+        ):
+            return True
+        if isinstance(exc, httpx.HTTPStatusError):
+            return exc.response.status_code in {408, 409, 425, 429, 500, 502, 503, 504}
+        return False
+
+    async def _get_json(
+        self,
+        client: httpx.AsyncClient,
+        url: str,
+        *,
+        params: Optional[dict] = None,
+        attempts: int = 3,
+    ):
+        last_error: Exception | None = None
+        for attempt in range(1, attempts + 1):
+            try:
+                response = await client.get(url, params=params)
+                response.raise_for_status()
+                return response.json()
+            except Exception as exc:
+                last_error = exc
+                if attempt >= attempts or not self._is_retryable_http_error(exc):
+                    raise
+                await asyncio.sleep(min(0.25 * attempt, 1.0))
+        if last_error is not None:
+            raise last_error
+        raise RuntimeError("External request failed without an explicit error")
+
+    @staticmethod
+    def _cached_mandi_warning(fetched_at: datetime) -> str:
+        return (
+            "Live mandi source temporarily unavailable. "
+            f"Showing last synced market prices from {fetched_at.astimezone(timezone.utc).date().isoformat()}."
+        )
+
+    @staticmethod
+    def _verified_mandi_unavailable_warning(days: int) -> str:
+        return (
+            "Live mandi source unavailable. "
+            f"No verified {days}-day mandi history is available yet for the selected crop and market."
+        )
+
     async def fetch_weather(self, location: str, days: int = 5) -> WeatherResponse:
         if settings.weather_api_url:
             try:
-                async with httpx.AsyncClient(timeout=settings.external_http_timeout_seconds) as client:
-                    response = await client.get(
+                async with httpx.AsyncClient(
+                    timeout=settings.external_http_timeout_seconds
+                ) as client:
+                    payload = await self._get_json(
+                        client,
                         settings.weather_api_url,
                         params={"q": location, "days": days, "key": settings.weather_api_key},
                     )
-                    response.raise_for_status()
-                    payload = response.json()
                 forecast = self._validate_weather_points(self._parse_weather(payload, days))
                 if forecast:
-                    logger.info("weather_data_fetched", source=settings.weather_api_url, location=location, points=len(forecast))
+                    logger.info(
+                        "weather_data_fetched",
+                        source=settings.weather_api_url,
+                        location=location,
+                        points=len(forecast),
+                    )
                     await self._audit_event(
                         "weather_fetch",
                         {
@@ -163,21 +246,40 @@ class ExternalDataService:
         ) as client:
             for source, url, params, parser in providers:
                 try:
-                    response = await client.get(url, params=params)
-                    response.raise_for_status()
-                    payload = parser(response.json(), lat=lat, lon=lon, fallback_label=coordinate_label)
+                    response_payload = await self._get_json(client, url, params=params)
+                    payload = parser(
+                        response_payload, lat=lat, lon=lon, fallback_label=coordinate_label
+                    )
                     if payload.label:
                         await self._audit_event(
                             "reverse_geocode",
-                            {"latitude": lat, "longitude": lon, "source": source, "label": payload.label, "status": "success"},
+                            {
+                                "latitude": lat,
+                                "longitude": lon,
+                                "source": source,
+                                "label": payload.label,
+                                "status": "success",
+                            },
                         )
                         return payload.model_copy(update={"source": source})
                 except Exception as exc:
-                    logger.warning("reverse_geocode_provider_failed", source=source, error=str(exc), latitude=lat, longitude=lon)
+                    logger.warning(
+                        "reverse_geocode_provider_failed",
+                        source=source,
+                        error=str(exc),
+                        latitude=lat,
+                        longitude=lon,
+                    )
 
         await self._audit_event(
             "reverse_geocode",
-            {"latitude": lat, "longitude": lon, "source": "coordinates", "label": coordinate_label, "status": "fallback"},
+            {
+                "latitude": lat,
+                "longitude": lon,
+                "source": "coordinates",
+                "label": coordinate_label,
+                "status": "fallback",
+            },
         )
         return LocationLookupResponse(
             latitude=lat,
@@ -212,42 +314,111 @@ class ExternalDataService:
         ) as client:
             for source, url, params, parser in providers:
                 try:
-                    response = await client.get(url, params=params)
-                    response.raise_for_status()
-                    payload = parser(response.json(), fallback_label=safe_query)
+                    response_payload = await self._get_json(client, url, params=params)
+                    payload = parser(response_payload, fallback_label=safe_query)
                     if payload.label:
                         await self._audit_event(
                             "forward_geocode",
-                            {"query": safe_query, "source": source, "label": payload.label, "status": "success"},
+                            {
+                                "query": safe_query,
+                                "source": source,
+                                "label": payload.label,
+                                "status": "success",
+                            },
                         )
                         return payload.model_copy(update={"source": source})
                 except Exception as exc:
-                    logger.warning("forward_geocode_provider_failed", source=source, error=str(exc), query=safe_query)
+                    logger.warning(
+                        "forward_geocode_provider_failed",
+                        source=source,
+                        error=str(exc),
+                        query=safe_query,
+                    )
 
         raise ValueError("Unable to resolve location name")
 
-    async def fetch_mandi_prices(self, crop: str, market: str, days: int = 7) -> MandiPriceResponse:
+    async def fetch_mandi_prices(
+        self, crop: str, market: str, days: int = 30
+    ) -> MandiPriceResponse:
         prices: List[MandiPricePoint] = []
         source = ""
         cached = False
         fetched_at = datetime.now(timezone.utc)
+        stale_data_warning: str | None = None
 
         custom_prices = await self._fetch_custom_mandi(crop=crop, market=market, days=days)
         if custom_prices:
-            prices = self._validate_mandi_points(custom_prices)
+            prices = self._merge_mandi_points(
+                prices, self._validate_mandi_points(custom_prices), days
+            )
             source = settings.mandi_api_url or "custom"
 
-        if not prices:
+        if len(prices) < days:
             data_gov_prices = await self._fetch_data_gov_mandi(crop=crop, market=market, days=days)
             if data_gov_prices:
-                prices = self._validate_mandi_points(data_gov_prices)
-                source = self.DEFAULT_MANDI_API_URL
+                prices = self._merge_mandi_points(
+                    prices, self._validate_mandi_points(data_gov_prices), days
+                )
+                if not source:
+                    source = self.DEFAULT_MANDI_API_URL
+
+        if len(prices) < days:
+            approved_prices = await self._fetch_approved_mandi_entries(
+                crop=crop, market=market, days=days
+            )
+            if approved_prices:
+                prices = self._merge_mandi_points(
+                    prices, self._validate_mandi_points(approved_prices), days
+                )
+                if not source:
+                    source = "approved_mandi_entries"
+
+        if len(prices) < days:
+            (
+                cached_prices,
+                cached_source,
+                cached_fetched_at,
+            ) = await self._fetch_cached_mandi_actuals(
+                crop=crop,
+                market=market,
+                days=days,
+            )
+            if cached_prices:
+                previous_count = len(prices)
+                prices = self._merge_mandi_points(
+                    prices, self._validate_mandi_points(cached_prices), days
+                )
+                source = source or cached_source or self.DEFAULT_MANDI_API_URL
+                fetched_at = cached_fetched_at or fetched_at
+                if len(prices) > previous_count:
+                    cached = True
+                    stale_data_warning = self._cached_mandi_warning(fetched_at)
+                    logger.warning(
+                        "mandi_data_live_cache_used",
+                        crop=crop,
+                        market=market,
+                        points=len(prices),
+                        source=source,
+                    )
+                    await self._audit_event(
+                        "mandi_fetch",
+                        {
+                            "crop": crop,
+                            "market": market,
+                            "days": days,
+                            "source": source,
+                            "cached": cached,
+                            "points": len(prices),
+                            "status": "cached_live",
+                            "last_synced_at": fetched_at,
+                        },
+                    )
 
         if not prices:
-            prices = self._validate_mandi_points(self._stub_mandi(crop=crop, market=market, days=days))
-            source = "stub"
+            source = "unavailable"
             cached = True
-            logger.warning("mandi_data_stale_using_cache", crop=crop, market=market, points=len(prices))
+            stale_data_warning = self._verified_mandi_unavailable_warning(days)
+            logger.warning("mandi_data_unavailable", crop=crop, market=market, days=days)
             await self._audit_event(
                 "mandi_fetch",
                 {
@@ -256,12 +427,14 @@ class ExternalDataService:
                     "days": days,
                     "source": source,
                     "cached": cached,
-                    "points": len(prices),
-                    "status": "fallback",
+                    "points": 0,
+                    "status": "unavailable",
                 },
             )
-        else:
-            logger.info("mandi_data_fetched", source=source, crop=crop, market=market, points=len(prices))
+        elif not cached:
+            logger.info(
+                "mandi_data_fetched", source=source, crop=crop, market=market, points=len(prices)
+            )
             await self._audit_event(
                 "mandi_fetch",
                 {
@@ -282,24 +455,178 @@ class ExternalDataService:
             prices=prices,
             fetched_at=fetched_at,
             cached=cached,
-            stale_data_warning=(
-                "Live mandi source unavailable. Showing cached/stub market prices."
-                if cached
-                else None
-            ),
+            stale_data_warning=stale_data_warning,
         )
-        if self._db is not None and prices and not cached and source != "stub":
+        if (
+            self._db is not None
+            and prices
+            and not cached
+            and source not in {"approved_mandi_entries", "unavailable"}
+        ):
+
             async def _postprocess_accuracy() -> None:
                 try:
                     accuracy_service = PriceAccuracyService(self._db)
-                    await accuracy_service.record_actuals(crop, market, prices, source=source, fetched_at=fetched_at)
+                    await accuracy_service.record_actuals(
+                        crop, market, prices, source=source, fetched_at=fetched_at
+                    )
                     await accuracy_service.refresh_accuracy(crop, market)
                 except Exception as exc:
-                    logger.warning("price_actuals_persist_failed", error=str(exc), crop=crop, market=market)
+                    logger.warning(
+                        "price_actuals_persist_failed", error=str(exc), crop=crop, market=market
+                    )
 
             asyncio.create_task(_postprocess_accuracy())
 
         return response
+
+    async def _fetch_cached_mandi_actuals(
+        self,
+        *,
+        crop: str,
+        market: str,
+        days: int,
+    ) -> tuple[List[MandiPricePoint], str | None, datetime | None]:
+        if self._price_actuals_collection is None:
+            return [], None, None
+
+        crop_key = self._normalize_lookup_key(crop)
+        market_key = self._normalize_lookup_key(market)
+        if not crop_key or not market_key:
+            return [], None, None
+
+        lookback_days = max(days * 6, 30)
+        cutoff = (datetime.now(timezone.utc).date() - timedelta(days=lookback_days - 1)).isoformat()
+        docs = (
+            await self._price_actuals_collection.find(
+                {
+                    "crop": crop_key,
+                    "market": market_key,
+                    "date": {"$gte": cutoff},
+                }
+            )
+            .sort("date", -1)
+            .limit(max(days * 6, 40))
+            .to_list(length=max(days * 6, 40))
+        )
+        if not docs:
+            return [], None, None
+
+        seen_dates: set[str] = set()
+        selected_docs: List[dict] = []
+        for doc in docs:
+            date_key = str(doc.get("date") or "").strip()[:10]
+            if not date_key or date_key in seen_dates:
+                continue
+            price = self._parse_price_value(doc.get("price", 0))
+            if price <= 0:
+                continue
+            seen_dates.add(date_key)
+            selected_docs.append(doc)
+            if len(selected_docs) >= days:
+                break
+
+        if not selected_docs:
+            return [], None, None
+
+        selected_docs.sort(key=lambda item: str(item.get("date") or ""))
+        prices: List[MandiPricePoint] = []
+        for doc in selected_docs:
+            parsed_date = self._parse_date_value(str(doc.get("date", "")))
+            if parsed_date is None:
+                continue
+            prices.append(
+                MandiPricePoint(
+                    date=parsed_date,
+                    price=self._parse_price_value(doc.get("price", 0)),
+                )
+            )
+        if not prices:
+            return [], None, None
+
+        latest_fetched_at = max(
+            (
+                parsed
+                for parsed in (
+                    self._coerce_datetime(doc.get("fetched_at"))
+                    or self._coerce_datetime(doc.get("updated_at"))
+                    for doc in selected_docs
+                )
+                if parsed is not None
+            ),
+            default=None,
+        )
+        latest_source = next(
+            (
+                str(doc.get("source")).strip()
+                for doc in selected_docs
+                if str(doc.get("source") or "").strip()
+            ),
+            None,
+        )
+        return prices, latest_source, latest_fetched_at
+
+    @staticmethod
+    def _merge_mandi_points(
+        primary: List[MandiPricePoint],
+        additional: List[MandiPricePoint],
+        days: int,
+    ) -> List[MandiPricePoint]:
+        by_date: Dict[date, MandiPricePoint] = {point.date: point for point in primary}
+        for point in additional:
+            if point.date not in by_date:
+                by_date[point.date] = point
+        ordered_dates = sorted(by_date.keys())[-days:]
+        return [by_date[item_date] for item_date in ordered_dates]
+
+    async def _fetch_approved_mandi_entries(
+        self,
+        *,
+        crop: str,
+        market: str,
+        days: int,
+    ) -> List[MandiPricePoint]:
+        if self._mandi_entries_collection is None:
+            return []
+
+        lookback_days = max(days * 6, 45)
+        docs = (
+            await self._mandi_entries_collection.find({})
+            .sort("arrival_date", -1)
+            .limit(max(days * 12, 120))
+            .to_list(length=max(days * 12, 120))
+        )
+        if not docs:
+            return []
+
+        crop_key = self._normalize_lookup_key(crop)
+        market_key = self._normalize_lookup_key(market)
+        cutoff = datetime.now(timezone.utc).date() - timedelta(days=lookback_days - 1)
+        grouped: Dict[date, List[float]] = {}
+
+        for doc in docs:
+            if self._normalize_lookup_key(str(doc.get("status", ""))) != "approved":
+                continue
+            if self._normalize_lookup_key(str(doc.get("commodity", ""))) != crop_key:
+                continue
+            if not self._record_matches_market(doc, market_key):
+                continue
+            arrival_date = self._parse_date_value(str(doc.get("arrival_date", "")))
+            if arrival_date is None or arrival_date < cutoff:
+                continue
+            price = self._parse_price_value(doc.get("modal_price", 0))
+            if price <= 0:
+                continue
+            grouped.setdefault(arrival_date, []).append(price)
+
+        if not grouped:
+            return []
+
+        ordered_dates = sorted(grouped.keys())[-days:]
+        return [
+            MandiPricePoint(date=dt, price=round(sum(grouped[dt]) / len(grouped[dt]), 2))
+            for dt in ordered_dates
+        ]
 
     def get_mandi_catalog(
         self,
@@ -330,7 +657,9 @@ class ExternalDataService:
         return f"Lat {lat:.4f}, Lon {lon:.4f}"
 
     @staticmethod
-    def _build_location_label(city: Optional[str], state: Optional[str], country: Optional[str], fallback: str) -> str:
+    def _build_location_label(
+        city: Optional[str], state: Optional[str], country: Optional[str], fallback: str
+    ) -> str:
         parts = [part.strip() for part in [city, state, country] if part and part.strip()]
         if not parts:
             return fallback
@@ -343,17 +672,26 @@ class ExternalDataService:
         lon: float,
         city: Optional[str],
         state: Optional[str],
+        district: Optional[str] = None,
+        block: Optional[str] = None,
+        village: Optional[str] = None,
+        postal_code: Optional[str] = None,
         country: Optional[str],
         source: str,
         fallback_label: str,
     ) -> LocationLookupResponse:
+        label_city = village or city
         return LocationLookupResponse(
             latitude=lat,
             longitude=lon,
             city=city,
             state=state,
+            district=district,
+            block=block,
+            village=village,
+            postal_code=postal_code,
             country=country,
-            label=self._build_location_label(city, state, country, fallback_label),
+            label=self._build_location_label(label_city, state, country, fallback_label),
             source=source,
         )
 
@@ -364,17 +702,26 @@ class ExternalDataService:
         lon: float,
         city: Optional[str],
         state: Optional[str],
+        district: Optional[str] = None,
+        block: Optional[str] = None,
+        village: Optional[str] = None,
+        postal_code: Optional[str] = None,
         country: Optional[str],
         source: str,
         fallback_label: str,
     ) -> LocationSearchResponse:
+        label_city = village or city
         return LocationSearchResponse(
             latitude=lat,
             longitude=lon,
             city=city,
             state=state,
+            district=district,
+            block=block,
+            village=village,
+            postal_code=postal_code,
             country=country,
-            label=self._build_location_label(city, state, country, fallback_label),
+            label=self._build_location_label(label_city, state, country, fallback_label),
             source=source,
         )
 
@@ -386,14 +733,18 @@ class ExternalDataService:
         lon: float,
         fallback_label: str,
     ) -> LocationLookupResponse:
-        result = payload.get("results", [None])[0] if isinstance(payload.get("results"), list) else None
+        result = (
+            payload.get("results", [None])[0] if isinstance(payload.get("results"), list) else None
+        )
         if not result:
             raise ValueError("No reverse geocode result")
         return self._build_lookup_response(
             lat=lat,
             lon=lon,
-            city=str(result.get("name") or result.get("city") or result.get("admin2") or "").strip() or None,
+            city=str(result.get("name") or result.get("city") or result.get("admin2") or "").strip()
+            or None,
             state=str(result.get("admin1") or "").strip() or None,
+            district=str(result.get("admin2") or "").strip() or None,
             country=str(result.get("country") or "").strip() or None,
             source="open-meteo",
             fallback_label=fallback_label,
@@ -408,15 +759,35 @@ class ExternalDataService:
         fallback_label: str,
     ) -> LocationLookupResponse:
         locality_info = payload.get("localityInfo") or {}
-        administrative = locality_info.get("administrative") if isinstance(locality_info, dict) else []
-        admin_name = None
-        if isinstance(administrative, list) and len(administrative) > 2 and isinstance(administrative[2], dict):
-            admin_name = administrative[2].get("name")
+        administrative = (
+            locality_info.get("administrative") if isinstance(locality_info, dict) else []
+        )
+        district = None
+        block = None
+        if isinstance(administrative, list):
+            for item in administrative:
+                if not isinstance(item, dict):
+                    continue
+                description = str(item.get("description") or "").strip().lower()
+                name = str(item.get("name") or "").strip() or None
+                if description in {"district", "state district"} and not district:
+                    district = name
+                elif (
+                    description
+                    in {"county", "subdistrict", "development block", "block", "taluk", "tehsil"}
+                    and not block
+                ):
+                    block = name
+        village = str(payload.get("locality") or payload.get("city") or "").strip() or None
         return self._build_lookup_response(
             lat=lat,
             lon=lon,
-            city=str(payload.get("city") or payload.get("locality") or admin_name or "").strip() or None,
+            city=str(payload.get("city") or district or "").strip() or None,
             state=str(payload.get("principalSubdivision") or "").strip() or None,
+            district=district,
+            block=block,
+            village=village,
+            postal_code=str(payload.get("postcode") or "").strip() or None,
             country=str(payload.get("countryName") or "").strip() or None,
             source="bigdatacloud",
             fallback_label=fallback_label,
@@ -438,20 +809,36 @@ class ExternalDataService:
             or address.get("hamlet")
             or payload.get("name")
         )
-        state = address.get("state") or address.get("county")
+        district = address.get("state_district") or address.get("county")
+        village = (
+            address.get("village")
+            or address.get("hamlet")
+            or address.get("quarter")
+            or address.get("neighbourhood")
+        )
+        block = address.get("suburb") or address.get("municipality") or address.get("city_district")
+        state = address.get("state")
         country = address.get("country")
         return self._build_lookup_response(
             lat=lat,
             lon=lon,
             city=str(city or "").strip() or None,
             state=str(state or "").strip() or None,
+            district=str(district or "").strip() or None,
+            block=str(block or "").strip() or None,
+            village=str(village or "").strip() or None,
+            postal_code=str(address.get("postcode") or "").strip() or None,
             country=str(country or "").strip() or None,
             source="nominatim",
             fallback_label=fallback_label,
         )
 
-    def _parse_open_meteo_search(self, payload: dict, *, fallback_label: str) -> LocationSearchResponse:
-        result = payload.get("results", [None])[0] if isinstance(payload.get("results"), list) else None
+    def _parse_open_meteo_search(
+        self, payload: dict, *, fallback_label: str
+    ) -> LocationSearchResponse:
+        result = (
+            payload.get("results", [None])[0] if isinstance(payload.get("results"), list) else None
+        )
         if not result:
             raise ValueError("No geocode result")
         lat = float(result.get("latitude"))
@@ -461,24 +848,44 @@ class ExternalDataService:
             lon=lon,
             city=str(result.get("name") or "").strip() or None,
             state=str(result.get("admin1") or "").strip() or None,
+            district=str(result.get("admin2") or "").strip() or None,
             country=str(result.get("country") or "").strip() or None,
             source="open-meteo",
             fallback_label=fallback_label,
         )
 
-    def _parse_nominatim_search(self, payload: object, *, fallback_label: str) -> LocationSearchResponse:
+    def _parse_nominatim_search(
+        self, payload: object, *, fallback_label: str
+    ) -> LocationSearchResponse:
         result = payload[0] if isinstance(payload, list) and payload else None
         if not isinstance(result, dict):
             raise ValueError("No geocode result")
         address = result.get("address") if isinstance(result.get("address"), dict) else {}
-        city = address.get("city") or address.get("town") or address.get("village") or address.get("hamlet")
-        state = address.get("state") or address.get("county")
+        city = (
+            address.get("city")
+            or address.get("town")
+            or address.get("village")
+            or address.get("hamlet")
+        )
+        state = address.get("state")
+        district = address.get("state_district") or address.get("county")
+        block = address.get("suburb") or address.get("municipality") or address.get("city_district")
+        village = (
+            address.get("village")
+            or address.get("hamlet")
+            or address.get("quarter")
+            or address.get("neighbourhood")
+        )
         country = address.get("country")
         return self._build_search_response(
             lat=float(result.get("lat")),
             lon=float(result.get("lon")),
             city=str(city or result.get("name") or "").strip() or None,
             state=str(state or "").strip() or None,
+            district=str(district or "").strip() or None,
+            block=str(block or "").strip() or None,
+            village=str(village or "").strip() or None,
+            postal_code=str(address.get("postcode") or "").strip() or None,
             country=str(country or "").strip() or None,
             source="nominatim",
             fallback_label=fallback_label,
@@ -535,55 +942,14 @@ class ExternalDataService:
             for offset in range(days)
         ]
 
-    def _stub_mandi(self, crop: str, market: str, days: int) -> List[MandiPricePoint]:
-        category_map = crop_to_category_map()
-        category = category_map.get(crop.strip().lower(), "vegetables")
-        category_base: Dict[str, float] = {
-            "cereals": 2200,
-            "millet": 2000,
-            "pseudo-cereal": 2300,
-            "pulses": 6200,
-            "oilseeds": 5200,
-            "vegetables": 1800,
-            "fruit vegetable": 2400,
-            "leafy": 1200,
-            "fruits": 3200,
-            "spices": 7600,
-            "cash_crops": 3600,
-            "flowers": 2800,
-        }
-        base = category_base.get(category, 2400)
-
-        key = f"{crop.lower()}::{market.lower()}"
-        seed = int(hashlib.sha256(key.encode("utf-8")).hexdigest()[:8], 16)
-        start = datetime.now(timezone.utc).date() - timedelta(days=days - 1)
-
-        trend = (seed % 9) - 4
-        volatility = 0.012 + ((seed % 5) * 0.003)
-        return [
-            MandiPricePoint(
-                date=start + timedelta(days=offset),
-                price=round(
-                    max(
-                        100,
-                        base
-                        + trend * offset * 5
-                        + math.sin((offset + (seed % 11)) / 2.5) * base * volatility
-                        + (((seed >> (offset % 16)) & 0x0F) - 7) * 6,
-                    ),
-                    2,
-                ),
-            )
-            for offset in range(days)
-        ]
-
     async def _fetch_custom_mandi(self, crop: str, market: str, days: int) -> List[MandiPricePoint]:
         if not settings.mandi_api_url:
             return []
 
         try:
             async with httpx.AsyncClient(timeout=settings.external_http_timeout_seconds) as client:
-                response = await client.get(
+                payload = await self._get_json(
+                    client,
                     settings.mandi_api_url,
                     params={
                         "crop": crop,
@@ -592,8 +958,6 @@ class ExternalDataService:
                         "key": settings.mandi_api_key,
                     },
                 )
-                response.raise_for_status()
-                payload = response.json()
             prices = self._parse_mandi(payload, days)
             if prices:
                 return prices
@@ -601,49 +965,38 @@ class ExternalDataService:
             logger.warning("mandi_custom_api_failed", error=str(exc))
         return []
 
-    async def _fetch_data_gov_mandi(self, crop: str, market: str, days: int) -> List[MandiPricePoint]:
+    async def _fetch_data_gov_mandi(
+        self, crop: str, market: str, days: int
+    ) -> List[MandiPricePoint]:
         mandi_url = self.DEFAULT_MANDI_API_URL
+        api_key = self._resolved_mandi_api_key()
         base_params = {
             "format": "json",
             "offset": 0,
-            "limit": max(40, days * 15),
-            "sort[0][arrival_date]": "desc",
+            "limit": max(120, days * 50),
         }
-        if settings.mandi_api_key:
-            base_params["api-key"] = settings.mandi_api_key
+        if api_key:
+            base_params["api-key"] = api_key
 
         async with httpx.AsyncClient(timeout=settings.external_http_timeout_seconds) as client:
-            records = await self._fetch_data_gov_records(
+            exact_records = await self._fetch_data_gov_records(
                 client,
                 mandi_url,
                 {**base_params, "filters[commodity]": crop, "filters[market]": market},
             )
-            if not records:
-                records = await self._fetch_data_gov_records(
-                    client,
-                    mandi_url,
-                    {**base_params, "filters[commodity]": crop},
-                )
-            if not records:
-                return []
+            commodity_records = await self._fetch_data_gov_records(
+                client,
+                mandi_url,
+                {**base_params, "filters[commodity]": crop},
+            )
 
-        grouped: Dict[date, float] = {}
-        for record in records:
-            dt = self._parse_date_value(str(record.get("arrival_date", "")))
-            if not dt:
-                continue
-            if dt in grouped:
-                continue
-            price = self._parse_price_value(record.get("modal_price", record.get("price", 0)))
-            grouped[dt] = price
-            if len(grouped) >= days:
-                break
-
-        if not grouped:
+        record_candidates = exact_records or []
+        if commodity_records:
+            record_candidates.extend(commodity_records)
+        if not record_candidates:
             return []
 
-        ordered_dates = sorted(grouped.keys())
-        return [MandiPricePoint(date=dt, price=grouped[dt]) for dt in ordered_dates[-days:]]
+        return self._build_verified_mandi_points(record_candidates, market=market, days=days)
 
     async def _fetch_data_gov_records(
         self,
@@ -652,12 +1005,19 @@ class ExternalDataService:
         params: dict,
     ) -> List[dict]:
         try:
-            response = await client.get(url, params=params)
-            response.raise_for_status()
-            payload = response.json()
-            records = payload.get("records", payload.get("data", []))
-            if isinstance(records, list):
-                return records
+            page_limit = int(params.get("limit", 100) or 100)
+            collected: List[dict] = []
+            for page_index in range(5):
+                page_params = dict(params)
+                page_params["offset"] = page_index * page_limit
+                payload = await self._get_json(client, url, params=page_params)
+                records = payload.get("records", payload.get("data", []))
+                if not isinstance(records, list) or not records:
+                    break
+                collected.extend(records)
+                if len(records) < page_limit:
+                    break
+            return collected
         except Exception as exc:
             logger.warning("mandi_data_gov_failed", error=str(exc))
         return []
@@ -686,3 +1046,40 @@ class ExternalDataService:
             return date.fromisoformat(value[:10])
         except ValueError:
             return None
+
+    def _record_matches_market(self, record: dict, market_key: str) -> bool:
+        if not market_key:
+            return False
+        for field in ("market", "district"):
+            value = self._normalize_lookup_key(str(record.get(field, "")))
+            if not value:
+                continue
+            if value == market_key or market_key in value or value in market_key:
+                return True
+        return False
+
+    def _build_verified_mandi_points(
+        self, records: List[dict], *, market: str, days: int
+    ) -> List[MandiPricePoint]:
+        market_key = self._normalize_lookup_key(market)
+        grouped: Dict[date, List[float]] = {}
+
+        for record in records:
+            if not self._record_matches_market(record, market_key):
+                continue
+            dt = self._parse_date_value(str(record.get("arrival_date", "")))
+            if not dt:
+                continue
+            price = self._parse_price_value(record.get("modal_price", record.get("price", 0)))
+            if price <= 0:
+                continue
+            grouped.setdefault(dt, []).append(price)
+
+        if not grouped:
+            return []
+
+        ordered_dates = sorted(grouped.keys())[-days:]
+        return [
+            MandiPricePoint(date=dt, price=round(sum(grouped[dt]) / len(grouped[dt]), 2))
+            for dt in ordered_dates
+        ]

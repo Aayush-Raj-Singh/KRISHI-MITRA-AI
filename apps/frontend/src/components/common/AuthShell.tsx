@@ -7,18 +7,18 @@ const headerBadges = [
   {
     name: "Azadi Ka Amrit Mahotsav",
     url: "https://amritmahotsav.nic.in/",
-    logoSrc: "https://www.nfsm.gov.in/assets/img/azadi-ka-amrit-mahotsav.png"
+    logoSrc: "https://www.nfsm.gov.in/assets/img/azadi-ka-amrit-mahotsav.png",
   },
   {
     name: "G20 India",
     url: "https://www.g20.org/en/",
-    logoSrc: "https://www.nfsm.gov.in/assets/img/g20.png"
+    logoSrc: "https://www.nfsm.gov.in/assets/img/g20.png",
   },
   {
     name: "Digital India",
     url: "https://www.digitalindia.gov.in/",
-    logoSrc: "https://www.nfsm.gov.in/assets/img/clients/degitalindia.png"
-  }
+    logoSrc: "https://www.nfsm.gov.in/assets/img/clients/degitalindia.png",
+  },
 ];
 const authMaxWidth = "var(--app-shell-width)";
 const authShellContainerSx = {
@@ -27,11 +27,11 @@ const authShellContainerSx = {
   mx: "auto",
   minWidth: 0,
   "& > *": {
-    minWidth: 0
-  }
+    minWidth: 0,
+  },
 } as const;
 const authHorizontalPaddingSx = {
-  px: "var(--app-shell-inline-pad)"
+  px: "var(--app-shell-inline-pad)",
 } as const;
 
 type AuthShellProps = {
@@ -52,7 +52,7 @@ const AuthShell: React.FC<AuthShellProps> = ({ children }) => {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundAttachment: "fixed",
-        backgroundRepeat: "no-repeat"
+        backgroundRepeat: "no-repeat",
       }}
     >
       <Box
@@ -62,7 +62,7 @@ const AuthShell: React.FC<AuthShellProps> = ({ children }) => {
           color: "#fff",
           ...authHorizontalPaddingSx,
           py: 1.5,
-          borderBottom: "1px solid #175b2d"
+          borderBottom: "1px solid #175b2d",
         }}
       >
         <Box sx={authShellContainerSx}>
@@ -78,7 +78,7 @@ const AuthShell: React.FC<AuthShellProps> = ({ children }) => {
                     width: "auto",
                     objectFit: "contain",
                     mr: 1.25,
-                    borderRadius: "50%"
+                    borderRadius: "50%",
                   }}
                 />
               </ButtonBase>
@@ -104,10 +104,15 @@ const AuthShell: React.FC<AuthShellProps> = ({ children }) => {
                     borderRadius: 999,
                     px: 1.2,
                     py: 0.6,
-                    border: "1px solid rgba(255,255,255,0.2)"
+                    border: "1px solid rgba(255,255,255,0.2)",
                   }}
                 >
-                  <Box component="img" src={badge.logoSrc} alt={badge.name} sx={{ height: 30, width: "auto" }} />
+                  <Box
+                    component="img"
+                    src={badge.logoSrc}
+                    alt={badge.name}
+                    sx={{ height: 30, width: "auto" }}
+                  />
                 </ButtonBase>
               ))}
             </Stack>
@@ -126,15 +131,18 @@ const AuthShell: React.FC<AuthShellProps> = ({ children }) => {
           color: "#fff",
           ...authHorizontalPaddingSx,
           py: 1.5,
-          borderTop: "1px solid rgba(255,255,255,0.15)"
+          borderTop: "1px solid rgba(255,255,255,0.15)",
         }}
       >
         <Box sx={authShellContainerSx}>
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={1} alignItems={{ xs: "flex-start", sm: "center" }} justifyContent="space-between">
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={1}
+            alignItems={{ xs: "flex-start", sm: "center" }}
+            justifyContent="space-between"
+          >
             <Typography variant="body2">{t("layout.dbt_portal")}</Typography>
-            <Typography variant="body2">
-              {t("layout.helpline")}: 1800-000-000
-            </Typography>
+            <Typography variant="body2">{t("layout.helpline")}: 1800-000-000</Typography>
           </Stack>
         </Box>
       </Box>

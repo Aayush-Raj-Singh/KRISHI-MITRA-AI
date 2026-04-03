@@ -1,24 +1,75 @@
 import React, { ReactNode } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  type ImageSourcePropType,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { colors } from "../theme/colors";
+import { AppChrome } from "./AppChrome";
+import { AppFooter } from "./AppFooter";
+import { colors, radius, shadows, spacing, typography } from "../theme";
 
 interface ScreenShellProps {
   title: string;
   subtitle: string;
+  eyebrow?: string;
+  heroBadges?: string[];
+  heroImageSource?: ImageSourcePropType;
   children: ReactNode;
 }
 
-export const ScreenShell = ({ title, subtitle, children }: ScreenShellProps) => (
+export const ScreenShell = ({
+  title,
+  subtitle,
+  eyebrow = "KrishiMitra AI",
+  heroBadges,
+  heroImageSource,
+  children,
+}: ScreenShellProps) => (
   <SafeAreaView style={styles.safeArea} edges={["top"]}>
     <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-      <View style={styles.hero}>
-        <Text style={styles.eyebrow}>Mobile Field Assistant</Text>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.subtitle}>{subtitle}</Text>
-      </View>
+      <AppChrome />
+      {heroImageSource ? (
+        <ImageBackground imageStyle={styles.heroImage} source={heroImageSource} style={styles.hero}>
+          <View style={styles.heroOverlay}>
+            <View style={styles.heroGlow} />
+            <Text style={styles.eyebrow}>{eyebrow}</Text>
+            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.subtitle}>{subtitle}</Text>
+            {heroBadges?.length ? (
+              <View style={styles.badgesRow}>
+                {heroBadges.map((badge) => (
+                  <View key={badge} style={styles.badge}>
+                    <Text style={styles.badgeText}>{badge}</Text>
+                  </View>
+                ))}
+              </View>
+            ) : null}
+          </View>
+        </ImageBackground>
+      ) : (
+        <View style={styles.hero}>
+          <View style={styles.heroGlow} />
+          <Text style={styles.eyebrow}>{eyebrow}</Text>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.subtitle}>{subtitle}</Text>
+          {heroBadges?.length ? (
+            <View style={styles.badgesRow}>
+              {heroBadges.map((badge) => (
+                <View key={badge} style={styles.badge}>
+                  <Text style={styles.badgeText}>{badge}</Text>
+                </View>
+              ))}
+            </View>
+          ) : null}
+        </View>
+      )}
       <View style={styles.body}>{children}</View>
+      <AppFooter />
     </ScrollView>
   </SafeAreaView>
 );
@@ -26,37 +77,77 @@ export const ScreenShell = ({ title, subtitle, children }: ScreenShellProps) => 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background
+    backgroundColor: colors.background,
   },
   content: {
-    padding: 16,
-    gap: 16,
-    paddingBottom: 32
+    padding: spacing.md,
+    gap: spacing.md,
+    paddingBottom: spacing.xxl,
   },
   hero: {
+    position: "relative",
+    overflow: "hidden",
     backgroundColor: colors.primaryDark,
-    borderRadius: 28,
-    padding: 20,
-    gap: 6
+    borderRadius: radius.xl,
+    minHeight: 192,
+    ...shadows.hero,
+  },
+  heroImage: {
+    borderRadius: radius.xl,
+  },
+  heroOverlay: {
+    minHeight: 192,
+    backgroundColor: "rgba(16, 66, 35, 0.6)",
+    padding: spacing.lg,
+    gap: spacing.xs,
+  },
+  heroGlow: {
+    position: "absolute",
+    right: -24,
+    top: -18,
+    width: 120,
+    height: 120,
+    borderRadius: 999,
+    backgroundColor: "rgba(255,255,255,0.08)",
   },
   eyebrow: {
     color: "#bfd9c5",
-    fontSize: 12,
+    fontSize: typography.caption,
     fontWeight: "700",
     textTransform: "uppercase",
-    letterSpacing: 0.8
+    letterSpacing: 0.8,
   },
   title: {
     color: colors.white,
-    fontSize: 28,
-    fontWeight: "800"
+    fontFamily: typography.headingFont,
+    fontSize: typography.display,
+    lineHeight: 40,
   },
   subtitle: {
     color: "#d7ead9",
-    fontSize: 14,
-    lineHeight: 20
+    fontSize: typography.body,
+    lineHeight: 22,
+  },
+  badgesRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.xs,
+    marginTop: spacing.sm,
+  },
+  badge: {
+    borderRadius: radius.pill,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.18)",
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 8,
+  },
+  badgeText: {
+    color: colors.white,
+    fontSize: typography.caption,
+    fontWeight: "700",
   },
   body: {
-    gap: 16
-  }
+    gap: spacing.md,
+  },
 });

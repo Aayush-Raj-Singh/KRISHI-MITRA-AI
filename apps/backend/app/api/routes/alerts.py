@@ -4,8 +4,8 @@ from datetime import date
 from typing import Optional
 
 from fastapi import APIRouter, Depends
-from app.core.database import Database
 
+from app.core.database import Database
 from app.core.dependencies import get_db, require_roles
 from app.schemas.response import APIResponse
 from app.schemas.trends import PriceSpikeAlert, TrendFilters

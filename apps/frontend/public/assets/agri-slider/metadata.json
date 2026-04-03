@@ -3,10 +3,7 @@
     "file": "agri-001.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,farm?random=9226005",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_30914438592_88a5d14fb2_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "farm"
-    ],
+    "tags": ["agriculture", "farm"],
     "sha1": "2cf9f230095b18e14b1fbded9055314d1cee8881",
     "bytes": 211528
   },
@@ -14,10 +11,7 @@
     "file": "agri-002.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,technology?random=7084015",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54399883101_01407bf1fb_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "technology"
-    ],
+    "tags": ["agriculture", "technology"],
     "sha1": "2af0c68c2b2ad4fcec8497a63729042fac6e0adb",
     "bytes": 187993
   },
@@ -25,10 +19,7 @@
     "file": "agri-003.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agritech,farm?random=2519712",
     "resolved_url": "https://loremflickr.com/cache/resized/defaultImage.small_1280_720_nofilter.jpg",
-    "tags": [
-      "agritech",
-      "farm"
-    ],
+    "tags": ["agritech", "farm"],
     "sha1": "ea669b75a6a554565f495fb3fbc71b014a117c3f",
     "bytes": 225104
   },
@@ -36,10 +27,7 @@
     "file": "agri-004.jpg",
     "request_url": "https://loremflickr.com/1920/1080/tractor,farm?random=4267740",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54158195310_b3374cf7f4_h_1280_720_nofilter.jpg",
-    "tags": [
-      "tractor",
-      "farm"
-    ],
+    "tags": ["tractor", "farm"],
     "sha1": "3af0dbe937f0dc89b7227f4b5b9c18b9f8d8cfc5",
     "bytes": 157350
   },
@@ -47,10 +35,7 @@
     "file": "agri-005.jpg",
     "request_url": "https://loremflickr.com/1920/1080/harvest,crops?random=9297524",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54094257325_ae4d47b2e4_h_1280_720_nofilter.jpg",
-    "tags": [
-      "harvest",
-      "crops"
-    ],
+    "tags": ["harvest", "crops"],
     "sha1": "30817920731184f685edd9833ad8397fb3eba897",
     "bytes": 172326
   },
@@ -58,10 +43,7 @@
     "file": "agri-006.jpg",
     "request_url": "https://loremflickr.com/1920/1080/irrigation,farm?random=4622021",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_48011530472_e07b0cd19c_h_1280_720_nofilter.jpg",
-    "tags": [
-      "irrigation",
-      "farm"
-    ],
+    "tags": ["irrigation", "farm"],
     "sha1": "1b87cbee0c312a325198781e123f9cc505c158f2",
     "bytes": 223208
   },
@@ -69,10 +51,7 @@
     "file": "agri-007.jpg",
     "request_url": "https://loremflickr.com/1920/1080/greenhouse,agriculture?random=9894802",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53708613162_575ac49a32_h_1280_720_nofilter.jpg",
-    "tags": [
-      "greenhouse",
-      "agriculture"
-    ],
+    "tags": ["greenhouse", "agriculture"],
     "sha1": "e1223b0638b82534fe33ee5f6d85c24061f8ddc6",
     "bytes": 74723
   },
@@ -80,10 +59,7 @@
     "file": "agri-008.jpg",
     "request_url": "https://loremflickr.com/1920/1080/drone,agriculture?random=3228541",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53998604999_c5b653dc8b_h_1280_720_nofilter.jpg",
-    "tags": [
-      "drone",
-      "agriculture"
-    ],
+    "tags": ["drone", "agriculture"],
     "sha1": "2c9440b87bec9282076ee0030a72033a8418c8f6",
     "bytes": 211288
   },
@@ -91,10 +67,7 @@
     "file": "agri-009.jpg",
     "request_url": "https://loremflickr.com/1920/1080/soil,agriculture?random=4584591",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54334183016_257e775003_h_1280_720_nofilter.jpg",
-    "tags": [
-      "soil",
-      "agriculture"
-    ],
+    "tags": ["soil", "agriculture"],
     "sha1": "7bd31ee7c07abb4c088975fcc39677b307f2e292",
     "bytes": 78793
   },
@@ -102,10 +75,7 @@
     "file": "agri-010.jpg",
     "request_url": "https://loremflickr.com/1920/1080/seedling,field?random=6062665",
     "resolved_url": "https://loremflickr.com/cache/resized/3793_9629678207_7607da07ae_1280_720_nofilter.jpg",
-    "tags": [
-      "seedling",
-      "field"
-    ],
+    "tags": ["seedling", "field"],
     "sha1": "e09ee69ab698af8540835c16f5455073e5023060",
     "bytes": 41748
   },
@@ -113,10 +83,7 @@
     "file": "agri-011.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,farm?random=2421040",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54545611574_25575e4834_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "farm"
-    ],
+    "tags": ["agriculture", "farm"],
     "sha1": "98b38541ef50b8e764dc01fded20cd11a6adab5c",
     "bytes": 125496
   },
@@ -124,10 +91,7 @@
     "file": "agri-012.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,technology?random=6080933",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54391650189_d5f13bd611_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "technology"
-    ],
+    "tags": ["agriculture", "technology"],
     "sha1": "7501b959452fe05759a33dfc69125d732f951678",
     "bytes": 212532
   },
@@ -135,10 +99,7 @@
     "file": "agri-013.jpg",
     "request_url": "https://loremflickr.com/1920/1080/tractor,farm?random=8700130",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54500674362_facc9147bf_h_1280_720_nofilter.jpg",
-    "tags": [
-      "tractor",
-      "farm"
-    ],
+    "tags": ["tractor", "farm"],
     "sha1": "49a595ec9f9c446bf4598608083fde9dea486183",
     "bytes": 202595
   },
@@ -146,10 +107,7 @@
     "file": "agri-014.jpg",
     "request_url": "https://loremflickr.com/1920/1080/harvest,crops?random=6298133",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_52280744503_abdf9d679d_h_1280_720_nofilter.jpg",
-    "tags": [
-      "harvest",
-      "crops"
-    ],
+    "tags": ["harvest", "crops"],
     "sha1": "ce5bb263c8aa488409e3710afeedcaba84aad149",
     "bytes": 277952
   },
@@ -157,10 +115,7 @@
     "file": "agri-015.jpg",
     "request_url": "https://loremflickr.com/1920/1080/irrigation,farm?random=8801040",
     "resolved_url": "https://loremflickr.com/cache/resized/7812_47320982451_3f46e9eb2b_h_1280_720_nofilter.jpg",
-    "tags": [
-      "irrigation",
-      "farm"
-    ],
+    "tags": ["irrigation", "farm"],
     "sha1": "31b887e66de231f75e15a447385897e16a154252",
     "bytes": 87300
   },
@@ -168,10 +123,7 @@
     "file": "agri-016.jpg",
     "request_url": "https://loremflickr.com/1920/1080/greenhouse,agriculture?random=5395801",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54508954880_f2e925fff5_h_1280_720_nofilter.jpg",
-    "tags": [
-      "greenhouse",
-      "agriculture"
-    ],
+    "tags": ["greenhouse", "agriculture"],
     "sha1": "f8018ce6b32d839ba0cea88a67148ed847b10a19",
     "bytes": 112191
   },
@@ -179,10 +131,7 @@
     "file": "agri-017.jpg",
     "request_url": "https://loremflickr.com/1920/1080/drone,agriculture?random=8268246",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53928366890_7831af80f7_h_1280_720_nofilter.jpg",
-    "tags": [
-      "drone",
-      "agriculture"
-    ],
+    "tags": ["drone", "agriculture"],
     "sha1": "a89ebc0c7341b3774e76b30c4152ab725349cbf7",
     "bytes": 161192
   },
@@ -190,10 +139,7 @@
     "file": "agri-018.jpg",
     "request_url": "https://loremflickr.com/1920/1080/soil,agriculture?random=5816533",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54571469546_68fac514a4_h_1280_720_nofilter.jpg",
-    "tags": [
-      "soil",
-      "agriculture"
-    ],
+    "tags": ["soil", "agriculture"],
     "sha1": "f3a0d2004233d6dbc24eec9f10c0f1f33f9ce0b9",
     "bytes": 61932
   },
@@ -201,10 +147,7 @@
     "file": "agri-019.jpg",
     "request_url": "https://loremflickr.com/1920/1080/seedling,field?random=5239276",
     "resolved_url": "https://loremflickr.com/cache/resized/2881_9632912098_1b4a127535_1280_720_nofilter.jpg",
-    "tags": [
-      "seedling",
-      "field"
-    ],
+    "tags": ["seedling", "field"],
     "sha1": "12a3f0a11a62c88fde45a41cb2004a63c097d59e",
     "bytes": 40868
   },
@@ -212,10 +155,7 @@
     "file": "agri-020.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,farm?random=2767923",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54504792318_2871b989ee_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "farm"
-    ],
+    "tags": ["agriculture", "farm"],
     "sha1": "1bbcefb18728091b3297c3605b22d196ed42ff79",
     "bytes": 181762
   },
@@ -223,10 +163,7 @@
     "file": "agri-021.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,technology?random=9446973",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54508869113_101e1ae1e9_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "technology"
-    ],
+    "tags": ["agriculture", "technology"],
     "sha1": "aa40d0d86e2939d92adba2e6a3d999b889ea0f76",
     "bytes": 190727
   },
@@ -234,10 +171,7 @@
     "file": "agri-022.jpg",
     "request_url": "https://loremflickr.com/1920/1080/tractor,farm?random=6913606",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54501536581_c9d9a781fb_h_1280_720_nofilter.jpg",
-    "tags": [
-      "tractor",
-      "farm"
-    ],
+    "tags": ["tractor", "farm"],
     "sha1": "fd35b578e646aeaa47dc6938ac8780b56c87c1a4",
     "bytes": 166865
   },
@@ -245,10 +179,7 @@
     "file": "agri-023.jpg",
     "request_url": "https://loremflickr.com/1920/1080/harvest,crops?random=2784387",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_52247354338_037673f99a_h_1280_720_nofilter.jpg",
-    "tags": [
-      "harvest",
-      "crops"
-    ],
+    "tags": ["harvest", "crops"],
     "sha1": "f16348da0a96fe92e87a9d108a17daec2b28d576",
     "bytes": 158981
   },
@@ -256,10 +187,7 @@
     "file": "agri-024.jpg",
     "request_url": "https://loremflickr.com/1920/1080/irrigation,farm?random=5695991",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_51372857648_fe2db7fad1_h_1280_720_nofilter.jpg",
-    "tags": [
-      "irrigation",
-      "farm"
-    ],
+    "tags": ["irrigation", "farm"],
     "sha1": "87452722d0e235f3eed6f3300342d8c491d892ca",
     "bytes": 152774
   },
@@ -267,10 +195,7 @@
     "file": "agri-025.jpg",
     "request_url": "https://loremflickr.com/1920/1080/greenhouse,agriculture?random=653390",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_52662942354_6defc60c66_h_1280_720_nofilter.jpg",
-    "tags": [
-      "greenhouse",
-      "agriculture"
-    ],
+    "tags": ["greenhouse", "agriculture"],
     "sha1": "dcc6ab737cef56603eef25e76d97edf86039b41f",
     "bytes": 147957
   },
@@ -278,10 +203,7 @@
     "file": "agri-026.jpg",
     "request_url": "https://loremflickr.com/1920/1080/drone,agriculture?random=7469676",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54101216576_5edbe94c3b_h_1280_720_nofilter.jpg",
-    "tags": [
-      "drone",
-      "agriculture"
-    ],
+    "tags": ["drone", "agriculture"],
     "sha1": "96dd453ab802a712a1cff609455ea7f629d86bad",
     "bytes": 161012
   },
@@ -289,10 +211,7 @@
     "file": "agri-027.jpg",
     "request_url": "https://loremflickr.com/1920/1080/soil,agriculture?random=8732423",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_52463862032_a20524f916_k_1280_720_nofilter.jpg",
-    "tags": [
-      "soil",
-      "agriculture"
-    ],
+    "tags": ["soil", "agriculture"],
     "sha1": "0bd9805148fcba832ea8f6774f537ec1859b392d",
     "bytes": 185779
   },
@@ -300,10 +219,7 @@
     "file": "agri-028.jpg",
     "request_url": "https://loremflickr.com/1920/1080/seedling,field?random=1546507",
     "resolved_url": "https://loremflickr.com/cache/resized/3732_9632910180_8c180d937a_1280_720_nofilter.jpg",
-    "tags": [
-      "seedling",
-      "field"
-    ],
+    "tags": ["seedling", "field"],
     "sha1": "8a6cbd7a1b9d010d46f4964a95392a5e059fa1e0",
     "bytes": 42122
   },
@@ -311,10 +227,7 @@
     "file": "agri-029.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,farm?random=9269358",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54582906292_a4d689f896_k_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "farm"
-    ],
+    "tags": ["agriculture", "farm"],
     "sha1": "c978c43363c9b15f34800d47448ea49e12edcfa7",
     "bytes": 108440
   },
@@ -322,10 +235,7 @@
     "file": "agri-030.jpg",
     "request_url": "https://loremflickr.com/1920/1080/tractor,farm?random=6000821",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54501531476_7427083117_h_1280_720_nofilter.jpg",
-    "tags": [
-      "tractor",
-      "farm"
-    ],
+    "tags": ["tractor", "farm"],
     "sha1": "4a7f108b1380a6b895dc9a9b55cb0f5c3eefd61d",
     "bytes": 120578
   },
@@ -333,10 +243,7 @@
     "file": "agri-031.jpg",
     "request_url": "https://loremflickr.com/1920/1080/harvest,crops?random=3820588",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_52608793335_0ae8ec662b_h_1280_720_nofilter.jpg",
-    "tags": [
-      "harvest",
-      "crops"
-    ],
+    "tags": ["harvest", "crops"],
     "sha1": "ebec77cdc74da7e13ef7e1cb7595a04790a3c764",
     "bytes": 110642
   },
@@ -344,10 +251,7 @@
     "file": "agri-032.jpg",
     "request_url": "https://loremflickr.com/1920/1080/irrigation,farm?random=4731923",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_51370623932_3164656797_h_1280_720_nofilter.jpg",
-    "tags": [
-      "irrigation",
-      "farm"
-    ],
+    "tags": ["irrigation", "farm"],
     "sha1": "8b57b3d712f215c502c7649b7e012f04140d24dd",
     "bytes": 99026
   },
@@ -355,10 +259,7 @@
     "file": "agri-033.jpg",
     "request_url": "https://loremflickr.com/1920/1080/greenhouse,agriculture?random=901696",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53709959770_11d6f56eaf_h_1280_720_nofilter.jpg",
-    "tags": [
-      "greenhouse",
-      "agriculture"
-    ],
+    "tags": ["greenhouse", "agriculture"],
     "sha1": "05b3079e36c45d7340f5efb650c767322cace8b9",
     "bytes": 78922
   },
@@ -366,10 +267,7 @@
     "file": "agri-034.jpg",
     "request_url": "https://loremflickr.com/1920/1080/drone,agriculture?random=7529633",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53963892747_e8f6466e3b_h_1280_720_nofilter.jpg",
-    "tags": [
-      "drone",
-      "agriculture"
-    ],
+    "tags": ["drone", "agriculture"],
     "sha1": "200860fd7a61ee5c1c68b466e5b835b126612b16",
     "bytes": 184576
   },
@@ -377,10 +275,7 @@
     "file": "agri-035.jpg",
     "request_url": "https://loremflickr.com/1920/1080/soil,agriculture?random=2972553",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53631920974_ed363549fa_h_1280_720_nofilter.jpg",
-    "tags": [
-      "soil",
-      "agriculture"
-    ],
+    "tags": ["soil", "agriculture"],
     "sha1": "8abbc738aa44b5532247e9690867d9a7ce1b21f9",
     "bytes": 48494
   },
@@ -388,10 +283,7 @@
     "file": "agri-036.jpg",
     "request_url": "https://loremflickr.com/1920/1080/seedling,field?random=8145688",
     "resolved_url": "https://loremflickr.com/cache/resized/4071_4688668123_49e34cf38b_k_1280_720_nofilter.jpg",
-    "tags": [
-      "seedling",
-      "field"
-    ],
+    "tags": ["seedling", "field"],
     "sha1": "a49a392001977ed56088a471acc5f6d747898f64",
     "bytes": 233317
   },
@@ -399,10 +291,7 @@
     "file": "agri-037.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,farm?random=8506135",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54594978168_f050830c22_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "farm"
-    ],
+    "tags": ["agriculture", "farm"],
     "sha1": "b5aa538bcef9894a43d3deb8d35b41bd7d8f26ad",
     "bytes": 171017
   },
@@ -410,10 +299,7 @@
     "file": "agri-038.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,technology?random=1660575",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_47870746611_998ebebc73_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "technology"
-    ],
+    "tags": ["agriculture", "technology"],
     "sha1": "5eecfe85ef65ada9c698fd84bd39939d77f8ed93",
     "bytes": 213534
   },
@@ -421,10 +307,7 @@
     "file": "agri-039.jpg",
     "request_url": "https://loremflickr.com/1920/1080/tractor,farm?random=5688694",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53997545625_ed44c5788c_h_1280_720_nofilter.jpg",
-    "tags": [
-      "tractor",
-      "farm"
-    ],
+    "tags": ["tractor", "farm"],
     "sha1": "9dff5dd713ffea4b1a25897925cb53b030ee36e3",
     "bytes": 235068
   },
@@ -432,10 +315,7 @@
     "file": "agri-040.jpg",
     "request_url": "https://loremflickr.com/1920/1080/irrigation,farm?random=2349056",
     "resolved_url": "https://loremflickr.com/cache/resized/8724_28809771901_5b0735678b_h_1280_720_nofilter.jpg",
-    "tags": [
-      "irrigation",
-      "farm"
-    ],
+    "tags": ["irrigation", "farm"],
     "sha1": "e7303af74fea5a751738f419472c74b688bead3b",
     "bytes": 117966
   },
@@ -443,10 +323,7 @@
     "file": "agri-041.jpg",
     "request_url": "https://loremflickr.com/1920/1080/greenhouse,agriculture?random=8414660",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54391072962_28c1a1887a_h_1280_720_nofilter.jpg",
-    "tags": [
-      "greenhouse",
-      "agriculture"
-    ],
+    "tags": ["greenhouse", "agriculture"],
     "sha1": "275956c91d5ac13fc590bf4abffe80c9cd6bc292",
     "bytes": 230163
   },
@@ -454,10 +331,7 @@
     "file": "agri-042.jpg",
     "request_url": "https://loremflickr.com/1920/1080/soil,agriculture?random=432670",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53968911674_40a17a1522_h_1280_720_nofilter.jpg",
-    "tags": [
-      "soil",
-      "agriculture"
-    ],
+    "tags": ["soil", "agriculture"],
     "sha1": "d86cdc9115f6f05e00fd8b171de5ee187ab7573f",
     "bytes": 96341
   },
@@ -465,10 +339,7 @@
     "file": "agri-043.jpg",
     "request_url": "https://loremflickr.com/1920/1080/seedling,field?random=7025872",
     "resolved_url": "https://loremflickr.com/cache/resized/8823_18080532426_66cbebf56e_h_1280_720_nofilter.jpg",
-    "tags": [
-      "seedling",
-      "field"
-    ],
+    "tags": ["seedling", "field"],
     "sha1": "25e77c4d2530e6f03ae4235c844c692322144fef",
     "bytes": 152311
   },
@@ -476,10 +347,7 @@
     "file": "agri-044.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,farm?random=1124388",
     "resolved_url": "https://loremflickr.com/cache/resized/3275_3068813672_d62198726c_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "farm"
-    ],
+    "tags": ["agriculture", "farm"],
     "sha1": "9e331fc31d6c9e31ea1f89ee2298b0db81b1171a",
     "bytes": 163721
   },
@@ -487,10 +355,7 @@
     "file": "agri-045.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,technology?random=7829220",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54281700273_d76d9c1903_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "technology"
-    ],
+    "tags": ["agriculture", "technology"],
     "sha1": "350ee17330f5688cf49bbd104b9a04c2dd03e3b3",
     "bytes": 66194
   },
@@ -498,10 +363,7 @@
     "file": "agri-046.jpg",
     "request_url": "https://loremflickr.com/1920/1080/tractor,farm?random=2821261",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53997545890_f04b37de6a_h_1280_720_nofilter.jpg",
-    "tags": [
-      "tractor",
-      "farm"
-    ],
+    "tags": ["tractor", "farm"],
     "sha1": "d8aab63f3f8becaf12ce3d04ef66e920cc8e0c37",
     "bytes": 111943
   },
@@ -509,10 +371,7 @@
     "file": "agri-047.jpg",
     "request_url": "https://loremflickr.com/1920/1080/harvest,crops?random=1429585",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_52675475697_36e67bf343_h_1280_720_nofilter.jpg",
-    "tags": [
-      "harvest",
-      "crops"
-    ],
+    "tags": ["harvest", "crops"],
     "sha1": "b78334eb36fb71ff3e09da53dffdde796b2e7fb1",
     "bytes": 136099
   },
@@ -520,10 +379,7 @@
     "file": "agri-048.jpg",
     "request_url": "https://loremflickr.com/1920/1080/irrigation,farm?random=2506826",
     "resolved_url": "https://loremflickr.com/cache/resized/974_42313203721_2d2d90653b_h_1280_720_nofilter.jpg",
-    "tags": [
-      "irrigation",
-      "farm"
-    ],
+    "tags": ["irrigation", "farm"],
     "sha1": "a4f3055cdda6e0242fbcdee9228c16e2f8647a34",
     "bytes": 101159
   },
@@ -531,10 +387,7 @@
     "file": "agri-049.jpg",
     "request_url": "https://loremflickr.com/1920/1080/greenhouse,agriculture?random=4873470",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54393768826_90965cee46_h_1280_720_nofilter.jpg",
-    "tags": [
-      "greenhouse",
-      "agriculture"
-    ],
+    "tags": ["greenhouse", "agriculture"],
     "sha1": "6d0f0b90d0e089d4fb272c08934a2aba1c579ecb",
     "bytes": 246277
   },
@@ -542,10 +395,7 @@
     "file": "agri-050.jpg",
     "request_url": "https://loremflickr.com/1920/1080/drone,agriculture?random=8529330",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54039093959_1ca7eb22b8_h_1280_720_nofilter.jpg",
-    "tags": [
-      "drone",
-      "agriculture"
-    ],
+    "tags": ["drone", "agriculture"],
     "sha1": "a7850a465e031a65acea05d7407fd4f3be08c7b2",
     "bytes": 205421
   },
@@ -553,10 +403,7 @@
     "file": "agri-051.jpg",
     "request_url": "https://loremflickr.com/1920/1080/soil,agriculture?random=4353058",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54492068701_dac4048658_h_1280_720_nofilter.jpg",
-    "tags": [
-      "soil",
-      "agriculture"
-    ],
+    "tags": ["soil", "agriculture"],
     "sha1": "107fc741df2adaa158b432ed64d9639713f1bdfc",
     "bytes": 99521
   },
@@ -564,10 +411,7 @@
     "file": "agri-052.jpg",
     "request_url": "https://loremflickr.com/1920/1080/seedling,field?random=7249183",
     "resolved_url": "https://loremflickr.com/cache/resized/1029_636007029_13f2a5cd80_o_1280_720_nofilter.jpg",
-    "tags": [
-      "seedling",
-      "field"
-    ],
+    "tags": ["seedling", "field"],
     "sha1": "d6c01a97e4b5769995a80076d806c67c192c43dc",
     "bytes": 74039
   },
@@ -575,10 +419,7 @@
     "file": "agri-053.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,farm?random=6068486",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54536668293_fab96b6707_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "farm"
-    ],
+    "tags": ["agriculture", "farm"],
     "sha1": "8f9b14dbb90eecada873068a31553d5a7043d77c",
     "bytes": 63458
   },
@@ -586,10 +427,7 @@
     "file": "agri-054.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,technology?random=4014411",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54508603831_684fceb58f_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "technology"
-    ],
+    "tags": ["agriculture", "technology"],
     "sha1": "48a8bdd611126c402da998fac94b3a3dce3e0b2d",
     "bytes": 116212
   },
@@ -597,10 +435,7 @@
     "file": "agri-055.jpg",
     "request_url": "https://loremflickr.com/1920/1080/tractor,farm?random=5296823",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54057726110_caae0f0371_h_1280_720_nofilter.jpg",
-    "tags": [
-      "tractor",
-      "farm"
-    ],
+    "tags": ["tractor", "farm"],
     "sha1": "6c6d98564e3785051392aad97242381d76b340fb",
     "bytes": 188611
   },
@@ -608,10 +443,7 @@
     "file": "agri-056.jpg",
     "request_url": "https://loremflickr.com/1920/1080/irrigation,farm?random=2783932",
     "resolved_url": "https://loremflickr.com/cache/resized/3931_34105560665_4a908e396b_h_1280_720_nofilter.jpg",
-    "tags": [
-      "irrigation",
-      "farm"
-    ],
+    "tags": ["irrigation", "farm"],
     "sha1": "a2885ea81ff68948b8eee9e1d523810c5a234040",
     "bytes": 219628
   },
@@ -619,10 +451,7 @@
     "file": "agri-057.jpg",
     "request_url": "https://loremflickr.com/1920/1080/greenhouse,agriculture?random=2926592",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54391975036_809a7c22f1_h_1280_720_nofilter.jpg",
-    "tags": [
-      "greenhouse",
-      "agriculture"
-    ],
+    "tags": ["greenhouse", "agriculture"],
     "sha1": "5a854bca7ef7c006857af6bd716cbad347f0210d",
     "bytes": 253147
   },
@@ -630,10 +459,7 @@
     "file": "agri-058.jpg",
     "request_url": "https://loremflickr.com/1920/1080/drone,agriculture?random=31784",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54508868763_f0aee839f1_h_1280_720_nofilter.jpg",
-    "tags": [
-      "drone",
-      "agriculture"
-    ],
+    "tags": ["drone", "agriculture"],
     "sha1": "1b608af6729e91f04ce0eff45fa07865b7343483",
     "bytes": 146043
   },
@@ -641,10 +467,7 @@
     "file": "agri-059.jpg",
     "request_url": "https://loremflickr.com/1920/1080/soil,agriculture?random=2443806",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_52502942829_7c3228272d_h_1280_720_nofilter.jpg",
-    "tags": [
-      "soil",
-      "agriculture"
-    ],
+    "tags": ["soil", "agriculture"],
     "sha1": "4ef40ae095f721f72ea2312d7de8c1efa2f9479e",
     "bytes": 198623
   },
@@ -652,10 +475,7 @@
     "file": "agri-060.jpg",
     "request_url": "https://loremflickr.com/1920/1080/seedling,field?random=8184118",
     "resolved_url": "https://loremflickr.com/cache/resized/1861_29522018957_2a730bb6f3_h_1280_720_nofilter.jpg",
-    "tags": [
-      "seedling",
-      "field"
-    ],
+    "tags": ["seedling", "field"],
     "sha1": "b158eaa8cbc1425ae7cfd2f0ed23f5412aa8dbaa",
     "bytes": 73407
   },
@@ -663,10 +483,7 @@
     "file": "agri-061.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,farm?random=8471577",
     "resolved_url": "https://loremflickr.com/cache/resized/4316_35170357203_b341e00273_k_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "farm"
-    ],
+    "tags": ["agriculture", "farm"],
     "sha1": "5d1bba4a322b3042850797cd440f64fd263eac52",
     "bytes": 125436
   },
@@ -674,10 +491,7 @@
     "file": "agri-062.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,technology?random=4720769",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54196148189_5b49a0b26d_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "technology"
-    ],
+    "tags": ["agriculture", "technology"],
     "sha1": "50c60606de9878aebb7e0dc278171ea8a321c258",
     "bytes": 191338
   },
@@ -685,10 +499,7 @@
     "file": "agri-063.jpg",
     "request_url": "https://loremflickr.com/1920/1080/tractor,farm?random=2404502",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54501533936_97638a90e8_h_1280_720_nofilter.jpg",
-    "tags": [
-      "tractor",
-      "farm"
-    ],
+    "tags": ["tractor", "farm"],
     "sha1": "725fb7e5dab442b9b5e9b9fabfa7956135cbea41",
     "bytes": 209505
   },
@@ -696,10 +507,7 @@
     "file": "agri-064.jpg",
     "request_url": "https://loremflickr.com/1920/1080/harvest,crops?random=4678999",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_52280995044_12d914e162_h_1280_720_nofilter.jpg",
-    "tags": [
-      "harvest",
-      "crops"
-    ],
+    "tags": ["harvest", "crops"],
     "sha1": "dfafed3651abda91c10c66eb0025d29de0087323",
     "bytes": 221657
   },
@@ -707,10 +515,7 @@
     "file": "agri-065.jpg",
     "request_url": "https://loremflickr.com/1920/1080/irrigation,farm?random=9357631",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_50359648948_054e82b9be_h_1280_720_nofilter.jpg",
-    "tags": [
-      "irrigation",
-      "farm"
-    ],
+    "tags": ["irrigation", "farm"],
     "sha1": "04132b9e877427f04335be5796d4450777a4dc0b",
     "bytes": 100860
   },
@@ -718,10 +523,7 @@
     "file": "agri-066.jpg",
     "request_url": "https://loremflickr.com/1920/1080/greenhouse,agriculture?random=5106116",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53709959760_6204faf201_k_1280_720_nofilter.jpg",
-    "tags": [
-      "greenhouse",
-      "agriculture"
-    ],
+    "tags": ["greenhouse", "agriculture"],
     "sha1": "f2c6b1926f0996722678d0b7825e2dccbf69c8ed",
     "bytes": 133321
   },
@@ -729,10 +531,7 @@
     "file": "agri-067.jpg",
     "request_url": "https://loremflickr.com/1920/1080/drone,agriculture?random=9471759",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54016788472_670ce2f3c8_h_1280_720_nofilter.jpg",
-    "tags": [
-      "drone",
-      "agriculture"
-    ],
+    "tags": ["drone", "agriculture"],
     "sha1": "9360417ee641938095a002f6491383f214f815b2",
     "bytes": 174597
   },
@@ -740,10 +539,7 @@
     "file": "agri-068.jpg",
     "request_url": "https://loremflickr.com/1920/1080/soil,agriculture?random=3798111",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54570603517_79e48ecd21_h_1280_720_nofilter.jpg",
-    "tags": [
-      "soil",
-      "agriculture"
-    ],
+    "tags": ["soil", "agriculture"],
     "sha1": "7ee54d64e249cc5c0575ea495afc44ebb72e8b7f",
     "bytes": 114403
   },
@@ -751,10 +547,7 @@
     "file": "agri-069.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,farm?random=26953",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_51948940178_77f5331660_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "farm"
-    ],
+    "tags": ["agriculture", "farm"],
     "sha1": "21ec8a1f4bfd4c6c4b8fceefb0b88326738f359c",
     "bytes": 296027
   },
@@ -762,10 +555,7 @@
     "file": "agri-070.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,technology?random=9891751",
     "resolved_url": "https://loremflickr.com/cache/resized/4492_37875737561_1bbe42fe75_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "technology"
-    ],
+    "tags": ["agriculture", "technology"],
     "sha1": "6d8a00db7747eddc4339ce43211c7d55d83c3bed",
     "bytes": 62480
   },
@@ -773,10 +563,7 @@
     "file": "agri-071.jpg",
     "request_url": "https://loremflickr.com/1920/1080/tractor,farm?random=3863240",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54500673247_fccf5e462a_h_1280_720_nofilter.jpg",
-    "tags": [
-      "tractor",
-      "farm"
-    ],
+    "tags": ["tractor", "farm"],
     "sha1": "a6cc2c8954d37a73b208657662098cf576d54afe",
     "bytes": 122852
   },
@@ -784,10 +571,7 @@
     "file": "agri-072.jpg",
     "request_url": "https://loremflickr.com/1920/1080/harvest,crops?random=5289258",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54150193069_4b9935eb9f_h_1280_720_nofilter.jpg",
-    "tags": [
-      "harvest",
-      "crops"
-    ],
+    "tags": ["harvest", "crops"],
     "sha1": "43aae4f8136bfebd8eb240910a4f0eb0fc6dbde4",
     "bytes": 154465
   },
@@ -795,10 +579,7 @@
     "file": "agri-073.jpg",
     "request_url": "https://loremflickr.com/1920/1080/irrigation,farm?random=7771816",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_50240513367_62c9d8502c_h_1280_720_nofilter.jpg",
-    "tags": [
-      "irrigation",
-      "farm"
-    ],
+    "tags": ["irrigation", "farm"],
     "sha1": "97c7da9a843274f0fe4dc24dcb273fd38433973f",
     "bytes": 175861
   },
@@ -806,10 +587,7 @@
     "file": "agri-074.jpg",
     "request_url": "https://loremflickr.com/1920/1080/greenhouse,agriculture?random=8517137",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54392329085_fa10fe13e5_h_1280_720_nofilter.jpg",
-    "tags": [
-      "greenhouse",
-      "agriculture"
-    ],
+    "tags": ["greenhouse", "agriculture"],
     "sha1": "c0af14d225737f4077ac8de8ab2e0d5a8559d678",
     "bytes": 218537
   },
@@ -817,10 +595,7 @@
     "file": "agri-075.jpg",
     "request_url": "https://loremflickr.com/1920/1080/drone,agriculture?random=1421845",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53969887008_3c4c37feff_h_1280_720_nofilter.jpg",
-    "tags": [
-      "drone",
-      "agriculture"
-    ],
+    "tags": ["drone", "agriculture"],
     "sha1": "bd7940b483c4d4de8f5986494dbef2692830284f",
     "bytes": 211079
   },
@@ -828,10 +603,7 @@
     "file": "agri-076.jpg",
     "request_url": "https://loremflickr.com/1920/1080/soil,agriculture?random=1145097",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53770828841_f402450444_h_1280_720_nofilter.jpg",
-    "tags": [
-      "soil",
-      "agriculture"
-    ],
+    "tags": ["soil", "agriculture"],
     "sha1": "7c7e4e9ebd5cab13aa8848dc64fa5969ac4dc3bd",
     "bytes": 269738
   },
@@ -839,10 +611,7 @@
     "file": "agri-077.jpg",
     "request_url": "https://loremflickr.com/1920/1080/seedling,field?random=3384739",
     "resolved_url": "https://loremflickr.com/cache/resized/2695_32010909733_eea43b9a64_h_1280_720_nofilter.jpg",
-    "tags": [
-      "seedling",
-      "field"
-    ],
+    "tags": ["seedling", "field"],
     "sha1": "4f8fff159f3763d3d9d6d1972fa275f8278e8eb5",
     "bytes": 195642
   },
@@ -850,10 +619,7 @@
     "file": "agri-078.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,farm?random=5534954",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54519472532_a6c89fc70e_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "farm"
-    ],
+    "tags": ["agriculture", "farm"],
     "sha1": "1301ddc19277854ca339910c3c92e2557f01daf0",
     "bytes": 65169
   },
@@ -861,10 +627,7 @@
     "file": "agri-079.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,technology?random=221975",
     "resolved_url": "https://loremflickr.com/cache/resized/4391_36779462161_4d0d55cc96_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "technology"
-    ],
+    "tags": ["agriculture", "technology"],
     "sha1": "320dfa7ed54038b8f8dfd15a6187f71ac2aa2797",
     "bytes": 48089
   },
@@ -872,10 +635,7 @@
     "file": "agri-080.jpg",
     "request_url": "https://loremflickr.com/1920/1080/tractor,farm?random=4425062",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54420821882_12c68b7741_1280_720_nofilter.jpg",
-    "tags": [
-      "tractor",
-      "farm"
-    ],
+    "tags": ["tractor", "farm"],
     "sha1": "b427f0c3f3bbad991f6416e82b9be9bcb6dd5cbe",
     "bytes": 72780
   },
@@ -883,10 +643,7 @@
     "file": "agri-081.jpg",
     "request_url": "https://loremflickr.com/1920/1080/harvest,crops?random=3944818",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_52430049960_053ef4c99a_h_1280_720_nofilter.jpg",
-    "tags": [
-      "harvest",
-      "crops"
-    ],
+    "tags": ["harvest", "crops"],
     "sha1": "584ef29be02a4789855b8b634bca633094afd228",
     "bytes": 160889
   },
@@ -894,10 +651,7 @@
     "file": "agri-082.jpg",
     "request_url": "https://loremflickr.com/1920/1080/irrigation,farm?random=8005954",
     "resolved_url": "https://loremflickr.com/cache/resized/5321_29706126584_991e0d13ac_h_1280_720_nofilter.jpg",
-    "tags": [
-      "irrigation",
-      "farm"
-    ],
+    "tags": ["irrigation", "farm"],
     "sha1": "77738adf417d79d8ffba62fc2e4bdaa7f068975c",
     "bytes": 186638
   },
@@ -905,10 +659,7 @@
     "file": "agri-083.jpg",
     "request_url": "https://loremflickr.com/1920/1080/greenhouse,agriculture?random=5294783",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53708613067_f93bcac9ad_k_1280_720_nofilter.jpg",
-    "tags": [
-      "greenhouse",
-      "agriculture"
-    ],
+    "tags": ["greenhouse", "agriculture"],
     "sha1": "f640ccefc2ab5f1a3d262e1162bd57a9455d922f",
     "bytes": 176954
   },
@@ -916,10 +667,7 @@
     "file": "agri-084.jpg",
     "request_url": "https://loremflickr.com/1920/1080/drone,agriculture?random=4202405",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54079432615_62ab3218c4_h_1280_720_nofilter.jpg",
-    "tags": [
-      "drone",
-      "agriculture"
-    ],
+    "tags": ["drone", "agriculture"],
     "sha1": "36748824a9292f3727e301fc8330fc87572b0e1a",
     "bytes": 419128
   },
@@ -927,10 +675,7 @@
     "file": "agri-085.jpg",
     "request_url": "https://loremflickr.com/1920/1080/soil,agriculture?random=9312384",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54597685380_6238ae5f77_h_1280_720_nofilter.jpg",
-    "tags": [
-      "soil",
-      "agriculture"
-    ],
+    "tags": ["soil", "agriculture"],
     "sha1": "2115141fd53a744ea564869825cccda34cc99a9c",
     "bytes": 64417
   },
@@ -938,10 +683,7 @@
     "file": "agri-086.jpg",
     "request_url": "https://loremflickr.com/1920/1080/seedling,field?random=5912670",
     "resolved_url": "https://loremflickr.com/cache/resized/1847_30590323858_6de8a56f0b_h_1280_720_nofilter.jpg",
-    "tags": [
-      "seedling",
-      "field"
-    ],
+    "tags": ["seedling", "field"],
     "sha1": "9f5d4d40c6afc6a4342d8cfd9d426d59c8c07a03",
     "bytes": 152037
   },
@@ -949,10 +691,7 @@
     "file": "agri-087.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,farm?random=5007832",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54504666546_7ca2c1a9cd_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "farm"
-    ],
+    "tags": ["agriculture", "farm"],
     "sha1": "4b12233bcb9295f5ee24b7503507772e6b7214d2",
     "bytes": 79188
   },
@@ -960,10 +699,7 @@
     "file": "agri-088.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,technology?random=9300698",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_48275089632_c45b506beb_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "technology"
-    ],
+    "tags": ["agriculture", "technology"],
     "sha1": "7b5bd72eafb5e40fca19c222c5a46e0b155b6555",
     "bytes": 137657
   },
@@ -971,10 +707,7 @@
     "file": "agri-089.jpg",
     "request_url": "https://loremflickr.com/1920/1080/tractor,farm?random=3252547",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54501802868_2ae945102c_h_1280_720_nofilter.jpg",
-    "tags": [
-      "tractor",
-      "farm"
-    ],
+    "tags": ["tractor", "farm"],
     "sha1": "48d7658112cd6f50855757867fc293614e87be85",
     "bytes": 189251
   },
@@ -982,10 +715,7 @@
     "file": "agri-090.jpg",
     "request_url": "https://loremflickr.com/1920/1080/harvest,crops?random=6882174",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_52279750102_daaf03d246_h_1280_720_nofilter.jpg",
-    "tags": [
-      "harvest",
-      "crops"
-    ],
+    "tags": ["harvest", "crops"],
     "sha1": "542ebc805c56a16c30e1d18db1c4d321ee966505",
     "bytes": 344676
   },
@@ -993,10 +723,7 @@
     "file": "agri-091.jpg",
     "request_url": "https://loremflickr.com/1920/1080/irrigation,farm?random=4367197",
     "resolved_url": "https://loremflickr.com/cache/resized/8327_28780478022_28cb5cf50c_k_1280_720_nofilter.jpg",
-    "tags": [
-      "irrigation",
-      "farm"
-    ],
+    "tags": ["irrigation", "farm"],
     "sha1": "a467679d506703537fd88e7dd59a8abffe83e3a9",
     "bytes": 96178
   },
@@ -1004,10 +731,7 @@
     "file": "agri-092.jpg",
     "request_url": "https://loremflickr.com/1920/1080/drone,agriculture?random=252299",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54152620204_6eb3f98054_h_1280_720_nofilter.jpg",
-    "tags": [
-      "drone",
-      "agriculture"
-    ],
+    "tags": ["drone", "agriculture"],
     "sha1": "6cfc241ece07fa828b988d4b5a0b1af7ad9fe046",
     "bytes": 150375
   },
@@ -1015,10 +739,7 @@
     "file": "agri-093.jpg",
     "request_url": "https://loremflickr.com/1920/1080/soil,agriculture?random=2093820",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_52729861619_bdfa0045ab_h_1280_720_nofilter.jpg",
-    "tags": [
-      "soil",
-      "agriculture"
-    ],
+    "tags": ["soil", "agriculture"],
     "sha1": "55220c292b319a578519973058d52102fb87e29f",
     "bytes": 185793
   },
@@ -1026,10 +747,7 @@
     "file": "agri-094.jpg",
     "request_url": "https://loremflickr.com/1920/1080/seedling,field?random=7567187",
     "resolved_url": "https://loremflickr.com/cache/resized/1737_28913647818_a8daa08045_h_1280_720_nofilter.jpg",
-    "tags": [
-      "seedling",
-      "field"
-    ],
+    "tags": ["seedling", "field"],
     "sha1": "2bd0cc4f6ab0f8ce7d7f86177122ae026d8de564",
     "bytes": 164235
   },
@@ -1037,10 +755,7 @@
     "file": "agri-095.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,farm?random=311696",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54543552860_d4eeeaf624_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "farm"
-    ],
+    "tags": ["agriculture", "farm"],
     "sha1": "2be1b1aca58d564d44c909a920a78423cade2cbc",
     "bytes": 126869
   },
@@ -1048,10 +763,7 @@
     "file": "agri-096.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,technology?random=6696971",
     "resolved_url": "https://loremflickr.com/cache/resized/4502_37746085016_e6f7eec1d3_k_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "technology"
-    ],
+    "tags": ["agriculture", "technology"],
     "sha1": "07a914df1c373fdcebbd09383e4ef11d06dd5056",
     "bytes": 160194
   },
@@ -1059,10 +771,7 @@
     "file": "agri-097.jpg",
     "request_url": "https://loremflickr.com/1920/1080/tractor,farm?random=4946742",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54501891825_9c80271b87_h_1280_720_nofilter.jpg",
-    "tags": [
-      "tractor",
-      "farm"
-    ],
+    "tags": ["tractor", "farm"],
     "sha1": "48a71ffc635cb9d20bff22856f5b634e528f711b",
     "bytes": 293328
   },
@@ -1070,10 +779,7 @@
     "file": "agri-098.jpg",
     "request_url": "https://loremflickr.com/1920/1080/harvest,crops?random=7980770",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_52279750362_8c887f7d08_h_1280_720_nofilter.jpg",
-    "tags": [
-      "harvest",
-      "crops"
-    ],
+    "tags": ["harvest", "crops"],
     "sha1": "596a111e5323f11f75d551852aa5f7d4482e05d5",
     "bytes": 359272
   },
@@ -1081,10 +787,7 @@
     "file": "agri-099.jpg",
     "request_url": "https://loremflickr.com/1920/1080/irrigation,farm?random=2620990",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53509820250_992fd39324_h_1280_720_nofilter.jpg",
-    "tags": [
-      "irrigation",
-      "farm"
-    ],
+    "tags": ["irrigation", "farm"],
     "sha1": "f9ff35d0522d7b892fd4b58972ad743d95408b59",
     "bytes": 167915
   },
@@ -1092,10 +795,7 @@
     "file": "agri-100.jpg",
     "request_url": "https://loremflickr.com/1920/1080/greenhouse,agriculture?random=1926826",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53133571714_71e52d8ce9_h_1280_720_nofilter.jpg",
-    "tags": [
-      "greenhouse",
-      "agriculture"
-    ],
+    "tags": ["greenhouse", "agriculture"],
     "sha1": "ccb8b3d70be1ee119ca17705c54598e3ea3ab1e9",
     "bytes": 267187
   },
@@ -1103,10 +803,7 @@
     "file": "agri-101.jpg",
     "request_url": "https://loremflickr.com/1920/1080/drone,agriculture?random=8941754",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54120404399_167c327b78_h_1280_720_nofilter.jpg",
-    "tags": [
-      "drone",
-      "agriculture"
-    ],
+    "tags": ["drone", "agriculture"],
     "sha1": "7e78f66e49b0b46c4b1fdceda1920c3570efebcb",
     "bytes": 164461
   },
@@ -1114,10 +811,7 @@
     "file": "agri-102.jpg",
     "request_url": "https://loremflickr.com/1920/1080/soil,agriculture?random=9478002",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_52497688054_7690a6c15d_k_1280_720_nofilter.jpg",
-    "tags": [
-      "soil",
-      "agriculture"
-    ],
+    "tags": ["soil", "agriculture"],
     "sha1": "724a3b70d66ea3b3355779327894038f421482dc",
     "bytes": 74549
   },
@@ -1125,10 +819,7 @@
     "file": "agri-103.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,farm?random=6809364",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_40983892314_8d54558ae5_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "farm"
-    ],
+    "tags": ["agriculture", "farm"],
     "sha1": "69b8a5352f4dbb08ecdb25adefe559ebf0d9e482",
     "bytes": 91960
   },
@@ -1136,10 +827,7 @@
     "file": "agri-104.jpg",
     "request_url": "https://loremflickr.com/1920/1080/tractor,farm?random=591740",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54121680875_0a4365172d_h_1280_720_nofilter.jpg",
-    "tags": [
-      "tractor",
-      "farm"
-    ],
+    "tags": ["tractor", "farm"],
     "sha1": "6b51f45f81c4fa0342ec2452318f5563c16a2750",
     "bytes": 179256
   },
@@ -1147,10 +835,7 @@
     "file": "agri-105.jpg",
     "request_url": "https://loremflickr.com/1920/1080/harvest,crops?random=2761274",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54104106699_06584449fa_h_1280_720_nofilter.jpg",
-    "tags": [
-      "harvest",
-      "crops"
-    ],
+    "tags": ["harvest", "crops"],
     "sha1": "3dab2ca425e7c5f112e0e871173bf95e3d68b7a1",
     "bytes": 224071
   },
@@ -1158,10 +843,7 @@
     "file": "agri-106.jpg",
     "request_url": "https://loremflickr.com/1920/1080/irrigation,farm?random=1779800",
     "resolved_url": "https://loremflickr.com/cache/resized/8688_28600543930_b8bf7e4540_k_1280_720_nofilter.jpg",
-    "tags": [
-      "irrigation",
-      "farm"
-    ],
+    "tags": ["irrigation", "farm"],
     "sha1": "0e48c64efe922d2634b3e86dcfd85c758bfd29c1",
     "bytes": 177066
   },
@@ -1169,10 +851,7 @@
     "file": "agri-107.jpg",
     "request_url": "https://loremflickr.com/1920/1080/greenhouse,agriculture?random=8319514",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_52663150638_b72cd057b9_h_1280_720_nofilter.jpg",
-    "tags": [
-      "greenhouse",
-      "agriculture"
-    ],
+    "tags": ["greenhouse", "agriculture"],
     "sha1": "a520e094634d4af73ae2e92b9af121832b440f9a",
     "bytes": 172320
   },
@@ -1180,10 +859,7 @@
     "file": "agri-108.jpg",
     "request_url": "https://loremflickr.com/1920/1080/drone,agriculture?random=5411398",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53929680821_ef61a0ca3f_h_1280_720_nofilter.jpg",
-    "tags": [
-      "drone",
-      "agriculture"
-    ],
+    "tags": ["drone", "agriculture"],
     "sha1": "45577e7567dae1dd3e0b3250e46356c700047b08",
     "bytes": 246399
   },
@@ -1191,10 +867,7 @@
     "file": "agri-109.jpg",
     "request_url": "https://loremflickr.com/1920/1080/soil,agriculture?random=6755910",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54568286537_8cbb59315c_h_1280_720_nofilter.jpg",
-    "tags": [
-      "soil",
-      "agriculture"
-    ],
+    "tags": ["soil", "agriculture"],
     "sha1": "42e14cd8318a677932b933c767eb1995c65b2809",
     "bytes": 53867
   },
@@ -1202,10 +875,7 @@
     "file": "agri-110.jpg",
     "request_url": "https://loremflickr.com/1920/1080/seedling,field?random=1086055",
     "resolved_url": "https://loremflickr.com/cache/resized/5519_9632912192_01dc035f7c_1280_720_nofilter.jpg",
-    "tags": [
-      "seedling",
-      "field"
-    ],
+    "tags": ["seedling", "field"],
     "sha1": "f130c5d82165ee335c5682a026bca3f8ae0beef1",
     "bytes": 43357
   },
@@ -1213,10 +883,7 @@
     "file": "agri-111.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,farm?random=1899863",
     "resolved_url": "https://loremflickr.com/cache/resized/4477_24124960108_8fdad2e4b2_k_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "farm"
-    ],
+    "tags": ["agriculture", "farm"],
     "sha1": "4a86f8409ddc8c57a93393fb872c4397f0f70319",
     "bytes": 173486
   },
@@ -1224,10 +891,7 @@
     "file": "agri-112.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,technology?random=7180514",
     "resolved_url": "https://loremflickr.com/cache/resized/4507_23637308898_4b3e3ab534_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "technology"
-    ],
+    "tags": ["agriculture", "technology"],
     "sha1": "bdd78b2184f5f0a3da239f00f10b5a90587b8225",
     "bytes": 96332
   },
@@ -1235,10 +899,7 @@
     "file": "agri-113.jpg",
     "request_url": "https://loremflickr.com/1920/1080/tractor,farm?random=883899",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54501892105_176954afc5_h_1280_720_nofilter.jpg",
-    "tags": [
-      "tractor",
-      "farm"
-    ],
+    "tags": ["tractor", "farm"],
     "sha1": "763f5fcf4bf162bbc56b3db65d31d2f53223af87",
     "bytes": 185793
   },
@@ -1246,10 +907,7 @@
     "file": "agri-114.jpg",
     "request_url": "https://loremflickr.com/1920/1080/harvest,crops?random=1019058",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54105190207_8dbcf86d08_h_1280_720_nofilter.jpg",
-    "tags": [
-      "harvest",
-      "crops"
-    ],
+    "tags": ["harvest", "crops"],
     "sha1": "b4959384af979243d00f2111ad7df1a72e8589c6",
     "bytes": 190568
   },
@@ -1257,10 +915,7 @@
     "file": "agri-115.jpg",
     "request_url": "https://loremflickr.com/1920/1080/irrigation,farm?random=1743042",
     "resolved_url": "https://loremflickr.com/cache/resized/2826_34064579036_6eef781dea_h_1280_720_nofilter.jpg",
-    "tags": [
-      "irrigation",
-      "farm"
-    ],
+    "tags": ["irrigation", "farm"],
     "sha1": "c0c8c97ab9df8a538534ad7867500851d174adb4",
     "bytes": 80028
   },
@@ -1268,10 +923,7 @@
     "file": "agri-116.jpg",
     "request_url": "https://loremflickr.com/1920/1080/greenhouse,agriculture?random=2704844",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53133571794_98c543b48b_k_1280_720_nofilter.jpg",
-    "tags": [
-      "greenhouse",
-      "agriculture"
-    ],
+    "tags": ["greenhouse", "agriculture"],
     "sha1": "075d1ca7dff8c091ccb3b4f7a5f22e8d5e1ff01b",
     "bytes": 242656
   },
@@ -1279,10 +931,7 @@
     "file": "agri-117.jpg",
     "request_url": "https://loremflickr.com/1920/1080/drone,agriculture?random=3816006",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54140658661_f7f4ddc433_h_1280_720_nofilter.jpg",
-    "tags": [
-      "drone",
-      "agriculture"
-    ],
+    "tags": ["drone", "agriculture"],
     "sha1": "9928dd6b785caaba97c1aa740b8b6ce8651f7833",
     "bytes": 251577
   },
@@ -1290,10 +939,7 @@
     "file": "agri-118.jpg",
     "request_url": "https://loremflickr.com/1920/1080/soil,agriculture?random=1576395",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54339302226_f98fa44e54_h_1280_720_nofilter.jpg",
-    "tags": [
-      "soil",
-      "agriculture"
-    ],
+    "tags": ["soil", "agriculture"],
     "sha1": "545f5861314c1278fcbe4485ba70ba6dabd1005f",
     "bytes": 125788
   },
@@ -1301,10 +947,7 @@
     "file": "agri-119.jpg",
     "request_url": "https://loremflickr.com/1920/1080/seedling,field?random=2695389",
     "resolved_url": "https://loremflickr.com/cache/resized/5057_5398336057_4f2d161bdc_k_1280_720_nofilter.jpg",
-    "tags": [
-      "seedling",
-      "field"
-    ],
+    "tags": ["seedling", "field"],
     "sha1": "163a6cb55d3c4d2acb6e72edac7635ff52906322",
     "bytes": 125910
   },
@@ -1312,10 +955,7 @@
     "file": "agri-120.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,farm?random=7414835",
     "resolved_url": "https://loremflickr.com/cache/resized/7644_27561836834_530e5700b3_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "farm"
-    ],
+    "tags": ["agriculture", "farm"],
     "sha1": "0f6ad953419673bba69a9113b220314c0957ea2b",
     "bytes": 142376
   },
@@ -1323,10 +963,7 @@
     "file": "agri-121.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,technology?random=2431215",
     "resolved_url": "https://loremflickr.com/cache/resized/4503_37458586582_a1a6ce5084_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "technology"
-    ],
+    "tags": ["agriculture", "technology"],
     "sha1": "d066f9edd7cb1a86b0ca7bb6d3ca693e0b6b97c2",
     "bytes": 58628
   },
@@ -1334,10 +971,7 @@
     "file": "agri-122.jpg",
     "request_url": "https://loremflickr.com/1920/1080/tractor,farm?random=363920",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54500669877_8c65fca5dd_h_1280_720_nofilter.jpg",
-    "tags": [
-      "tractor",
-      "farm"
-    ],
+    "tags": ["tractor", "farm"],
     "sha1": "eaf3c35274f0bbc7c0ce4f77282bd68a3074de28",
     "bytes": 112864
   },
@@ -1345,10 +979,7 @@
     "file": "agri-123.jpg",
     "request_url": "https://loremflickr.com/1920/1080/harvest,crops?random=5736006",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54087272330_775bd44167_h_1280_720_nofilter.jpg",
-    "tags": [
-      "harvest",
-      "crops"
-    ],
+    "tags": ["harvest", "crops"],
     "sha1": "7e2c1082e3d321b235ec294a3982ade78ec6108c",
     "bytes": 151811
   },
@@ -1356,10 +987,7 @@
     "file": "agri-124.jpg",
     "request_url": "https://loremflickr.com/1920/1080/irrigation,farm?random=7477043",
     "resolved_url": "https://loremflickr.com/cache/resized/1852_30524846568_a9b7e84d8d_1280_720_nofilter.jpg",
-    "tags": [
-      "irrigation",
-      "farm"
-    ],
+    "tags": ["irrigation", "farm"],
     "sha1": "cfb0a39c9d7969741aa01a089f060f8f4d1091c4",
     "bytes": 53497
   },
@@ -1367,10 +995,7 @@
     "file": "agri-125.jpg",
     "request_url": "https://loremflickr.com/1920/1080/greenhouse,agriculture?random=8337231",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_52662942229_70d3abd228_h_1280_720_nofilter.jpg",
-    "tags": [
-      "greenhouse",
-      "agriculture"
-    ],
+    "tags": ["greenhouse", "agriculture"],
     "sha1": "ed9f89425d178f822b1c9e329199fb787229a87f",
     "bytes": 147672
   },
@@ -1378,10 +1003,7 @@
     "file": "agri-126.jpg",
     "request_url": "https://loremflickr.com/1920/1080/drone,agriculture?random=6155520",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53989299230_9c8a9f73ab_h_1280_720_nofilter.jpg",
-    "tags": [
-      "drone",
-      "agriculture"
-    ],
+    "tags": ["drone", "agriculture"],
     "sha1": "8d2dd07f99c97f300fb7c2f2edde99e70e11da8c",
     "bytes": 159623
   },
@@ -1389,10 +1011,7 @@
     "file": "agri-127.jpg",
     "request_url": "https://loremflickr.com/1920/1080/soil,agriculture?random=5236967",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54339724385_86daf10a82_h_1280_720_nofilter.jpg",
-    "tags": [
-      "soil",
-      "agriculture"
-    ],
+    "tags": ["soil", "agriculture"],
     "sha1": "649f76f91fe689688f85d96a1de14dc3a5e3bc38",
     "bytes": 73079
   },
@@ -1400,10 +1019,7 @@
     "file": "agri-128.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,farm?random=1452232",
     "resolved_url": "https://loremflickr.com/cache/resized/4386_36422572265_9e98fa53ec_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "farm"
-    ],
+    "tags": ["agriculture", "farm"],
     "sha1": "c96943fb446948f6b90da02fd2efc75df613ef0f",
     "bytes": 274349
   },
@@ -1411,10 +1027,7 @@
     "file": "agri-129.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,technology?random=8045669",
     "resolved_url": "https://loremflickr.com/cache/resized/4517_38557647616_70f6e7bb9d_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "technology"
-    ],
+    "tags": ["agriculture", "technology"],
     "sha1": "8c1b1a207b288cdc4c5ce3abcba2cfc128826ea8",
     "bytes": 92060
   },
@@ -1422,10 +1035,7 @@
     "file": "agri-130.jpg",
     "request_url": "https://loremflickr.com/1920/1080/tractor,farm?random=1869960",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53997545390_5882b3601b_h_1280_720_nofilter.jpg",
-    "tags": [
-      "tractor",
-      "farm"
-    ],
+    "tags": ["tractor", "farm"],
     "sha1": "282f78b912320ec2b2198e7f813be66d139dcc69",
     "bytes": 206977
   },
@@ -1433,10 +1043,7 @@
     "file": "agri-131.jpg",
     "request_url": "https://loremflickr.com/1920/1080/harvest,crops?random=3776151",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54108794050_452fe86ff7_h_1280_720_nofilter.jpg",
-    "tags": [
-      "harvest",
-      "crops"
-    ],
+    "tags": ["harvest", "crops"],
     "sha1": "e7be9f595abe4ed362d541679ef2ae91c8de432e",
     "bytes": 218958
   },
@@ -1444,10 +1051,7 @@
     "file": "agri-132.jpg",
     "request_url": "https://loremflickr.com/1920/1080/irrigation,farm?random=4213223",
     "resolved_url": "https://loremflickr.com/cache/resized/4339_36777280332_427f18ff1d_h_1280_720_nofilter.jpg",
-    "tags": [
-      "irrigation",
-      "farm"
-    ],
+    "tags": ["irrigation", "farm"],
     "sha1": "7de81332cd46faaa18cbdb2b858612d50a87abe2",
     "bytes": 175377
   },
@@ -1455,10 +1059,7 @@
     "file": "agri-133.jpg",
     "request_url": "https://loremflickr.com/1920/1080/greenhouse,agriculture?random=2464911",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_52663094570_3fdcb44c7d_h_1280_720_nofilter.jpg",
-    "tags": [
-      "greenhouse",
-      "agriculture"
-    ],
+    "tags": ["greenhouse", "agriculture"],
     "sha1": "968cbd47faa9d48ce4fca91d4cbe2a553fa50d12",
     "bytes": 140002
   },
@@ -1466,10 +1067,7 @@
     "file": "agri-134.jpg",
     "request_url": "https://loremflickr.com/1920/1080/drone,agriculture?random=8232342",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54048858318_5b848a2d8d_h_1280_720_nofilter.jpg",
-    "tags": [
-      "drone",
-      "agriculture"
-    ],
+    "tags": ["drone", "agriculture"],
     "sha1": "f9a99e976d4fa0c319e210eb3c20ab34d69f71d7",
     "bytes": 198005
   },
@@ -1477,10 +1075,7 @@
     "file": "agri-135.jpg",
     "request_url": "https://loremflickr.com/1920/1080/soil,agriculture?random=4741710",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54492333408_92c8f9d66c_h_1280_720_nofilter.jpg",
-    "tags": [
-      "soil",
-      "agriculture"
-    ],
+    "tags": ["soil", "agriculture"],
     "sha1": "cf1f25e2c466593ce184ef10f025d9e16b31ba17",
     "bytes": 101429
   },
@@ -1488,10 +1083,7 @@
     "file": "agri-136.jpg",
     "request_url": "https://loremflickr.com/1920/1080/seedling,field?random=76217",
     "resolved_url": "https://loremflickr.com/cache/resized/2726_4521213868_b1e4b171a0_1280_720_nofilter.jpg",
-    "tags": [
-      "seedling",
-      "field"
-    ],
+    "tags": ["seedling", "field"],
     "sha1": "56f1b1600b759e9ceba961e1735d8d3295c9e327",
     "bytes": 28503
   },
@@ -1499,10 +1091,7 @@
     "file": "agri-137.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,farm?random=7134768",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54594760526_66367bd815_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "farm"
-    ],
+    "tags": ["agriculture", "farm"],
     "sha1": "00fd5b87b5f26fb31578d0b51732e538af0ab65b",
     "bytes": 154018
   },
@@ -1510,10 +1099,7 @@
     "file": "agri-138.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,technology?random=6324684",
     "resolved_url": "https://loremflickr.com/cache/resized/4484_37458575032_850c7e2af7_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "technology"
-    ],
+    "tags": ["agriculture", "technology"],
     "sha1": "0cda5466968fafbf0308cf11d549fb4d668fe64c",
     "bytes": 54443
   },
@@ -1521,10 +1107,7 @@
     "file": "agri-139.jpg",
     "request_url": "https://loremflickr.com/1920/1080/tractor,farm?random=8907490",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53997545695_007873b6c2_h_1280_720_nofilter.jpg",
-    "tags": [
-      "tractor",
-      "farm"
-    ],
+    "tags": ["tractor", "farm"],
     "sha1": "d010a9c85214f19988bc70804c1a40f055a9ad5c",
     "bytes": 200930
   },
@@ -1532,10 +1115,7 @@
     "file": "agri-140.jpg",
     "request_url": "https://loremflickr.com/1920/1080/harvest,crops?random=709763",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54565322350_eed8970a83_k_1280_720_nofilter.jpg",
-    "tags": [
-      "harvest",
-      "crops"
-    ],
+    "tags": ["harvest", "crops"],
     "sha1": "2715a1eb84323cf545fd585b5cf4060582e5995d",
     "bytes": 62522
   },
@@ -1543,10 +1123,7 @@
     "file": "agri-141.jpg",
     "request_url": "https://loremflickr.com/1920/1080/irrigation,farm?random=9641198",
     "resolved_url": "https://loremflickr.com/cache/resized/1821_42130319195_68051c3717_h_1280_720_nofilter.jpg",
-    "tags": [
-      "irrigation",
-      "farm"
-    ],
+    "tags": ["irrigation", "farm"],
     "sha1": "d754b6b809f0dfa6ac15269b3bb740a3063e918d",
     "bytes": 84242
   },
@@ -1554,10 +1131,7 @@
     "file": "agri-142.jpg",
     "request_url": "https://loremflickr.com/1920/1080/greenhouse,agriculture?random=4268353",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53709735948_6ad122d4c9_h_1280_720_nofilter.jpg",
-    "tags": [
-      "greenhouse",
-      "agriculture"
-    ],
+    "tags": ["greenhouse", "agriculture"],
     "sha1": "fcd23063f27b3a3b3a3bc40e3a1a529d62acd9ea",
     "bytes": 59048
   },
@@ -1565,10 +1139,7 @@
     "file": "agri-143.jpg",
     "request_url": "https://loremflickr.com/1920/1080/drone,agriculture?random=7403329",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53934801993_3f50dc3124_h_1280_720_nofilter.jpg",
-    "tags": [
-      "drone",
-      "agriculture"
-    ],
+    "tags": ["drone", "agriculture"],
     "sha1": "86cf8cbc52e1a25dcdc8e19bd76b3472d0285dae",
     "bytes": 164122
   },
@@ -1576,10 +1147,7 @@
     "file": "agri-144.jpg",
     "request_url": "https://loremflickr.com/1920/1080/soil,agriculture?random=5320619",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54338401072_be14eb7da0_h_1280_720_nofilter.jpg",
-    "tags": [
-      "soil",
-      "agriculture"
-    ],
+    "tags": ["soil", "agriculture"],
     "sha1": "a65f1719aaed0ff552656edec93ebc0eca231344",
     "bytes": 89103
   },
@@ -1587,10 +1155,7 @@
     "file": "agri-145.jpg",
     "request_url": "https://loremflickr.com/1920/1080/seedling,field?random=615496",
     "resolved_url": "https://loremflickr.com/cache/resized/3820_9632912616_27cfb133b7_1280_720_nofilter.jpg",
-    "tags": [
-      "seedling",
-      "field"
-    ],
+    "tags": ["seedling", "field"],
     "sha1": "eaf797d16bc62feda004e8c87d26680855454564",
     "bytes": 54036
   },
@@ -1598,10 +1163,7 @@
     "file": "agri-146.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,farm?random=4583651",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_54505710952_9da5c635a1_k_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "farm"
-    ],
+    "tags": ["agriculture", "farm"],
     "sha1": "2106b9feb0c0705ccc964a55f11bee6c2d68ea8f",
     "bytes": 89488
   },
@@ -1609,10 +1171,7 @@
     "file": "agri-147.jpg",
     "request_url": "https://loremflickr.com/1920/1080/agriculture,technology?random=9304040",
     "resolved_url": "https://loremflickr.com/cache/resized/4912_44881621725_2ecf7e75df_h_1280_720_nofilter.jpg",
-    "tags": [
-      "agriculture",
-      "technology"
-    ],
+    "tags": ["agriculture", "technology"],
     "sha1": "0ffa931b167294f17701a01003eced95431f00e0",
     "bytes": 81137
   },
@@ -1620,10 +1179,7 @@
     "file": "agri-148.jpg",
     "request_url": "https://loremflickr.com/1920/1080/harvest,crops?random=6632933",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_52280995799_eb8aa53e68_h_1280_720_nofilter.jpg",
-    "tags": [
-      "harvest",
-      "crops"
-    ],
+    "tags": ["harvest", "crops"],
     "sha1": "568917341bd5e1c27bcc1af155037e6c4a2267d7",
     "bytes": 380621
   },
@@ -1631,10 +1187,7 @@
     "file": "agri-149.jpg",
     "request_url": "https://loremflickr.com/1920/1080/irrigation,farm?random=5764689",
     "resolved_url": "https://loremflickr.com/cache/resized/8752_28853891426_f2ad16534c_h_1280_720_nofilter.jpg",
-    "tags": [
-      "irrigation",
-      "farm"
-    ],
+    "tags": ["irrigation", "farm"],
     "sha1": "3cb6712e7d3ababd9be025f07bdf10d4b882e3b6",
     "bytes": 68855
   },
@@ -1642,10 +1195,7 @@
     "file": "agri-150.jpg",
     "request_url": "https://loremflickr.com/1920/1080/greenhouse,agriculture?random=4444576",
     "resolved_url": "https://loremflickr.com/cache/resized/65535_53709735953_89ebbd9d5c_h_1280_720_nofilter.jpg",
-    "tags": [
-      "greenhouse",
-      "agriculture"
-    ],
+    "tags": ["greenhouse", "agriculture"],
     "sha1": "27aeedafd6a10c7d71d6ccc602c211cf7845be86",
     "bytes": 96026
   }

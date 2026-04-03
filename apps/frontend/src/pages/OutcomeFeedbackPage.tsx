@@ -8,7 +8,7 @@ import {
   Grid,
   Stack,
   TextField,
-  Typography
+  Typography,
 } from "@mui/material";
 import FeedbackIcon from "@mui/icons-material/Feedback";
 import { useMutation } from "@tanstack/react-query";
@@ -20,7 +20,7 @@ import {
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
 } from "chart.js";
 import { useTranslation } from "react-i18next";
 
@@ -40,7 +40,7 @@ const OutcomeFeedbackPage: React.FC = () => {
     income_inr: 85000,
     water_usage_l_per_acre: 420000,
     fertilizer_kg_per_acre: 105,
-    notes: ""
+    notes: "",
   });
   const [result, setResult] = useState<OutcomeFeedbackResponse | null>(null);
   const labels = useTranslatedStrings({
@@ -52,12 +52,12 @@ const OutcomeFeedbackPage: React.FC = () => {
     regionTitle: "Regional comparison",
     waterVsRegion: "Water vs region",
     fertilizerVsRegion: "Fertilizer vs region",
-    yieldVsRegion: "Yield vs region"
+    yieldVsRegion: "Yield vs region",
   });
 
   const mutation = useMutation({
     mutationFn: submitOutcomeFeedback,
-    onSuccess: (data) => setResult(data)
+    onSuccess: (data) => setResult(data),
   });
 
   const chartData = useMemo(() => {
@@ -66,7 +66,7 @@ const OutcomeFeedbackPage: React.FC = () => {
       labels: [
         t("dashboard_page.sustainability_labels.water"),
         t("dashboard_page.sustainability_labels.fertilizer"),
-        t("dashboard_page.sustainability_labels.yield")
+        t("dashboard_page.sustainability_labels.yield"),
       ],
       datasets: [
         {
@@ -74,11 +74,11 @@ const OutcomeFeedbackPage: React.FC = () => {
           data: [
             result.sub_scores.water_efficiency,
             result.sub_scores.fertilizer_efficiency,
-            result.sub_scores.yield_optimization
+            result.sub_scores.yield_optimization,
           ],
-          backgroundColor: ["#1b6b3a", "#b65d2a", "#144a2c"]
-        }
-      ]
+          backgroundColor: ["#1b6b3a", "#b65d2a", "#144a2c"],
+        },
+      ],
     };
   }, [result, t]);
 
@@ -92,7 +92,7 @@ const OutcomeFeedbackPage: React.FC = () => {
           badges={[
             t("dashboard_page.feedback.rating"),
             t("dashboard_page.feedback.yield_kg_per_acre"),
-            t("dashboard.sustainability")
+            t("dashboard.sustainability"),
           ]}
           imageSrc="/assets/agri-slider/slide-09.jpg"
         />
@@ -108,21 +108,27 @@ const OutcomeFeedbackPage: React.FC = () => {
                   <TextField
                     label={t("dashboard_page.feedback.recommendation_id")}
                     value={form.recommendation_id}
-                    onChange={(e) => setForm((prev) => ({ ...prev, recommendation_id: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, recommendation_id: e.target.value }))
+                    }
                   />
                   <Stack direction="row" spacing={2}>
                     <TextField
                       label={t("dashboard_page.feedback.rating")}
                       type="number"
                       value={form.rating}
-                      onChange={(e) => setForm((prev) => ({ ...prev, rating: Number(e.target.value) }))}
+                      onChange={(e) =>
+                        setForm((prev) => ({ ...prev, rating: Number(e.target.value) }))
+                      }
                       fullWidth
                     />
                     <TextField
                       label={t("dashboard_page.feedback.yield_kg_per_acre")}
                       type="number"
                       value={form.yield_kg_per_acre}
-                      onChange={(e) => setForm((prev) => ({ ...prev, yield_kg_per_acre: Number(e.target.value) }))}
+                      onChange={(e) =>
+                        setForm((prev) => ({ ...prev, yield_kg_per_acre: Number(e.target.value) }))
+                      }
                       fullWidth
                     />
                   </Stack>
@@ -131,7 +137,9 @@ const OutcomeFeedbackPage: React.FC = () => {
                       label={t("dashboard_page.feedback.income_inr")}
                       type="number"
                       value={form.income_inr}
-                      onChange={(e) => setForm((prev) => ({ ...prev, income_inr: Number(e.target.value) }))}
+                      onChange={(e) =>
+                        setForm((prev) => ({ ...prev, income_inr: Number(e.target.value) }))
+                      }
                       fullWidth
                     />
                     <TextField
@@ -139,7 +147,10 @@ const OutcomeFeedbackPage: React.FC = () => {
                       type="number"
                       value={form.water_usage_l_per_acre}
                       onChange={(e) =>
-                        setForm((prev) => ({ ...prev, water_usage_l_per_acre: Number(e.target.value) }))
+                        setForm((prev) => ({
+                          ...prev,
+                          water_usage_l_per_acre: Number(e.target.value),
+                        }))
                       }
                       fullWidth
                     />
@@ -149,7 +160,10 @@ const OutcomeFeedbackPage: React.FC = () => {
                     type="number"
                     value={form.fertilizer_kg_per_acre}
                     onChange={(e) =>
-                      setForm((prev) => ({ ...prev, fertilizer_kg_per_acre: Number(e.target.value) }))
+                      setForm((prev) => ({
+                        ...prev,
+                        fertilizer_kg_per_acre: Number(e.target.value),
+                      }))
                     }
                   />
                   <TextField
@@ -166,11 +180,13 @@ const OutcomeFeedbackPage: React.FC = () => {
                         yield_kg_per_acre: Number(form.yield_kg_per_acre),
                         income_inr: Number(form.income_inr),
                         water_usage_l_per_acre: Number(form.water_usage_l_per_acre),
-                        fertilizer_kg_per_acre: Number(form.fertilizer_kg_per_acre)
+                        fertilizer_kg_per_acre: Number(form.fertilizer_kg_per_acre),
                       })
                     }
                     disabled={mutation.isPending}
-                    startIcon={mutation.isPending ? <CircularProgress size={16} color="inherit" /> : null}
+                    startIcon={
+                      mutation.isPending ? <CircularProgress size={16} color="inherit" /> : null
+                    }
                   >
                     {mutation.isPending ? t("actions.submitting") : t("actions.submit")}
                   </Button>
@@ -205,23 +221,35 @@ const OutcomeFeedbackPage: React.FC = () => {
                                 : labels.trendNoHistory
                         }`}
                         color={
-                          result.trend === "declining" ? "warning" : result.trend === "improving" ? "success" : "default"
+                          result.trend === "declining"
+                            ? "warning"
+                            : result.trend === "improving"
+                              ? "success"
+                              : "default"
                         }
                         variant="outlined"
                       />
                     )}
-                    {chartData && <Bar data={chartData} options={{ responsive: true, plugins: { legend: { display: false } } }} />}
+                    {chartData && (
+                      <Bar
+                        data={chartData}
+                        options={{ responsive: true, plugins: { legend: { display: false } } }}
+                      />
+                    )}
                     {result.regional_comparison && (
                       <Stack spacing={0.5}>
                         <Typography variant="subtitle2">{labels.regionTitle}</Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {labels.waterVsRegion}: {result.regional_comparison.water_vs_region_percent ?? 0}%
+                          {labels.waterVsRegion}:{" "}
+                          {result.regional_comparison.water_vs_region_percent ?? 0}%
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {labels.fertilizerVsRegion}: {result.regional_comparison.fertilizer_vs_region_percent ?? 0}%
+                          {labels.fertilizerVsRegion}:{" "}
+                          {result.regional_comparison.fertilizer_vs_region_percent ?? 0}%
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {labels.yieldVsRegion}: {result.regional_comparison.yield_vs_region_percent ?? 0}%
+                          {labels.yieldVsRegion}:{" "}
+                          {result.regional_comparison.yield_vs_region_percent ?? 0}%
                         </Typography>
                       </Stack>
                     )}

@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from "@mui/material";
+import {
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { inspectExternalLink, ExternalLinkCheckResponse } from "../../services/links";
@@ -11,7 +20,12 @@ interface ExternalLinkWarningDialogProps {
   onConfirm: () => void;
 }
 
-const ExternalLinkWarningDialog: React.FC<ExternalLinkWarningDialogProps> = ({ open, url, onClose, onConfirm }) => {
+const ExternalLinkWarningDialog: React.FC<ExternalLinkWarningDialogProps> = ({
+  open,
+  url,
+  onClose,
+  onConfirm,
+}) => {
   const { t } = useTranslation();
   const [inspection, setInspection] = useState<ExternalLinkCheckResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -52,6 +66,7 @@ const ExternalLinkWarningDialog: React.FC<ExternalLinkWarningDialogProps> = ({ o
 
   const safe = inspection?.safe ?? false;
   const verified = inspection?.verified ?? false;
+  const canContinue = safe && verified && !loading;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -69,7 +84,9 @@ const ExternalLinkWarningDialog: React.FC<ExternalLinkWarningDialogProps> = ({ o
             {!loading && inspection && (
               <>
                 <Chip
-                  label={safe ? t("external_link_warning.safe_link") : t("external_link_warning.blocked")}
+                  label={
+                    safe ? t("external_link_warning.safe_link") : t("external_link_warning.blocked")
+                  }
                   size="small"
                   color={safe ? "success" : "error"}
                 />
@@ -90,7 +107,7 @@ const ExternalLinkWarningDialog: React.FC<ExternalLinkWarningDialogProps> = ({ o
               {error}
             </Typography>
           )}
-          {!error && inspection?.reason && !safe && (
+          {!error && inspection?.reason && (!safe || !verified) && (
             <Typography variant="body2" color="error">
               {inspection.reason}
             </Typography>
@@ -101,7 +118,7 @@ const ExternalLinkWarningDialog: React.FC<ExternalLinkWarningDialogProps> = ({ o
         <Button onClick={onClose} variant="outlined">
           {t("external_link_warning.cancel")}
         </Button>
-        <Button onClick={onConfirm} variant="contained" disabled={!safe || loading}>
+        <Button onClick={onConfirm} variant="contained" disabled={!canContinue}>
           {t("external_link_warning.continue")}
         </Button>
       </DialogActions>

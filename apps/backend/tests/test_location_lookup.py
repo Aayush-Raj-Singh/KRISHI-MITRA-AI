@@ -27,7 +27,9 @@ def test_reverse_location_endpoint_returns_place_name(monkeypatch):
     monkeypatch.setattr(ExternalDataService, "reverse_geocode", fake_reverse_geocode)
 
     with TestClient(app) as client:
-        response = client.get("/api/v1/data/location/reverse", params={"lat": 25.5941, "lon": 85.1376})
+        response = client.get(
+            "/api/v1/data/location/reverse", params={"lat": 25.5941, "lon": 85.1376}
+        )
 
     assert response.status_code == 200
     payload = response.json()["data"]

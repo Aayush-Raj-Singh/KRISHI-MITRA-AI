@@ -1,33 +1,51 @@
 import { useEffect, useMemo, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   downloadAnalyticsReport,
   fetchRegionalInsights,
   type AnalyticsFilters,
-  type AnalyticsReportFormat,
   type AnalyticsOverview,
+  type AnalyticsReportFormat,
   type FarmerAttentionItem,
-  type FeedbackReliabilityStats
+  type FeedbackReliabilityStats,
 } from "../../../services/analytics";
+import { fetchDashboardHeroSummary, type DashboardHeroSummary } from "../../../services/dashboard";
 import {
   fetchMandiCatalog,
   fetchMandiPrices,
   type MandiCatalogResponse,
-  type MandiPriceResponse
+  type MandiPriceResponse,
 } from "../../../services/integrations";
-import { fetchDashboardHeroSummary, type DashboardHeroSummary } from "../../../services/dashboard";
+import { fetchMandiDirectory } from "../../../services/mandiDirectory";
 import {
   fetchSchedulerOverview,
   triggerDailyDataRefresh,
   triggerQuarterlyRetrain,
   triggerWeeklyPriceRefresh,
-  type SchedulerOverviewResponse
+  type SchedulerOverviewResponse,
 } from "../../../services/operations";
-import { FALLBACK_MANDI_CATALOG } from "../constants";
+import { resolveWsUrl } from "../../../services/runtimeConfig";
 import { useLocationContext } from "../../../context/LocationContext";
 import { mandiMarketLookup } from "../../../data/mandiMarketGeo";
+import {
+  buildTradingSnapshotQueryKey,
+  buildTradingSummary,
+  fetchMandiTradingSnapshot,
+  matchesRealtimeTick,
+  mergeRealtimeTick,
+  parseRealtimeMandiEvent,
+} from "../../../features/mandi-trading/services/mandiTradingService";
+import type {
+  LiveTransportMode,
+  MandiTradingPoint,
+  MandiTradingSnapshot,
+  TradingTimeframe,
+} from "../../../features/mandi-trading/types";
+import { useAppSelector } from "../../../store/hooks";
 import { haversineKm } from "../../../utils/geo";
+import { useWebSocket } from "../../../utils/useWebSocket";
+import { FALLBACK_MANDI_CATALOG } from "../constants";
 
 type Translate = (key: string, options?: Record<string, unknown>) => string;
 
@@ -38,6 +56,12 @@ interface AnalyticsFiltersFormState {
   farm_size_max: string;
   from_date: string;
   to_date: string;
+}
+
+interface MandiFormValues {
+  crop: string;
+  market: string;
+  days: number;
 }
 
 interface NearestMarket {
@@ -55,13 +79,22 @@ interface MandiPriceCard {
   distanceKm?: number;
 }
 
+const normalizeText = (value?: string | null) => String(value || "").trim();
+const normalizeKey = (value?: string | null) => normalizeText(value).toLowerCase();
+const sameValue = (left?: string | null, right?: string | null) =>
+  normalizeKey(left) === normalizeKey(right);
+
 const buildAnalyticsFilters = (analyticsFilters: AnalyticsFiltersFormState): AnalyticsFilters => ({
   location: analyticsFilters.location || undefined,
   crop: analyticsFilters.crop || undefined,
-  farm_size_min: analyticsFilters.farm_size_min ? Number(analyticsFilters.farm_size_min) : undefined,
-  farm_size_max: analyticsFilters.farm_size_max ? Number(analyticsFilters.farm_size_max) : undefined,
+  farm_size_min: analyticsFilters.farm_size_min
+    ? Number(analyticsFilters.farm_size_min)
+    : undefined,
+  farm_size_max: analyticsFilters.farm_size_max
+    ? Number(analyticsFilters.farm_size_max)
+    : undefined,
   from_date: analyticsFilters.from_date || undefined,
-  to_date: analyticsFilters.to_date || undefined
+  to_date: analyticsFilters.to_date || undefined,
 });
 
 const buildModalPrice = (values: number[]): number => {
@@ -85,8 +118,14 @@ const buildMandiCard = (result: MandiPriceResponse, distanceKm?: number): MandiP
     max,
     modal: buildModalPrice(values),
     changePct,
-    distanceKm
+    distanceKm,
   };
+};
+
+const toTradingTimeframe = (days: number): TradingTimeframe => {
+  if (days <= 1) return 1;
+  if (days <= 7) return 7;
+  return 30;
 };
 
 interface UseDashboardDataOptions {
@@ -96,33 +135,46 @@ interface UseDashboardDataOptions {
 }
 
 const useDashboardData = ({ isOfficer, isAdmin, t }: UseDashboardDataOptions) => {
-  const { coords, label: locationLabel } = useLocationContext();
+  const accessToken = useAppSelector((state) => state.auth.accessToken);
+  const queryClient = useQueryClient();
+  const {
+    coords,
+    label: locationLabel,
+    status: locationStatus,
+    requestLocation,
+  } = useLocationContext();
   const [analyticsFilters, setAnalyticsFilters] = useState<AnalyticsFiltersFormState>({
     location: "",
     crop: "",
     farm_size_min: "",
     farm_size_max: "",
     from_date: "",
-    to_date: ""
+    to_date: "",
   });
   const [analyticsData, setAnalyticsData] = useState<AnalyticsOverview | null>(null);
   const [farmersNeedingAttention, setFarmersNeedingAttention] = useState<FarmerAttentionItem[]>([]);
-  const [feedbackReliability, setFeedbackReliability] = useState<FeedbackReliabilityStats | null>(null);
+  const [feedbackReliability, setFeedbackReliability] = useState<FeedbackReliabilityStats | null>(
+    null,
+  );
   const [heroSummary, setHeroSummary] = useState<DashboardHeroSummary | null>(null);
-  const [operationsOverview, setOperationsOverview] = useState<SchedulerOverviewResponse | null>(null);
-  const [mandiForm, setMandiForm] = useState({
+  const [operationsOverview, setOperationsOverview] = useState<SchedulerOverviewResponse | null>(
+    null,
+  );
+  const [mandiForm, setMandiForm] = useState<MandiFormValues>({
     crop: "Rice",
     market: "Patna",
-    days: 7
+    days: 30,
   });
   const [mandiCategory, setMandiCategory] = useState("all");
-  const [mandiCatalogData, setMandiCatalogData] = useState<MandiCatalogResponse>(FALLBACK_MANDI_CATALOG);
+  const [mandiCatalogData, setMandiCatalogData] =
+    useState<MandiCatalogResponse>(FALLBACK_MANDI_CATALOG);
   const [mandiResult, setMandiResult] = useState<MandiPriceResponse | null>(null);
   const [showMandiTable, setShowMandiTable] = useState(false);
   const [nearestMarkets, setNearestMarkets] = useState<NearestMarket[]>([]);
   const [mandiCards, setMandiCards] = useState<MandiPriceCard[]>([]);
   const [hasDefaultMarket, setHasDefaultMarket] = useState(false);
   const [hasLoadedOfficerAnalytics, setHasLoadedOfficerAnalytics] = useState(false);
+  const [hasRealtimeMarketFeed, setHasRealtimeMarketFeed] = useState(false);
 
   const analyticsMutation = useMutation({
     mutationFn: fetchRegionalInsights,
@@ -130,49 +182,160 @@ const useDashboardData = ({ isOfficer, isAdmin, t }: UseDashboardDataOptions) =>
       setAnalyticsData(data.overview);
       setFarmersNeedingAttention(data.farmers_needing_attention);
       setFeedbackReliability(data.feedback_reliability);
-    }
+    },
   });
   const heroSummaryMutation = useMutation({
     mutationFn: fetchDashboardHeroSummary,
     onSuccess: (data) => {
       setHeroSummary(data);
-    }
+    },
   });
   const reportExportMutation = useMutation({
-    mutationFn: ({ format, filters }: { format: AnalyticsReportFormat; filters: AnalyticsFilters }) =>
-      downloadAnalyticsReport(filters, format)
+    mutationFn: ({
+      format,
+      filters,
+    }: {
+      format: AnalyticsReportFormat;
+      filters: AnalyticsFilters;
+    }) => downloadAnalyticsReport(filters, format),
   });
   const operationsOverviewMutation = useMutation({
     mutationFn: fetchSchedulerOverview,
     onSuccess: (data) => {
       setOperationsOverview(data);
-    }
+    },
   });
   const triggerWeeklyMutation = useMutation({
     mutationFn: (asyncMode: boolean) => triggerWeeklyPriceRefresh(asyncMode),
     onSuccess: () => {
       operationsOverviewMutation.mutate();
-    }
+    },
   });
   const triggerQuarterlyMutation = useMutation({
     mutationFn: (asyncMode: boolean) => triggerQuarterlyRetrain(asyncMode),
     onSuccess: () => {
       operationsOverviewMutation.mutate();
-    }
+    },
   });
   const triggerDailyDataMutation = useMutation({
     mutationFn: (asyncMode: boolean) => triggerDailyDataRefresh(asyncMode),
     onSuccess: () => {
       operationsOverviewMutation.mutate();
-    }
+    },
   });
 
   const mandiMutation = useMutation({
     mutationFn: fetchMandiPrices,
     onSuccess: (data) => {
       setMandiResult(data);
-    }
+    },
   });
+
+  const directoryQuery = useQuery({
+    queryKey: ["dashboard-mandi-directory"],
+    queryFn: () => fetchMandiDirectory({ limit: 800 }),
+    staleTime: 1000 * 60 * 30,
+    gcTime: 1000 * 60 * 60,
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
+
+  const mandiMarkets = mandiCatalogData.markets;
+  const directoryItems = directoryQuery.data || [];
+  const resolvedMandiState = useMemo(() => {
+    const match = directoryItems.find((item) => sameValue(item.name, mandiForm.market));
+    return match?.state || "";
+  }, [directoryItems, mandiForm.market]);
+
+  const tradingTimeframe = useMemo(() => toTradingTimeframe(mandiForm.days), [mandiForm.days]);
+  const tradingFilters = useMemo(
+    () => ({
+      crop: normalizeText(mandiForm.crop),
+      mandi: normalizeText(mandiForm.market),
+      state: normalizeText(resolvedMandiState),
+      timeframe: tradingTimeframe,
+    }),
+    [mandiForm.crop, mandiForm.market, resolvedMandiState, tradingTimeframe],
+  );
+  const tradingSnapshotQueryKey = useMemo(
+    () => buildTradingSnapshotQueryKey(tradingFilters),
+    [tradingFilters],
+  );
+
+  const wsBaseUrl = resolveWsUrl(import.meta.env.VITE_WS_URL as string | undefined);
+  const wsUrl = accessToken ? wsBaseUrl : undefined;
+  const wsAuthMessage = accessToken
+    ? JSON.stringify({ type: "auth", token: accessToken })
+    : undefined;
+  const {
+    status: marketFeedStatus,
+    lastEvent: marketFeedEvent,
+    sendMessage: sendMarketFeedMessage,
+  } = useWebSocket(wsUrl, wsAuthMessage);
+
+  const tradingSnapshotQuery = useQuery({
+    queryKey: tradingSnapshotQueryKey,
+    queryFn: () => fetchMandiTradingSnapshot(tradingFilters),
+    enabled: Boolean(tradingFilters.crop && tradingFilters.mandi),
+    staleTime: 1000 * 5,
+    gcTime: 1000 * 60 * 10,
+    retry: 1,
+    refetchOnWindowFocus: false,
+    refetchInterval: hasRealtimeMarketFeed && marketFeedStatus === "open" ? false : 8000,
+  });
+
+  useEffect(() => {
+    setHasRealtimeMarketFeed(false);
+  }, [
+    tradingFilters.crop,
+    tradingFilters.mandi,
+    tradingFilters.state,
+    tradingFilters.timeframe,
+    marketFeedStatus,
+  ]);
+
+  useEffect(() => {
+    if (marketFeedStatus !== "open") return;
+    const interval = window.setInterval(() => {
+      sendMarketFeedMessage("ping");
+    }, 15000);
+
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, [marketFeedStatus, sendMarketFeedMessage]);
+
+  useEffect(() => {
+    if (!marketFeedEvent) return;
+    const tick = parseRealtimeMandiEvent(marketFeedEvent);
+    if (!tick || !matchesRealtimeTick(tick, tradingFilters)) {
+      return;
+    }
+
+    setHasRealtimeMarketFeed(true);
+    queryClient.setQueryData<MandiTradingSnapshot>(tradingSnapshotQueryKey, (current) => {
+      const nextHistory = mergeRealtimeTick(current?.history || [], tick, tradingFilters.timeframe);
+      return {
+        history: nextHistory,
+        summary: buildTradingSummary(nextHistory, tick.timestamp),
+        gainers: current?.gainers || [],
+        losers: current?.losers || [],
+        staleDataWarning: current?.staleDataWarning || null,
+        updatedAt: tick.timestamp,
+        source: current?.source || "websocket",
+        isCached: false,
+        offline: false,
+      };
+    });
+  }, [marketFeedEvent, queryClient, tradingFilters, tradingSnapshotQueryKey]);
+
+  const tradingSnapshot = tradingSnapshotQuery.data || null;
+  const transportMode: LiveTransportMode =
+    marketFeedStatus === "open" && hasRealtimeMarketFeed ? "websocket" : "polling";
+  const recentTape = useMemo<MandiTradingPoint[]>(
+    () => [...(tradingSnapshot?.history || [])].slice(-6).reverse(),
+    [tradingSnapshot?.history],
+  );
 
   const analyticsChartData = useMemo(() => {
     if (!analyticsData || analyticsData.top_crops.length === 0) return null;
@@ -182,9 +345,9 @@ const useDashboardData = ({ isOfficer, isAdmin, t }: UseDashboardDataOptions) =>
         {
           label: t("dashboard_page.analytics.top_crops"),
           data: analyticsData.top_crops.map((item) => item.count),
-          backgroundColor: ["#1b6b3a", "#8c2f1b", "#4b915c", "#b65d2a", "#144a2c", "#c08a4b"]
-        }
-      ]
+          backgroundColor: ["#1b6b3a", "#8c2f1b", "#4b915c", "#b65d2a", "#144a2c", "#c08a4b"],
+        },
+      ],
     };
   }, [analyticsData, t]);
 
@@ -201,9 +364,9 @@ const useDashboardData = ({ isOfficer, isAdmin, t }: UseDashboardDataOptions) =>
           fill: true,
           tension: 0.35,
           pointRadius: 3,
-          pointHoverRadius: 5
-        }
-      ]
+          pointHoverRadius: 5,
+        },
+      ],
     };
   }, [mandiResult, t]);
 
@@ -225,7 +388,7 @@ const useDashboardData = ({ isOfficer, isAdmin, t }: UseDashboardDataOptions) =>
       const delta = item.price - previous;
       return {
         ...item,
-        delta
+        delta,
       };
     });
   }, [mandiResult]);
@@ -240,7 +403,12 @@ const useDashboardData = ({ isOfficer, isAdmin, t }: UseDashboardDataOptions) =>
       .filter((item) => mandiCategory === "all" || item.category === mandiCategory)
       .map((item) => item.crop);
   }, [mandiCatalogData.crops, mandiCategory]);
-  const mandiMarkets = mandiCatalogData.markets;
+
+  const explicitMarketHint = useMemo(() => {
+    const primaryLabel = (locationLabel || "").split(",")[0]?.trim().toLowerCase();
+    if (!primaryLabel) return null;
+    return mandiMarkets.find((market) => market.toLowerCase() === primaryLabel) || null;
+  }, [locationLabel, mandiMarkets]);
 
   useEffect(() => {
     if (!coords || mandiMarkets.length === 0) {
@@ -252,13 +420,20 @@ const useDashboardData = ({ isOfficer, isAdmin, t }: UseDashboardDataOptions) =>
       .map((market) => {
         const geo = mandiMarketLookup.get(market.toLowerCase());
         if (!geo) return null;
-        return { name: market, distanceKm: haversineKm(origin, { lat: geo.lat, lon: geo.lon }) };
+        return {
+          name: market,
+          distanceKm: haversineKm(origin, { lat: geo.lat, lon: geo.lon }),
+        };
       })
       .filter((item): item is NearestMarket => Boolean(item))
-      .sort((a, b) => a.distanceKm - b.distanceKm)
+      .sort((a, b) => {
+        if (explicitMarketHint && a.name === explicitMarketHint) return -1;
+        if (explicitMarketHint && b.name === explicitMarketHint) return 1;
+        return a.distanceKm - b.distanceKm;
+      })
       .slice(0, 3);
     setNearestMarkets(nearest);
-  }, [coords, mandiMarkets]);
+  }, [coords, explicitMarketHint, mandiMarkets]);
 
   useEffect(() => {
     if (!hasDefaultMarket && nearestMarkets.length) {
@@ -280,12 +455,14 @@ const useDashboardData = ({ isOfficer, isAdmin, t }: UseDashboardDataOptions) =>
             fetchMandiPrices({
               crop: mandiForm.crop.trim(),
               market: market.name.trim(),
-              days: mandiForm.days
-            })
-          )
+              days: mandiForm.days,
+            }),
+          ),
         );
         if (!active) return;
-        const cards = results.map((result, index) => buildMandiCard(result, nearestMarkets[index]?.distanceKm));
+        const cards = results.map((result, index) =>
+          buildMandiCard(result, nearestMarkets[index]?.distanceKm),
+        );
         setMandiCards(cards);
       } catch {
         if (active) {
@@ -298,6 +475,15 @@ const useDashboardData = ({ isOfficer, isAdmin, t }: UseDashboardDataOptions) =>
       active = false;
     };
   }, [nearestMarkets, mandiForm.crop, mandiForm.days]);
+
+  useEffect(() => {
+    const crop = mandiForm.crop.trim();
+    const market = mandiForm.market.trim();
+    if (!crop || !market) {
+      return;
+    }
+    mandiMutation.mutate({ crop, market, days: mandiForm.days });
+  }, [mandiForm.crop, mandiForm.market, mandiForm.days]);
 
   useEffect(() => {
     let active = true;
@@ -354,7 +540,10 @@ const useDashboardData = ({ isOfficer, isAdmin, t }: UseDashboardDataOptions) =>
   };
 
   const handleAnalyticsExport = (format: AnalyticsReportFormat) => {
-    reportExportMutation.mutate({ format, filters: buildAnalyticsFilters(analyticsFilters) });
+    reportExportMutation.mutate({
+      format,
+      filters: buildAnalyticsFilters(analyticsFilters),
+    });
   };
 
   const combinedError =
@@ -387,6 +576,10 @@ const useDashboardData = ({ isOfficer, isAdmin, t }: UseDashboardDataOptions) =>
     nearestMarkets,
     mandiCards,
     locationLabel,
+    locationCoords: coords,
+    locationAccuracyMeters: coords?.accuracy,
+    locationStatus,
+    refreshLocation: requestLocation,
     analyticsMutation,
     heroSummaryMutation,
     reportExportMutation,
@@ -402,9 +595,18 @@ const useDashboardData = ({ isOfficer, isAdmin, t }: UseDashboardDataOptions) =>
     mandiCategoryOptions,
     filteredMandiCrops,
     mandiMarkets,
+    resolvedMandiState,
+    tradingSnapshot,
+    tradingTransportMode: transportMode,
+    tradingFeedStatus: marketFeedStatus,
+    tradingRecentTape: recentTape,
+    tradingIsRefreshing: tradingSnapshotQuery.isFetching && Boolean(tradingSnapshot),
+    tradingIsLoading: tradingSnapshotQuery.isLoading && !tradingSnapshot,
+    tradingError: tradingSnapshotQuery.error || directoryQuery.error || null,
+    refreshTradingSnapshot: () => tradingSnapshotQuery.refetch(),
     handleAnalyticsFetch,
     handleAnalyticsExport,
-    errorMessage
+    errorMessage,
   };
 };
 

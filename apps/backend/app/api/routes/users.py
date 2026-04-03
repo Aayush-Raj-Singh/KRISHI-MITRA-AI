@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from app.core.database import Database
 
+from app.core.database import Database
 from app.core.dependencies import get_current_user, get_db
 from app.models.user import UserInDB
 from app.schemas.auth import FarmProfile, UserProfileUpdate, UserPublic

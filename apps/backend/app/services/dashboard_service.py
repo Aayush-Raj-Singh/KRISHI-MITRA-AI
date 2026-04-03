@@ -7,12 +7,14 @@ from collections import defaultdict
 from datetime import date, datetime, timezone
 from typing import Any, List, Optional
 
-from app.core.database import Database
-
 from app.core.cache import Cache
+from app.core.database import Database
 from app.core.logging import get_logger
 from app.schemas.dashboard import (
     DashboardHeroSummary,
+    MarketPriceTableFilters,
+    MarketPriceTableResponse,
+    MarketPriceTableRow,
     PriceArrivalDashboardResponse,
     PriceArrivalFilters,
     PriceArrivalPoint,
@@ -35,6 +37,12 @@ class DashboardService:
         return f"dashboard:price-arrival:{digest}"
 
     @staticmethod
+    def _market_price_cache_key(filters: MarketPriceTableFilters) -> str:
+        payload = json.dumps(filters.model_dump(), sort_keys=True, default=str)
+        digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+        return f"dashboard:market-prices:{digest}"
+
+    @staticmethod
     def _parse_date(value: Any) -> date:
         if isinstance(value, date):
             return value
@@ -55,6 +63,14 @@ class DashboardService:
         text = str(value or "").strip()
         return text or None
 
+    @staticmethod
+    def _normalized_page(page: int) -> int:
+        return max(int(page or 1), 1)
+
+    @staticmethod
+    def _normalized_page_size(page_size: int) -> int:
+        return min(max(int(page_size or 10), 1), 100)
+
     def _recommendation_context(self, document: Optional[dict]) -> Optional[str]:
         if not document:
             return None
@@ -71,7 +87,9 @@ class DashboardService:
                     return top_crop
         if kind == "price":
             crop = self._compact_text(response_payload.get("crop") or request_payload.get("crop"))
-            market = self._compact_text(response_payload.get("market") or request_payload.get("market"))
+            market = self._compact_text(
+                response_payload.get("market") or request_payload.get("market")
+            )
             return " · ".join(part for part in [crop, market] if part) or None
         if kind == "water":
             crop = self._compact_text(response_payload.get("crop") or request_payload.get("crop"))
@@ -96,7 +114,9 @@ class DashboardService:
             water_recommendation_count,
         ) = await asyncio.gather(
             recommendations.find_one({"user_id": user_id}, sort=[("created_at", -1)]),
-            recommendations.find_one({"user_id": user_id, "kind": "water"}, sort=[("created_at", -1)]),
+            recommendations.find_one(
+                {"user_id": user_id, "kind": "water"}, sort=[("created_at", -1)]
+            ),
             feedback.find_one({"user_id": user_id}, sort=[("created_at", -1)]),
             recommendations.count_documents({"user_id": user_id}),
             feedback.count_documents({"user_id": user_id}),
@@ -110,22 +130,28 @@ class DashboardService:
         )
 
         return DashboardHeroSummary(
-            latest_recommendation_id=str(latest_recommendation.get("_id")) if latest_recommendation else None,
-            latest_recommendation_kind=self._compact_text((latest_recommendation or {}).get("kind")),
+            latest_recommendation_id=str(latest_recommendation.get("_id"))
+            if latest_recommendation
+            else None,
+            latest_recommendation_kind=self._compact_text(
+                (latest_recommendation or {}).get("kind")
+            ),
             latest_recommendation_context=self._recommendation_context(latest_recommendation),
             latest_recommendation_created_at=(latest_recommendation or {}).get("created_at"),
             total_recommendations=total_recommendations,
             water_recommendation_count=water_recommendation_count,
             latest_water_savings_percent=(
                 round(self._as_float(latest_water_payload.get("water_savings_percent")), 1)
-                if latest_water_recommendation and latest_water_payload.get("water_savings_percent") is not None
+                if latest_water_recommendation
+                and latest_water_payload.get("water_savings_percent") is not None
                 else None
             ),
             latest_water_crop=latest_water_crop,
             latest_water_created_at=(latest_water_recommendation or {}).get("created_at"),
             latest_sustainability_score=(
                 round(self._as_float((latest_feedback or {}).get("sustainability_score")), 1)
-                if latest_feedback and (latest_feedback or {}).get("sustainability_score") is not None
+                if latest_feedback
+                and (latest_feedback or {}).get("sustainability_score") is not None
                 else None
             ),
             latest_sustainability_trend=self._compact_text((latest_feedback or {}).get("trend")),
@@ -179,15 +205,21 @@ class DashboardService:
                 row["modal_count"] += 1
             min_price = self._as_float(doc.get("min_price"))
             max_price = self._as_float(doc.get("max_price"))
-            row["min_price"] = min_price if row["min_price"] is None else min(row["min_price"], min_price)
-            row["max_price"] = max_price if row["max_price"] is None else max(row["max_price"], max_price)
+            row["min_price"] = (
+                min_price if row["min_price"] is None else min(row["min_price"], min_price)
+            )
+            row["max_price"] = (
+                max_price if row["max_price"] is None else max(row["max_price"], max_price)
+            )
             row["arrivals_qtl"] += self._as_float(doc.get("arrivals_qtl"))
             row["records"] += 1
 
         rows: List[dict] = []
         for day in sorted(grouped.keys()):
             values = grouped[day]
-            avg_modal = values["modal_sum"] / values["modal_count"] if values["modal_count"] else 0.0
+            avg_modal = (
+                values["modal_sum"] / values["modal_count"] if values["modal_count"] else 0.0
+            )
             rows.append(
                 {
                     "day": day,
@@ -200,7 +232,9 @@ class DashboardService:
             )
         return rows
 
-    async def price_arrival_dashboard(self, filters: PriceArrivalFilters) -> PriceArrivalDashboardResponse:
+    async def price_arrival_dashboard(
+        self, filters: PriceArrivalFilters
+    ) -> PriceArrivalDashboardResponse:
         cache_key = self._cache_key(filters)
         if self._cache is not None:
             cached = await self._cache.get(cache_key)
@@ -228,9 +262,14 @@ class DashboardService:
                 )
             )
         summary_row = {
-            "avg_modal": sum((float(row.get("avg_modal", 0.0) or 0.0) for row in rows)) / max(len(rows), 1),
-            "min_price": min((float(row.get("min_price", 0.0) or 0.0) for row in rows), default=0.0),
-            "max_price": max((float(row.get("max_price", 0.0) or 0.0) for row in rows), default=0.0),
+            "avg_modal": sum((float(row.get("avg_modal", 0.0) or 0.0) for row in rows))
+            / max(len(rows), 1),
+            "min_price": min(
+                (float(row.get("min_price", 0.0) or 0.0) for row in rows), default=0.0
+            ),
+            "max_price": max(
+                (float(row.get("max_price", 0.0) or 0.0) for row in rows), default=0.0
+            ),
             "arrivals_qtl": sum(float(row.get("arrivals_qtl", 0.0) or 0.0) for row in rows),
             "records": sum(int(row.get("records", 0) or 0) for row in rows),
         }
@@ -259,6 +298,126 @@ class DashboardService:
         )
 
         if self._cache is not None:
-            await self._cache.set(cache_key, json.dumps(response.model_dump(), default=str), ttl_seconds=60 * 15)
+            await self._cache.set(
+                cache_key, json.dumps(response.model_dump(), default=str), ttl_seconds=60 * 15
+            )
         logger.info("price_arrival_dashboard_generated", records=len(series))
         return response
+
+    async def market_price_table(
+        self, filters: MarketPriceTableFilters
+    ) -> MarketPriceTableResponse:
+        normalized_filters = filters.model_copy(
+            update={
+                "page": self._normalized_page(filters.page),
+                "page_size": self._normalized_page_size(filters.page_size),
+            }
+        )
+        cache_key = self._market_price_cache_key(normalized_filters)
+        if self._cache is not None:
+            cached = await self._cache.get(cache_key)
+            if cached:
+                payload = json.loads(cached)
+                return MarketPriceTableResponse(**payload, cached=True)
+
+        if getattr(self._db, "pool", None) is not None:
+            items, total = await self._market_price_rows_sql(normalized_filters)
+        else:
+            items, total = await self._market_price_rows_memory(normalized_filters)
+
+        response = MarketPriceTableResponse(
+            filters=normalized_filters,
+            items=items,
+            total=total,
+            page=normalized_filters.page,
+            page_size=normalized_filters.page_size,
+            generated_at=datetime.now(timezone.utc),
+        )
+
+        if self._cache is not None:
+            await self._cache.set(
+                cache_key, json.dumps(response.model_dump(), default=str), ttl_seconds=60 * 10
+            )
+        logger.info("market_price_table_generated", records=len(items), total=total)
+        return response
+
+    async def _market_price_rows_sql(
+        self, filters: MarketPriceTableFilters
+    ) -> tuple[List[MarketPriceTableRow], int]:
+        where_sql, params = build_mandi_where(filters)
+        where_sql = merge_where(where_sql, ["doc->>'arrival_date' IS NOT NULL"])
+        table = table_ref(self._db.schema, "mandi_entries")
+        offset = (filters.page - 1) * filters.page_size
+
+        count_sql = f"""
+            SELECT COUNT(*)::int AS total
+            FROM {table}
+            WHERE {where_sql}
+        """
+        data_sql = f"""
+            SELECT
+                COALESCE(doc->>'district', '') AS district,
+                COALESCE(doc->>'market', '') AS market,
+                (doc->>'arrival_date')::date AS day,
+                COALESCE(doc->>'commodity', '') AS commodity,
+                NULLIF(doc->>'variety', '') AS variety,
+                COALESCE(NULLIF(doc->>'modal_price', '')::double precision, 0) AS modal_price,
+                COALESCE(NULLIF(doc->>'min_price', '')::double precision, 0) AS min_price,
+                COALESCE(NULLIF(doc->>'max_price', '')::double precision, 0) AS max_price
+            FROM {table}
+            WHERE {where_sql}
+            ORDER BY day DESC, market ASC, commodity ASC
+            LIMIT ${len(params) + 1}
+            OFFSET ${len(params) + 2}
+        """
+
+        async with self._db.pool.acquire() as conn:
+            total_row = await conn.fetchrow(count_sql, *params)
+            rows = await conn.fetch(data_sql, *params, filters.page_size, offset)
+
+        total = int(dict(total_row or {}).get("total", 0) or 0)
+        items = [
+            MarketPriceTableRow(
+                district=self._compact_text(dict(row).get("district")),
+                market=self._compact_text(dict(row).get("market")) or "Unknown market",
+                date=self._parse_date(dict(row).get("day")),
+                commodity=self._compact_text(dict(row).get("commodity")) or "Unknown commodity",
+                variety=self._compact_text(dict(row).get("variety")),
+                price=round(float(dict(row).get("modal_price", 0.0) or 0.0), 2),
+                min_price=round(float(dict(row).get("min_price", 0.0) or 0.0), 2),
+                max_price=round(float(dict(row).get("max_price", 0.0) or 0.0), 2),
+            )
+            for row in rows
+        ]
+        return items, total
+
+    async def _market_price_rows_memory(
+        self, filters: MarketPriceTableFilters
+    ) -> tuple[List[MarketPriceTableRow], int]:
+        docs = await self._db["mandi_entries"].find({}).to_list(length=None)
+        matching_docs = [doc for doc in docs if match_mandi_document(doc, filters)]
+        matching_docs.sort(
+            key=lambda doc: (
+                -self._parse_date(doc.get("arrival_date")).toordinal(),
+                str(doc.get("market") or "").lower(),
+                str(doc.get("commodity") or "").lower(),
+            )
+        )
+        total = len(matching_docs)
+        start = (filters.page - 1) * filters.page_size
+        end = start + filters.page_size
+        page_docs = matching_docs[start:end]
+        items = [
+            MarketPriceTableRow(
+                district=self._compact_text(doc.get("district")),
+                market=self._compact_text(doc.get("market")) or "Unknown market",
+                date=self._parse_date(doc.get("arrival_date")),
+                commodity=self._compact_text(doc.get("commodity")) or "Unknown commodity",
+                variety=self._compact_text(doc.get("variety")),
+                price=round(self._as_float(doc.get("modal_price")), 2),
+                min_price=round(self._as_float(doc.get("min_price")), 2),
+                max_price=round(self._as_float(doc.get("max_price")), 2),
+            )
+            for doc in page_docs
+        ]
+        return items, total

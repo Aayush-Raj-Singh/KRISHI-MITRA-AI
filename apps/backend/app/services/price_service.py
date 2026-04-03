@@ -6,14 +6,6 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 import pandas as pd
-
-from app.core.logging import get_logger
-from app.schemas.recommendations import (
-    PriceForecastRequest,
-    PriceForecastResponse,
-    PriceForecastSeries,
-    PriceHistoricalSeries,
-)
 from ml.training.retrain_price_model import (
     load_model_from_artifact,
     load_or_generate_price_history,
@@ -22,15 +14,25 @@ from ml.training.retrain_price_model import (
     train_price_model_for_pair,
 )
 
+from app.core.config import settings
+from app.core.logging import get_logger
+from app.schemas.recommendations import (
+    PriceForecastRequest,
+    PriceForecastResponse,
+    PriceForecastSeries,
+    PriceHistoricalSeries,
+)
+
 logger = get_logger(__name__)
 
 
 class PriceForecaster:
     def __init__(self) -> None:
-        root = Path(__file__).resolve().parents[2]
-        self._history_path = root / "ml" / "price_model" / "price_history.csv"
-        self._artifact_dir = root / "ml" / "price_model" / "artifacts"
-        self._metadata_path = root / "ml" / "price_model" / "models_metadata.json"
+        self._history_path = settings.price_history_resolved_path
+        self._artifact_dir = settings.price_artifact_dir_resolved_path
+        self._legacy_artifact_dir = settings.price_artifact_legacy_dir
+        self._metadata_path = settings.price_metadata_resolved_path
+        self._legacy_metadata_path = settings.price_metadata_legacy_path
         self._model_cache: Dict[str, object] = {}
         self._history_df: pd.DataFrame | None = None
 
@@ -46,10 +48,13 @@ class PriceForecaster:
         return self._history_df
 
     def _read_metadata(self) -> dict:
-        if not self._metadata_path.exists():
+        metadata_path = (
+            self._metadata_path if self._metadata_path.exists() else self._legacy_metadata_path
+        )
+        if not metadata_path.exists():
             return {"models": [], "failures": []}
         try:
-            return json.loads(self._metadata_path.read_text(encoding="utf-8"))
+            return json.loads(metadata_path.read_text(encoding="utf-8"))
         except Exception:
             return {"models": [], "failures": []}
 
@@ -67,13 +72,14 @@ class PriceForecaster:
         self._write_metadata(metadata)
 
     def _resolve_artifact_path(self, key: str) -> Path | None:
-        candidates = [
-            self._artifact_dir / f"{key}.joblib",
-            self._artifact_dir / f"{key}.json",
-        ]
-        for candidate in candidates:
-            if candidate.exists():
-                return candidate
+        for base_dir in (self._artifact_dir, self._legacy_artifact_dir):
+            candidates = [
+                base_dir / f"{key}.joblib",
+                base_dir / f"{key}.json",
+            ]
+            for candidate in candidates:
+                if candidate.exists():
+                    return candidate
         return None
 
     def _ensure_model(self, crop: str, market: str) -> Tuple[object, dict]:
@@ -89,7 +95,9 @@ class PriceForecaster:
         if not model_path:
             history = self._history()
             try:
-                result = train_price_model_for_pair(history, crop_key, market_key, self._artifact_dir)
+                result = train_price_model_for_pair(
+                    history, crop_key, market_key, self._artifact_dir
+                )
             except ValueError:
                 retrain_price_models(
                     csv_path=self._history_path,
@@ -111,7 +119,11 @@ class PriceForecaster:
                         raise ValueError("No price model artifacts available after retraining")
                     model_path = available[0]
                     key = model_path.stem
-                    logger.warning("price_pair_model_missing_using_fallback_model", requested=self._key(crop_key, market_key), used=key)
+                    logger.warning(
+                        "price_pair_model_missing_using_fallback_model",
+                        requested=self._key(crop_key, market_key),
+                        used=key,
+                    )
                     result = self._find_metadata(key)
             else:
                 self._upsert_model_metadata(result)
@@ -132,7 +144,9 @@ class PriceForecaster:
                 return item
         return {"key": key, "version": "prophet-unknown", "mape": 0.0}
 
-    def _historical_window(self, crop: str, market: str, days: int = 90) -> PriceHistoricalSeries | None:
+    def _historical_window(
+        self, crop: str, market: str, days: int = 90
+    ) -> PriceHistoricalSeries | None:
         history = self._history()
         crop_key = crop.strip().lower()
         market_key = market.strip().lower()

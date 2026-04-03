@@ -20,38 +20,38 @@ export type {
   PriceForecastResponse,
   WaterOptimizationRequest,
   WaterOptimizationResponse,
-  WeatherDay
+  WeatherDay,
 } from "@krishimitra/shared";
 
 export const fetchCropRecommendation = async (
-  payload: CropRecommendationRequest
+  payload: CropRecommendationRequest,
 ): Promise<CropRecommendationResponse> => {
   const key = `crop:${JSON.stringify(payload)}`;
   return cachedPost<CropRecommendationResponse, CropRecommendationRequest>(
     key,
     API_ENDPOINTS.recommendations.crop,
-    sanitizeCropRecommendationPayload(payload)
+    sanitizeCropRecommendationPayload(payload),
   );
 };
 
 export const fetchPriceForecast = async (
-  payload: PriceForecastRequest
+  payload: PriceForecastRequest,
 ): Promise<PriceForecastResponse> => {
   const key = `price:${JSON.stringify(payload)}`;
   return cachedPost<PriceForecastResponse, PriceForecastRequest>(
     key,
     API_ENDPOINTS.recommendations.priceForecast,
-    sanitizePriceForecastPayload(payload)
+    sanitizePriceForecastPayload(payload),
   );
 };
 
 export const fetchWaterOptimization = async (
-  payload: WaterOptimizationRequest
+  payload: WaterOptimizationRequest,
 ): Promise<WaterOptimizationResponse> => {
   const key = `water:${JSON.stringify(payload)}`;
   return cachedPost<WaterOptimizationResponse, WaterOptimizationRequest>(
     key,
     API_ENDPOINTS.recommendations.waterOptimization,
-    sanitizeWaterOptimizationPayload(payload)
+    sanitizeWaterOptimizationPayload(payload),
   );
 };

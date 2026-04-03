@@ -57,10 +57,7 @@ class MandiEntryDB(MandiEntryBase):
     created_at: datetime
     updated_at: datetime
 
-    model_config = ConfigDict(
-        validate_by_name=True,
-        json_encoders={datetime: lambda v: v.isoformat()}
-    )
+    model_config = ConfigDict(validate_by_name=True)
 
 
 class MandiEntryListResponse(BaseModel):

@@ -1,0 +1,28 @@
+{
+  "recommendations": [
+    "amazonwebservices.aws-toolkit-vscode",
+    "charliermarsh.ruff",
+    "dbaeumer.vscode-eslint",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "hashicorp.terraform",
+    "humao.rest-client",
+    "ms-azuretools.vscode-docker",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "msjsdiag.vscode-react-native",
+    "redhat.vscode-yaml"
+  ],
+  "unwantedRecommendations": [
+    "bradlc.vscode-tailwindcss",
+    "dsznajder.es7-react-js-snippets",
+    "formulahendry.code-runner",
+    "franneck94.c-cpp-runner",
+    "ms-vscode.cmake-tools",
+    "ms-vscode.cpptools",
+    "ms-vscode.cpptools-extension-pack",
+    "ritwickdey.liveserver",
+    "steamforge.codex-effect",
+    "twxs.cmake"
+  ]
+}

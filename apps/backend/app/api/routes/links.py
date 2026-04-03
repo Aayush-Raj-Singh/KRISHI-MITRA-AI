@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import RedirectResponse
-from app.core.database import Database
 
+from app.core.database import Database
 from app.core.dependencies import get_db
 from app.schemas.links import ExternalLinkCheckResponse
 from app.schemas.response import APIResponse
@@ -21,8 +21,10 @@ async def safe_redirect(
 ):
     service = ExternalLinkService(db)
     check = await service.check(url)
-    if not check.safe:
-        raise HTTPException(status_code=400, detail=check.reason or "Unsafe link")
+    if not check.safe or not check.verified:
+        raise HTTPException(
+            status_code=400, detail=check.reason or "Only verified links are allowed"
+        )
     if inspect:
         return success_response(check, message="link verified")
     return RedirectResponse(url=check.url, status_code=302)

@@ -21,7 +21,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) =
         background: isDark
           ? "linear-gradient(140deg, rgba(20, 63, 43, 0.96) 0%, rgba(17, 52, 36, 0.96) 100%)"
           : "linear-gradient(140deg, rgba(236, 248, 239, 0.98) 0%, rgba(216, 240, 225, 0.98) 100%)",
-        boxShadow: isDark ? "0 16px 28px rgba(0,0,0,0.4)" : "0 18px 28px rgba(16, 66, 35, 0.12)"
+        boxShadow: isDark ? "0 16px 28px rgba(0,0,0,0.4)" : "0 18px 28px rgba(16, 66, 35, 0.12)",
       }}
     >
       <CardContent>
@@ -34,7 +34,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) =
               display: "grid",
               placeItems: "center",
               bgcolor: isDark ? "rgba(95, 209, 139, 0.2)" : "rgba(27, 107, 58, 0.14)",
-              color: isDark ? "#7ee4a3" : "#1b6b3a"
+              color: isDark ? "#7ee4a3" : "#1b6b3a",
             }}
           >
             {icon}

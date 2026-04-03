@@ -14,7 +14,9 @@ export interface DashboardRealtimeEvent {
 const useDashboardRealtime = (accessToken?: string | null) => {
   const wsBaseUrl = resolveWsUrl(import.meta.env.VITE_WS_URL as string | undefined);
   const wsUrl = accessToken ? wsBaseUrl : undefined;
-  const wsAuthMessage = accessToken ? JSON.stringify({ type: "auth", token: accessToken }) : undefined;
+  const wsAuthMessage = accessToken
+    ? JSON.stringify({ type: "auth", token: accessToken })
+    : undefined;
   const { status: wsStatus, lastEvent } = useWebSocket(wsUrl, wsAuthMessage);
   const [realtimeEvents, setRealtimeEvents] = useState<DashboardRealtimeEvent[]>([]);
   const realtimeCopy = useTranslatedStrings(
@@ -27,16 +29,18 @@ const useDashboardRealtime = (accessToken?: string | null) => {
         feedbackRecorded: "Outcome feedback recorded",
         quickRatingReceived: "Quick rating received for",
         serviceFallback: "service",
-        realtimeConnected: "Realtime channel connected"
+        realtimeConnected: "Realtime channel connected",
       }),
-      []
-    )
+      [],
+    ),
   );
 
   useEffect(() => {
     if (!lastEvent || typeof lastEvent !== "object") return;
     const eventType = String(lastEvent.event || "");
-    const timestamp = String(lastEvent.server_time || lastEvent.triggered_at || new Date().toISOString());
+    const timestamp = String(
+      lastEvent.server_time || lastEvent.triggered_at || new Date().toISOString(),
+    );
 
     let summary = eventType || realtimeCopy.eventFallback;
     let severity: "info" | "success" | "warning" = "info";
@@ -58,13 +62,18 @@ const useDashboardRealtime = (accessToken?: string | null) => {
     }
 
     const nextId = `${eventType}-${timestamp}`;
-    setRealtimeEvents((prev) => [{ id: nextId, summary, time: timestamp, severity }, ...prev.filter((item) => item.id !== nextId)].slice(0, 6));
+    setRealtimeEvents((prev) =>
+      [
+        { id: nextId, summary, time: timestamp, severity },
+        ...prev.filter((item) => item.id !== nextId),
+      ].slice(0, 6),
+    );
   }, [lastEvent, realtimeCopy]);
 
   return {
     wsStatus,
     wsUrl,
-    realtimeEvents
+    realtimeEvents,
   };
 };
 

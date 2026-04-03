@@ -4,8 +4,8 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
-from app.core.database import Database
 
+from app.core.database import Database
 from app.core.dependencies import get_db, require_roles
 from app.models.user import UserInDB
 from app.schemas.master import (
@@ -74,7 +74,9 @@ async def create_commodity(
     user: UserInDB = Depends(require_roles(["admin"])),
 ) -> APIResponse[dict]:
     created = await _create_doc(db, "commodities", payload.model_dump())
-    await log_audit_event(db, user.id, user.role, "commodity", created["_id"], "create", created, request.client.host)
+    await log_audit_event(
+        db, user.id, user.role, "commodity", created["_id"], "create", created, request.client.host
+    )
     return success_response(created, message="Commodity created")
 
 
@@ -108,7 +110,9 @@ async def update_commodity(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record not found")
         return success_response(_normalize(record), message="No changes applied")
     updated = await _update_doc(db, "commodities", commodity_id, updates)
-    await log_audit_event(db, user.id, user.role, "commodity", updated["_id"], "update", updates, request.client.host)
+    await log_audit_event(
+        db, user.id, user.role, "commodity", updated["_id"], "update", updates, request.client.host
+    )
     return success_response(updated, message="Commodity updated")
 
 
@@ -120,7 +124,9 @@ async def create_variety(
     user: UserInDB = Depends(require_roles(["admin"])),
 ) -> APIResponse[dict]:
     created = await _create_doc(db, "varieties", payload.model_dump())
-    await log_audit_event(db, user.id, user.role, "variety", created["_id"], "create", created, request.client.host)
+    await log_audit_event(
+        db, user.id, user.role, "variety", created["_id"], "create", created, request.client.host
+    )
     return success_response(created, message="Variety created")
 
 
@@ -157,7 +163,9 @@ async def update_variety(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record not found")
         return success_response(_normalize(record), message="No changes applied")
     updated = await _update_doc(db, "varieties", variety_id, updates)
-    await log_audit_event(db, user.id, user.role, "variety", updated["_id"], "update", updates, request.client.host)
+    await log_audit_event(
+        db, user.id, user.role, "variety", updated["_id"], "update", updates, request.client.host
+    )
     return success_response(updated, message="Variety updated")
 
 
@@ -169,7 +177,9 @@ async def create_grade(
     user: UserInDB = Depends(require_roles(["admin"])),
 ) -> APIResponse[dict]:
     created = await _create_doc(db, "grades", payload.model_dump())
-    await log_audit_event(db, user.id, user.role, "grade", created["_id"], "create", created, request.client.host)
+    await log_audit_event(
+        db, user.id, user.role, "grade", created["_id"], "create", created, request.client.host
+    )
     return success_response(created, message="Grade created")
 
 
@@ -206,7 +216,9 @@ async def update_grade(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record not found")
         return success_response(_normalize(record), message="No changes applied")
     updated = await _update_doc(db, "grades", grade_id, updates)
-    await log_audit_event(db, user.id, user.role, "grade", updated["_id"], "update", updates, request.client.host)
+    await log_audit_event(
+        db, user.id, user.role, "grade", updated["_id"], "update", updates, request.client.host
+    )
     return success_response(updated, message="Grade updated")
 
 
@@ -218,7 +230,9 @@ async def create_unit(
     user: UserInDB = Depends(require_roles(["admin"])),
 ) -> APIResponse[dict]:
     created = await _create_doc(db, "units", payload.model_dump())
-    await log_audit_event(db, user.id, user.role, "unit", created["_id"], "create", created, request.client.host)
+    await log_audit_event(
+        db, user.id, user.role, "unit", created["_id"], "create", created, request.client.host
+    )
     return success_response(created, message="Unit created")
 
 
@@ -248,7 +262,9 @@ async def update_unit(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record not found")
         return success_response(_normalize(record), message="No changes applied")
     updated = await _update_doc(db, "units", unit_id, updates)
-    await log_audit_event(db, user.id, user.role, "unit", updated["_id"], "update", updates, request.client.host)
+    await log_audit_event(
+        db, user.id, user.role, "unit", updated["_id"], "update", updates, request.client.host
+    )
     return success_response(updated, message="Unit updated")
 
 
@@ -260,7 +276,9 @@ async def create_season(
     user: UserInDB = Depends(require_roles(["admin"])),
 ) -> APIResponse[dict]:
     created = await _create_doc(db, "seasons", payload.model_dump())
-    await log_audit_event(db, user.id, user.role, "season", created["_id"], "create", created, request.client.host)
+    await log_audit_event(
+        db, user.id, user.role, "season", created["_id"], "create", created, request.client.host
+    )
     return success_response(created, message="Season created")
 
 
@@ -294,7 +312,9 @@ async def update_season(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record not found")
         return success_response(_normalize(record), message="No changes applied")
     updated = await _update_doc(db, "seasons", season_id, updates)
-    await log_audit_event(db, user.id, user.role, "season", updated["_id"], "update", updates, request.client.host)
+    await log_audit_event(
+        db, user.id, user.role, "season", updated["_id"], "update", updates, request.client.host
+    )
     return success_response(updated, message="Season updated")
 
 
@@ -306,7 +326,9 @@ async def create_msp(
     user: UserInDB = Depends(require_roles(["admin"])),
 ) -> APIResponse[dict]:
     created = await _create_doc(db, "msp_rates", payload.model_dump())
-    await log_audit_event(db, user.id, user.role, "msp", created["_id"], "create", created, request.client.host)
+    await log_audit_event(
+        db, user.id, user.role, "msp", created["_id"], "create", created, request.client.host
+    )
     return success_response(created, message="MSP created")
 
 
@@ -343,5 +365,7 @@ async def update_msp(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record not found")
         return success_response(_normalize(record), message="No changes applied")
     updated = await _update_doc(db, "msp_rates", msp_id, updates)
-    await log_audit_event(db, user.id, user.role, "msp", updated["_id"], "update", updates, request.client.host)
+    await log_audit_event(
+        db, user.id, user.role, "msp", updated["_id"], "update", updates, request.client.host
+    )
     return success_response(updated, message="MSP updated")

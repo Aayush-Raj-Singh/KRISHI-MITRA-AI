@@ -3,9 +3,8 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List
 
-from app.core.database import Database
-
 from app.core.config import settings
+from app.core.database import Database
 from app.core.logging import get_logger
 from app.models.feedback import default_feedback_record, default_quick_feedback_record
 from app.services.operations_service import OperationsService
@@ -24,15 +23,24 @@ class FeedbackService:
         self._sustainability = SustainabilityService()
 
     async def _history_scores(self, user_id: str, limit: int = 6) -> List[float]:
-        docs = await self._collection.find({"user_id": user_id}).sort("created_at", -1).limit(limit).to_list(length=limit)
+        docs = (
+            await self._collection.find({"user_id": user_id})
+            .sort("created_at", -1)
+            .limit(limit)
+            .to_list(length=limit)
+        )
         return [float(doc.get("sustainability_score", 0.0)) for doc in reversed(docs)]
 
     async def _negative_outcome_count(self, days: int = 90) -> int:
         from_date = datetime.now(timezone.utc) - timedelta(days=days)
-        return await self._collection.count_documents({"negative_outcome": True, "created_at": {"$gte": from_date}})
+        return await self._collection.count_documents(
+            {"negative_outcome": True, "created_at": {"$gte": from_date}}
+        )
 
     @staticmethod
-    def _should_flag_negative(payload: Dict[str, Any], sustainability_score: float, benchmark_yield: float) -> bool:
+    def _should_flag_negative(
+        payload: Dict[str, Any], sustainability_score: float, benchmark_yield: float
+    ) -> bool:
         if int(payload["rating"]) <= 2:
             return True
         if sustainability_score < 55:
@@ -118,7 +126,11 @@ class FeedbackService:
             negative_outcome=is_negative,
         )
         insert_result = await self._collection.insert_one(record)
-        logger.info("feedback_recorded", feedback_id=str(insert_result.inserted_id), negative_outcome=is_negative)
+        logger.info(
+            "feedback_recorded",
+            feedback_id=str(insert_result.inserted_id),
+            negative_outcome=is_negative,
+        )
 
         queued_for_review = False
         if is_negative:
@@ -158,7 +170,9 @@ class FeedbackService:
             source=payload.get("source"),
         )
         insert_result = await self._db["quick_feedback"].insert_one(record)
-        logger.info("quick_feedback_recorded", feedback_id=str(insert_result.inserted_id), service=service)
+        logger.info(
+            "quick_feedback_recorded", feedback_id=str(insert_result.inserted_id), service=service
+        )
         return {
             "feedback_id": str(insert_result.inserted_id),
             "recommendation_id": payload.get("recommendation_id"),

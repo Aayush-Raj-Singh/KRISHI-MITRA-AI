@@ -16,4 +16,3 @@ export const haversineKm = (a: Coordinates, b: Coordinates): number => {
   const h = sinLat * sinLat + Math.cos(lat1) * Math.cos(lat2) * sinLon * sinLon;
   return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
 };
-

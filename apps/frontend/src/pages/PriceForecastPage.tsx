@@ -18,7 +18,7 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TableRow
+  TableRow,
 } from "@mui/material";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
 import { useMutation } from "@tanstack/react-query";
@@ -31,7 +31,7 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
 } from "chart.js";
 import { useTranslation } from "react-i18next";
 
@@ -70,14 +70,21 @@ export const PriceForecastContent: React.FC<PriceForecastContentProps> = ({ embe
     district: "",
     mandi: "",
     crop: "rice",
-    currency: "INR"
+    currency: "INR",
   });
   const selectedState = form.state.trim();
   const selectedDistrict = form.district.trim();
   const districtsForState = selectedState ? mandiOptions.getDistrictsForState(selectedState) : [];
   const mandisForDistrict =
-    selectedState && selectedDistrict ? mandiOptions.getMandisForDistrict(selectedState, selectedDistrict) : [];
-  const currencySuggestions = useLocalSuggestions("price_forecast.currency", ["INR", "USD", "EUR", "GBP"]);
+    selectedState && selectedDistrict
+      ? mandiOptions.getMandisForDistrict(selectedState, selectedDistrict)
+      : [];
+  const currencySuggestions = useLocalSuggestions("price_forecast.currency", [
+    "INR",
+    "USD",
+    "EUR",
+    "GBP",
+  ]);
   const [horizon, setHorizon] = useState(30);
   const [result, setResult] = useState<PriceForecastResponse | null>(null);
   const [cachedAt, setCachedAt] = useState<number | null>(null);
@@ -92,15 +99,14 @@ export const PriceForecastContent: React.FC<PriceForecastContentProps> = ({ embe
       setResult(data);
       try {
         localStorage.setItem("krishimitra:last_price_payload", JSON.stringify(form));
-      } catch {
-      }
-    }
+      } catch {}
+    },
   });
 
   const cacheKey = useMemo(() => `price:${JSON.stringify(form)}`, [form]);
   const actualStorageKey = useMemo(
     () => `krishimitra:price_actuals:${form.crop}:${form.mandi}`,
-    [form.crop, form.mandi]
+    [form.crop, form.mandi],
   );
   const translated = useTranslatedStrings({
     historical: "Historical",
@@ -121,7 +127,7 @@ export const PriceForecastContent: React.FC<PriceForecastContentProps> = ({ embe
     noActuals: "No actuals recorded yet.",
     errorNoForecast: "Generate a forecast before adding actuals.",
     errorInvalidInput: "Enter a valid date and actual price.",
-    errorOutOfRange: "Selected date is outside the forecast horizon."
+    errorOutOfRange: "Selected date is outside the forecast horizon.",
   });
 
   useEffect(() => {
@@ -162,22 +168,10 @@ export const PriceForecastContent: React.FC<PriceForecastContentProps> = ({ embe
     const historicalDates = historical?.dates ?? [];
     const historicalPrices = historical?.prices ?? [];
     const chartLabels = [...historicalDates, ...activeSeries.dates];
-    const historicalData = [
-      ...historicalPrices,
-      ...Array(activeSeries.dates.length).fill(null)
-    ];
-    const forecastData = [
-      ...Array(historicalDates.length).fill(null),
-      ...activeSeries.forecast
-    ];
-    const lowerData = [
-      ...Array(historicalDates.length).fill(null),
-      ...activeSeries.lower
-    ];
-    const upperData = [
-      ...Array(historicalDates.length).fill(null),
-      ...activeSeries.upper
-    ];
+    const historicalData = [...historicalPrices, ...Array(activeSeries.dates.length).fill(null)];
+    const forecastData = [...Array(historicalDates.length).fill(null), ...activeSeries.forecast];
+    const lowerData = [...Array(historicalDates.length).fill(null), ...activeSeries.lower];
+    const upperData = [...Array(historicalDates.length).fill(null), ...activeSeries.upper];
 
     return {
       labels: chartLabels,
@@ -188,7 +182,7 @@ export const PriceForecastContent: React.FC<PriceForecastContentProps> = ({ embe
           borderColor: "#6f7f73",
           backgroundColor: "rgba(111, 127, 115, 0.18)",
           pointRadius: 1.8,
-          tension: 0.28
+          tension: 0.28,
         },
         {
           label: t("dashboard_page.chart.forecast"),
@@ -196,23 +190,23 @@ export const PriceForecastContent: React.FC<PriceForecastContentProps> = ({ embe
           borderColor: "#1b6b3a",
           backgroundColor: "rgba(27, 107, 58, 0.2)",
           borderDash: [6, 4],
-          pointRadius: 2.2
+          pointRadius: 2.2,
         },
         {
           label: t("dashboard_page.chart.lower"),
           data: lowerData,
           borderColor: "#8c2f1b",
           backgroundColor: "rgba(140, 47, 27, 0.12)",
-          pointRadius: 1.8
+          pointRadius: 1.8,
         },
         {
           label: t("dashboard_page.chart.upper"),
           data: upperData,
           borderColor: "#144a2c",
           backgroundColor: "rgba(20, 74, 44, 0.12)",
-          pointRadius: 1.8
-        }
-      ]
+          pointRadius: 1.8,
+        },
+      ],
     };
   }, [result, activeSeries, t, translated.historical]);
 
@@ -226,7 +220,7 @@ export const PriceForecastContent: React.FC<PriceForecastContentProps> = ({ embe
         district: payload.district || "",
         mandi: payload.mandi || payload.market || "",
         crop: payload.crop || "rice",
-        currency: payload.currency || "INR"
+        currency: payload.currency || "INR",
       };
       setForm(nextForm);
       const cached = getCachedWithMeta<PriceForecastResponse>(`price:${JSON.stringify(nextForm)}`);
@@ -234,8 +228,7 @@ export const PriceForecastContent: React.FC<PriceForecastContentProps> = ({ embe
         setResult(cached.value);
         setCachedAt(cached.ts);
       }
-    } catch {
-    }
+    } catch {}
   };
 
   const handleGenerate = () => {
@@ -268,14 +261,13 @@ export const PriceForecastContent: React.FC<PriceForecastContentProps> = ({ embe
       actual: actualValue,
       predicted,
       error,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
     setActualEntries((prev) => {
       const next = [entry, ...prev.filter((item) => item.date !== trimmedDate)].slice(0, 24);
       try {
         localStorage.setItem(actualStorageKey, JSON.stringify(next));
-      } catch {
-      }
+      } catch {}
       return next;
     });
     setActualPrice("");
@@ -285,15 +277,20 @@ export const PriceForecastContent: React.FC<PriceForecastContentProps> = ({ embe
     const withPred = actualEntries.filter((entry) => typeof entry.predicted === "number");
     if (!withPred.length) return null;
     const mae =
-      withPred.reduce((acc, entry) => acc + Math.abs((entry.actual || 0) - (entry.predicted || 0)), 0) /
-      withPred.length;
+      withPred.reduce(
+        (acc, entry) => acc + Math.abs((entry.actual || 0) - (entry.predicted || 0)),
+        0,
+      ) / withPred.length;
     const mapeData = withPred.reduce(
       (acc, entry) => {
         const actualValue = entry.actual || 0;
         if (!actualValue) return acc;
-        return { sum: acc.sum + Math.abs(((entry.predicted || 0) - actualValue) / actualValue), count: acc.count + 1 };
+        return {
+          sum: acc.sum + Math.abs(((entry.predicted || 0) - actualValue) / actualValue),
+          count: acc.count + 1,
+        };
       },
-      { sum: 0, count: 0 }
+      { sum: 0, count: 0 },
     );
     const mape = mapeData.count ? (mapeData.sum / mapeData.count) * 100 : 0;
     return { mae, mape };
@@ -313,211 +310,237 @@ export const PriceForecastContent: React.FC<PriceForecastContentProps> = ({ embe
           badges={[
             t("dashboard_page.price.horizon_30"),
             t("dashboard_page.price.horizon_60"),
-            t("dashboard_page.price.horizon_90")
+            t("dashboard_page.price.horizon_90"),
           ]}
           imageSrc="/assets/agri-slider/slide-07.jpg"
         />
       )}
 
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={4}>
-            <Card>
-              <CardContent>
-                <Typography variant="subtitle1" gutterBottom>
-                  {t("dashboard_page.price.inputs_title")}
-                </Typography>
-                <Stack spacing={2}>
-                  <FilterAutocomplete
-                    label={t("filters.state", { defaultValue: "State" })}
-                    value={form.state}
-                    options={mandiOptions.states}
-                    onChange={(value) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        state: value,
-                        district: prev.state !== value ? "" : prev.district,
-                        mandi: prev.state !== value ? "" : prev.mandi
-                      }))
-                    }
-                  />
-                  <FilterAutocomplete
-                    label={t("filters.district", { defaultValue: "District" })}
-                    value={form.district}
-                    options={districtsForState}
-                    disabled={!selectedState}
-                    onChange={(value) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        district: value,
-                        mandi: prev.district !== value ? "" : prev.mandi
-                      }))
-                    }
-                  />
-                  <FilterAutocomplete
-                    label={t("filters.mandi", { defaultValue: "Mandi" })}
-                    value={form.mandi}
-                    options={mandisForDistrict}
-                    disabled={!selectedState || !selectedDistrict}
-                    onChange={(value) => setForm((prev) => ({ ...prev, mandi: value }))}
-                  />
-                  <FilterAutocomplete
-                    label={t("dashboard_page.forms.crop")}
-                    value={form.crop}
-                    options={cropSuggestions.suggestions}
-                    onChange={(value) => setForm((prev) => ({ ...prev, crop: value }))}
-                  />
-                  <FilterAutocomplete
-                    label={t("dashboard_page.price.currency")}
-                    value={form.currency}
-                    options={currencySuggestions.suggestions}
-                    onChange={(value) => setForm((prev) => ({ ...prev, currency: value }))}
-                  />
-                  <Button
-                    variant="contained"
-                    onClick={handleGenerate}
-                    disabled={mutation.isPending}
-                    startIcon={mutation.isPending ? <CircularProgress size={16} color="inherit" /> : null}
-                  >
-                    {mutation.isPending ? t("actions.forecasting") : t("actions.generate")}
-                  </Button>
-                </Stack>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} md={8}>
-            <Card>
-              <CardContent>
-                <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
-                  <Typography variant="subtitle1">{t("dashboard_page.price.title")}</Typography>
-                  <Select size="small" value={horizon} onChange={(e) => setHorizon(Number(e.target.value))}>
-                    <MenuItem value={30}>{t("dashboard_page.price.horizon_30")}</MenuItem>
-                    <MenuItem value={60}>{t("dashboard_page.price.horizon_60")}</MenuItem>
-                    <MenuItem value={90}>{t("dashboard_page.price.horizon_90")}</MenuItem>
-                  </Select>
-                </Stack>
-
-                <Divider sx={{ my: 2 }} />
-
-                {!isOnline && (
-                  <Box sx={{ mb: 1.5 }}>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                      {translated.offlineTitle}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {translated.offlineBody}
-                    </Typography>
-                    <Button variant="text" onClick={handleLoadCached} sx={{ px: 0 }}>
-                      {translated.loadCached}
-                    </Button>
-                  </Box>
-                )}
-                {cachedAt && (
-                  <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
-                    {translated.lastUpdated}: {new Date(cachedAt).toLocaleString()}
-                  </Typography>
-                )}
-                {chartData ? (
-                  <Box>
-                    <Line data={chartData} options={{ responsive: true, plugins: { legend: { position: "bottom" } } }} />
-                    <Stack direction="row" spacing={1} sx={{ mt: 1 }} flexWrap="wrap">
-                      <Chip
-                        label={`${t("dashboard_page.price.mape")}: ${(result?.mape ?? 0).toFixed(2)}%`}
-                        size="small"
-                      />
-                      <Chip
-                        label={`${t("dashboard_page.price.confidence_band")}: ${(result?.confidence_interval?.level ?? 0.8) * 100}%`}
-                        size="small"
-                        variant="outlined"
-                      />
-                    </Stack>
-                  </Box>
-                ) : (
-                  <Typography variant="body2" color="text.secondary">
-                    {t("dashboard_page.price.empty")}
-                  </Typography>
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-
-        <Card>
-          <CardContent>
-            <Stack spacing={2}>
-              <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography variant="subtitle1">{translated.actualsTitle}</Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {translated.actualsSubtitle}
-                  </Typography>
-                </Box>
-                {accuracyMetrics && (
-                  <Stack direction="row" spacing={1}>
-                    <Chip label={`${translated.accuracyTitle}: MAE ${accuracyMetrics.mae.toFixed(2)}`} size="small" />
-                    <Chip label={`MAPE ${accuracyMetrics.mape.toFixed(1)}%`} size="small" variant="outlined" />
-                  </Stack>
-                )}
-              </Stack>
-
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
-                <TextField
-                  label={translated.actualDate}
-                  type="date"
-                  value={actualDate}
-                  onChange={(event) => setActualDate(event.target.value)}
-                  InputLabelProps={{ shrink: true }}
-                  sx={{ minWidth: 200 }}
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={4}>
+          <Card>
+            <CardContent>
+              <Typography variant="subtitle1" gutterBottom>
+                {t("dashboard_page.price.inputs_title")}
+              </Typography>
+              <Stack spacing={2}>
+                <FilterAutocomplete
+                  label={t("filters.state", { defaultValue: "State" })}
+                  value={form.state}
+                  options={mandiOptions.states}
+                  onChange={(value) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      state: value,
+                      district: prev.state !== value ? "" : prev.district,
+                      mandi: prev.state !== value ? "" : prev.mandi,
+                    }))
+                  }
                 />
-                <TextField
-                  label={translated.actualPrice}
-                  type="number"
-                  value={actualPrice}
-                  onChange={(event) => setActualPrice(event.target.value)}
-                  sx={{ minWidth: 200 }}
+                <FilterAutocomplete
+                  label={t("filters.district", { defaultValue: "District" })}
+                  value={form.district}
+                  options={districtsForState}
+                  disabled={!selectedState}
+                  onChange={(value) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      district: value,
+                      mandi: prev.district !== value ? "" : prev.mandi,
+                    }))
+                  }
                 />
-                <Button variant="outlined" onClick={handleAddActual} disabled={!actualDate || !actualPrice}>
-                  {translated.recordActual}
+                <FilterAutocomplete
+                  label={t("filters.mandi", { defaultValue: "Mandi" })}
+                  value={form.mandi}
+                  options={mandisForDistrict}
+                  disabled={!selectedState || !selectedDistrict}
+                  onChange={(value) => setForm((prev) => ({ ...prev, mandi: value }))}
+                />
+                <FilterAutocomplete
+                  label={t("dashboard_page.forms.crop")}
+                  value={form.crop}
+                  options={cropSuggestions.suggestions}
+                  onChange={(value) => setForm((prev) => ({ ...prev, crop: value }))}
+                />
+                <FilterAutocomplete
+                  label={t("dashboard_page.price.currency")}
+                  value={form.currency}
+                  options={currencySuggestions.suggestions}
+                  onChange={(value) => setForm((prev) => ({ ...prev, currency: value }))}
+                />
+                <Button
+                  variant="contained"
+                  onClick={handleGenerate}
+                  disabled={mutation.isPending}
+                  startIcon={
+                    mutation.isPending ? <CircularProgress size={16} color="inherit" /> : null
+                  }
+                >
+                  {mutation.isPending ? t("actions.forecasting") : t("actions.generate")}
                 </Button>
               </Stack>
+            </CardContent>
+          </Card>
+        </Grid>
 
-              {actualError && <Alert severity="warning">{actualError}</Alert>}
+        <Grid item xs={12} md={8}>
+          <Card>
+            <CardContent>
+              <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+                <Typography variant="subtitle1">{t("dashboard_page.price.title")}</Typography>
+                <Select
+                  size="small"
+                  value={horizon}
+                  onChange={(e) => setHorizon(Number(e.target.value))}
+                >
+                  <MenuItem value={30}>{t("dashboard_page.price.horizon_30")}</MenuItem>
+                  <MenuItem value={60}>{t("dashboard_page.price.horizon_60")}</MenuItem>
+                  <MenuItem value={90}>{t("dashboard_page.price.horizon_90")}</MenuItem>
+                </Select>
+              </Stack>
 
-              {actualEntries.length > 0 ? (
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>{translated.actualTableDate}</TableCell>
-                      <TableCell>{translated.actualTableActual}</TableCell>
-                      <TableCell>{translated.actualTablePredicted}</TableCell>
-                      <TableCell>{translated.actualTableError}</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {actualEntries.map((entry) => (
-                      <TableRow key={entry.date}>
-                        <TableCell>{entry.date}</TableCell>
-                        <TableCell>{entry.actual.toFixed(2)}</TableCell>
-                        <TableCell>{entry.predicted?.toFixed(2) ?? "-"}</TableCell>
-                        <TableCell>
-                          {entry.error !== null && entry.error !== undefined ? entry.error.toFixed(2) : "-"}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  {translated.noActuals}
+              <Divider sx={{ my: 2 }} />
+
+              {!isOnline && (
+                <Box sx={{ mb: 1.5 }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                    {translated.offlineTitle}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {translated.offlineBody}
+                  </Typography>
+                  <Button variant="text" onClick={handleLoadCached} sx={{ px: 0 }}>
+                    {translated.loadCached}
+                  </Button>
+                </Box>
+              )}
+              {cachedAt && (
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: "block", mb: 1 }}
+                >
+                  {translated.lastUpdated}: {new Date(cachedAt).toLocaleString()}
                 </Typography>
               )}
-            </Stack>
-          </CardContent>
-        </Card>
+              {chartData ? (
+                <Box>
+                  <Line
+                    data={chartData}
+                    options={{ responsive: true, plugins: { legend: { position: "bottom" } } }}
+                  />
+                  <Stack direction="row" spacing={1} sx={{ mt: 1 }} flexWrap="wrap">
+                    <Chip
+                      label={`${t("dashboard_page.price.mape")}: ${(result?.mape ?? 0).toFixed(2)}%`}
+                      size="small"
+                    />
+                    <Chip
+                      label={`${t("dashboard_page.price.confidence_band")}: ${(result?.confidence_interval?.level ?? 0.8) * 100}%`}
+                      size="small"
+                      variant="outlined"
+                    />
+                  </Stack>
+                </Box>
+              ) : (
+                <Typography variant="body2" color="text.secondary">
+                  {t("dashboard_page.price.empty")}
+                </Typography>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
-        {result?.recommendation_id && (
-          <QuickRatingCard recommendationId={result.recommendation_id} service="price" />
-        )}
+      <Card>
+        <CardContent>
+          <Stack spacing={2}>
+            <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+              <Box>
+                <Typography variant="subtitle1">{translated.actualsTitle}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {translated.actualsSubtitle}
+                </Typography>
+              </Box>
+              {accuracyMetrics && (
+                <Stack direction="row" spacing={1}>
+                  <Chip
+                    label={`${translated.accuracyTitle}: MAE ${accuracyMetrics.mae.toFixed(2)}`}
+                    size="small"
+                  />
+                  <Chip
+                    label={`MAPE ${accuracyMetrics.mape.toFixed(1)}%`}
+                    size="small"
+                    variant="outlined"
+                  />
+                </Stack>
+              )}
+            </Stack>
+
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
+              <TextField
+                label={translated.actualDate}
+                type="date"
+                value={actualDate}
+                onChange={(event) => setActualDate(event.target.value)}
+                InputLabelProps={{ shrink: true }}
+                sx={{ minWidth: 200 }}
+              />
+              <TextField
+                label={translated.actualPrice}
+                type="number"
+                value={actualPrice}
+                onChange={(event) => setActualPrice(event.target.value)}
+                sx={{ minWidth: 200 }}
+              />
+              <Button
+                variant="outlined"
+                onClick={handleAddActual}
+                disabled={!actualDate || !actualPrice}
+              >
+                {translated.recordActual}
+              </Button>
+            </Stack>
+
+            {actualError && <Alert severity="warning">{actualError}</Alert>}
+
+            {actualEntries.length > 0 ? (
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>{translated.actualTableDate}</TableCell>
+                    <TableCell>{translated.actualTableActual}</TableCell>
+                    <TableCell>{translated.actualTablePredicted}</TableCell>
+                    <TableCell>{translated.actualTableError}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {actualEntries.map((entry) => (
+                    <TableRow key={entry.date}>
+                      <TableCell>{entry.date}</TableCell>
+                      <TableCell>{entry.actual.toFixed(2)}</TableCell>
+                      <TableCell>{entry.predicted?.toFixed(2) ?? "-"}</TableCell>
+                      <TableCell>
+                        {entry.error !== null && entry.error !== undefined
+                          ? entry.error.toFixed(2)
+                          : "-"}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                {translated.noActuals}
+              </Typography>
+            )}
+          </Stack>
+        </CardContent>
+      </Card>
+
+      {result?.recommendation_id && (
+        <QuickRatingCard recommendationId={result.recommendation_id} service="price" />
+      )}
     </Stack>
   );
 };

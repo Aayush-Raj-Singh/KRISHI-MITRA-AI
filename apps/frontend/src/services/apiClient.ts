@@ -51,14 +51,16 @@ const withRetry = async <T>(fn: () => Promise<T>, retry = 1): Promise<T> => {
 export const cachedGet = async <T>(
   url: string,
   config?: ApiRequestOptions,
-  options?: CacheOptions
+  options?: CacheOptions,
 ): Promise<CachedResult<T>> => {
   const store = options?.store || "api";
   const key = options?.key || buildCacheKey(url, config?.params);
   const ttlMs = options?.ttlMs ?? DEFAULT_TTL;
   const shouldRegister = options?.registerSync !== false && typeof window !== "undefined";
   if (shouldRegister && !revalidators.has(key)) {
-    revalidators.set(key, () => cachedGet(url, config, { ...options, registerSync: false }).then(() => undefined));
+    revalidators.set(key, () =>
+      cachedGet(url, config, { ...options, registerSync: false }).then(() => undefined),
+    );
   }
   const cached = await getOfflineRecord<T>(store, key);
   const isFresh = cached && Date.now() - new Date(cached.updatedAt).getTime() < ttlMs;
@@ -67,7 +69,7 @@ export const cachedGet = async <T>(
     if (cached) {
       return {
         data: cached.value,
-        meta: { cached: true, stale: !isFresh, offline: true, updatedAt: cached.updatedAt }
+        meta: { cached: true, stale: !isFresh, offline: true, updatedAt: cached.updatedAt },
       };
     }
     throw new Error("Offline: no cached data available");
@@ -76,20 +78,26 @@ export const cachedGet = async <T>(
   if (cached && isFresh) {
     return {
       data: cached.value,
-      meta: { cached: true, stale: false, offline: false, updatedAt: cached.updatedAt }
+      meta: { cached: true, stale: false, offline: false, updatedAt: cached.updatedAt },
     };
   }
 
   try {
-    const response = await withRetry(() => api.get<ApiResponse<T>>(url, config), options?.retry ?? 1);
+    const response = await withRetry(
+      () => api.get<ApiResponse<T>>(url, config),
+      options?.retry ?? 1,
+    );
     const data = unwrap(response.data);
     await saveOfflineRecord(store, key, data);
-    return { data, meta: { cached: false, stale: false, offline: false, updatedAt: new Date().toISOString() } };
+    return {
+      data,
+      meta: { cached: false, stale: false, offline: false, updatedAt: new Date().toISOString() },
+    };
   } catch (error) {
     if (cached) {
       return {
         data: cached.value,
-        meta: { cached: true, stale: true, offline: false, updatedAt: cached.updatedAt }
+        meta: { cached: true, stale: true, offline: false, updatedAt: cached.updatedAt },
       };
     }
     throw error;
@@ -109,7 +117,7 @@ export const cachedPost = async <T, P>(
   url: string,
   payload: P,
   config?: ApiRequestOptions,
-  options?: CacheOptions
+  options?: CacheOptions,
 ): Promise<CachedResult<T>> => {
   const store = options?.store || "api";
   const key = options?.key || buildCacheKey(url, payload);
@@ -120,13 +128,22 @@ export const cachedPost = async <T, P>(
       queueOfflineRequest(url, payload);
     }
     if (cached) {
-      return { data: cached.value, meta: { cached: true, stale: true, offline: true, updatedAt: cached.updatedAt } };
+      return {
+        data: cached.value,
+        meta: { cached: true, stale: true, offline: true, updatedAt: cached.updatedAt },
+      };
     }
     throw new Error("Offline: request queued");
   }
 
-  const response = await withRetry(() => api.post<ApiResponse<T>>(url, payload, config), options?.retry ?? 1);
+  const response = await withRetry(
+    () => api.post<ApiResponse<T>>(url, payload, config),
+    options?.retry ?? 1,
+  );
   const data = unwrap(response.data);
   await saveOfflineRecord(store, key, data);
-  return { data, meta: { cached: false, stale: false, offline: false, updatedAt: new Date().toISOString() } };
+  return {
+    data,
+    meta: { cached: false, stale: false, offline: false, updatedAt: new Date().toISOString() },
+  };
 };

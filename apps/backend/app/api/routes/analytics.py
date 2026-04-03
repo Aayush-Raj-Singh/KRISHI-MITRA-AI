@@ -5,8 +5,8 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import Response
-from app.core.database import Database
 
+from app.core.database import Database
 from app.core.dependencies import (
     get_analytics_service,
     get_db,
@@ -22,8 +22,8 @@ from app.schemas.analytics import (
     FeedbackReliabilityStats,
     PriceAccuracyItem,
 )
-from app.schemas.trends import TrendAnalyticsResponse, TrendFilters
 from app.schemas.response import APIResponse
+from app.schemas.trends import TrendAnalyticsResponse, TrendFilters
 from app.services.analytics_service import AnalyticsService
 from app.services.report_export_service import ReportExportService
 from app.services.trend_service import TrendAnalyticsService
@@ -171,7 +171,13 @@ async def price_accuracy(
         query["crop"] = crop.strip().lower()
     if market:
         query["market"] = market.strip().lower()
-    docs = await db["price_accuracy"].find(query).sort("updated_at", -1).limit(limit).to_list(length=limit)
+    docs = (
+        await db["price_accuracy"]
+        .find(query)
+        .sort("updated_at", -1)
+        .limit(limit)
+        .to_list(length=limit)
+    )
     items = [
         PriceAccuracyItem(
             crop=str(doc.get("crop", "")),
@@ -191,5 +197,3 @@ async def price_accuracy(
         for doc in docs
     ]
     return success_response(items, message="price accuracy metrics")
-
-

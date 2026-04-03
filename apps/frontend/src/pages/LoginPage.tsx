@@ -21,20 +21,22 @@ const LoginPage: React.FC = () => {
             points={[
               {
                 icon: <CheckCircleIcon color="success" fontSize="small" />,
-                text: t("login_page.feature_crop_price_water")
+                text: t("login_page.feature_crop_price_water"),
               },
               {
                 icon: <CheckCircleIcon color="success" fontSize="small" />,
-                text: t("login_page.feature_bedrock")
+                text: t("login_page.feature_ai_runtime", {
+                  defaultValue: "Personalized advisory powered by a switchable AI runtime.",
+                }),
               },
               {
                 icon: <CheckCircleIcon color="success" fontSize="small" />,
-                text: t("login_page.feature_multilingual")
+                text: t("login_page.feature_multilingual"),
               },
               {
                 icon: <TipsAndUpdatesIcon color="primary" fontSize="small" />,
-                text: t("login_page.latest_update")
-              }
+                text: t("login_page.latest_update"),
+              },
             ]}
           />
         </Grid>

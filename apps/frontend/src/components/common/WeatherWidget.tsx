@@ -9,7 +9,7 @@ import {
   Stack,
   TextField,
   Typography,
-  useMediaQuery
+  useMediaQuery,
 } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -44,7 +44,8 @@ interface WeatherWidgetProps {
 const WeatherWidget: React.FC<WeatherWidgetProps> = ({ compact = false, tone = "light" }) => {
   const { t } = useTranslation();
   const isMobile = useMediaQuery("(max-width:900px)");
-  const { coords, label, status, error, manualLocation, requestLocation, saveManualLocation } = useLocationContext();
+  const { coords, label, status, error, manualLocation, requestLocation, saveManualLocation } =
+    useLocationContext();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [manualInput, setManualInput] = useState(manualLocation);
 
@@ -56,14 +57,14 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ compact = false, tone = "
     queryKey: ["weather-current", coords?.lat, coords?.lon],
     queryFn: () => getCurrentWeather(coords!.lat, coords!.lon),
     enabled: Boolean(coords),
-    staleTime: 1000 * 60 * 10
+    staleTime: 1000 * 60 * 10,
   });
 
   const aqiQuery = useQuery({
     queryKey: ["weather-aqi", coords?.lat, coords?.lon],
     queryFn: () => getAQI(coords!.lat, coords!.lon),
     enabled: Boolean(coords),
-    staleTime: 1000 * 60 * 10
+    staleTime: 1000 * 60 * 10,
   });
 
   const translatedCondition = useMemo(() => {
@@ -72,7 +73,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ compact = false, tone = "
       return weatherQuery.data?.condition || "--";
     }
     return t(`weather_widget.conditions.${code}`, {
-      defaultValue: weatherQuery.data?.condition || "--"
+      defaultValue: weatherQuery.data?.condition || "--",
     });
   }, [t, weatherQuery.data?.condition, weatherQuery.data?.weatherCode]);
 
@@ -85,14 +86,15 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ compact = false, tone = "
     }
     const emoji = weatherEmoji(weatherQuery.data.weatherCode);
     return `${emoji} ${formatNumber(weatherQuery.data.temperatureC, "\u00B0C")} | AQI ${formatNumber(
-      aqiQuery.data.aqi
+      aqiQuery.data.aqi,
     )} | ${formatNumber(weatherQuery.data.humidity, "%")} ${t("weather_widget.humidity_short")}`;
   }, [aqiQuery.data, status, t, weatherQuery.data, weatherQuery.isLoading, aqiQuery.isLoading]);
 
   const offlineMeta = useMemo(() => {
     const weatherOffline = Boolean(weatherQuery.data?.offline || weatherQuery.data?.stale);
     const aqiOffline = Boolean(aqiQuery.data?.offline || aqiQuery.data?.stale);
-    const offline = weatherOffline || aqiOffline || (typeof navigator !== "undefined" && !navigator.onLine);
+    const offline =
+      weatherOffline || aqiOffline || (typeof navigator !== "undefined" && !navigator.onLine);
     const updatedAt = weatherQuery.data?.lastUpdated || aqiQuery.data?.lastUpdated;
     return { offline, updatedAt };
   }, [aqiQuery.data, weatherQuery.data]);
@@ -124,7 +126,9 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ compact = false, tone = "
           py: compact ? 0.45 : 0.6,
           bgcolor: tone === "dark" ? "rgba(11, 44, 24, 0.85)" : "rgba(255,255,255,0.16)",
           border:
-            tone === "dark" ? "1px solid rgba(255,255,255,0.25)" : "1px solid rgba(255,255,255,0.35)",
+            tone === "dark"
+              ? "1px solid rgba(255,255,255,0.25)"
+              : "1px solid rgba(255,255,255,0.35)",
           color: "#fff",
           fontWeight: 700,
           fontSize: compact ? { xs: "0.78rem", md: "0.86rem" } : { xs: "0.8rem", md: "0.9rem" },
@@ -134,8 +138,8 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ compact = false, tone = "
           lineHeight: 1.15,
           maxWidth: "100%",
           "&:hover": {
-            bgcolor: tone === "dark" ? "rgba(11, 44, 24, 0.95)" : "rgba(255,255,255,0.24)"
-          }
+            bgcolor: tone === "dark" ? "rgba(11, 44, 24, 0.95)" : "rgba(255,255,255,0.24)",
+          },
         }}
       >
         {summary}
@@ -154,9 +158,10 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ compact = false, tone = "
             maxWidth: 380,
             borderRadius: 2.5,
             border: "1px solid rgba(23, 70, 38, 0.2)",
-            background: "linear-gradient(135deg, rgba(249, 255, 249, 0.98), rgba(230, 246, 235, 0.98))",
-            boxShadow: "0 16px 32px rgba(16, 62, 33, 0.28)"
-          }
+            background:
+              "linear-gradient(135deg, rgba(249, 255, 249, 0.98), rgba(230, 246, 235, 0.98))",
+            boxShadow: "0 16px 32px rgba(16, 62, 33, 0.28)",
+          },
         }}
       >
         <Stack spacing={1.4}>
@@ -172,7 +177,11 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ compact = false, tone = "
                 {locationLabel}
               </Typography>
             </Stack>
-            <IconButton size="small" onClick={requestLocation} aria-label={t("weather_widget.refresh_location")}>
+            <IconButton
+              size="small"
+              onClick={requestLocation}
+              aria-label={t("weather_widget.refresh_location")}
+            >
               <RefreshIcon fontSize="small" />
             </IconButton>
           </Stack>
@@ -190,7 +199,9 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ compact = false, tone = "
               <InfoOutlinedIcon sx={{ color: "#d07a2b" }} fontSize="small" />
               <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.25 }}>
                 {t("weather_widget.offline_last_updated")}
-                {offlineMeta.updatedAt ? ` (${new Date(offlineMeta.updatedAt).toLocaleString()})` : ""}
+                {offlineMeta.updatedAt
+                  ? ` (${new Date(offlineMeta.updatedAt).toLocaleString()})`
+                  : ""}
               </Typography>
             </Stack>
           )}

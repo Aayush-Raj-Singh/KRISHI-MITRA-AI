@@ -1,17 +1,18 @@
 from __future__ import annotations
 
-import os
 import asyncio
+import os
 from datetime import date, timedelta
 from uuid import uuid4
 
-from fastapi.testclient import TestClient
 import asyncpg
+from fastapi.testclient import TestClient
 
 os.environ.setdefault("POSTGRES_DSN", "postgresql://postgres:postgres@localhost:5432/krishimitra")
 os.environ.setdefault("POSTGRES_SCHEMA", "public")
 
 from app.main import app
+from app.testing.auth_helpers import seed_user
 
 
 def _cleanup_phone(phone: str) -> None:
@@ -22,38 +23,38 @@ def _cleanup_phone(phone: str) -> None:
         conn = await asyncpg.connect(dsn)
         try:
             row = await conn.fetchrow(
-                f"SELECT id FROM \"{schema}\".\"users\" WHERE doc->> 'phone' = $1",
+                f'SELECT id FROM "{schema}"."users" WHERE doc->> \'phone\' = $1',
                 phone,
             )
             if not row:
                 return
             user_id = row["id"]
             await conn.execute(
-                f"DELETE FROM \"{schema}\".\"feedback\" WHERE doc->> 'user_id' = $1",
+                f'DELETE FROM "{schema}"."feedback" WHERE doc->> \'user_id\' = $1',
                 user_id,
             )
             await conn.execute(
-                f"DELETE FROM \"{schema}\".\"recommendations\" WHERE doc->> 'user_id' = $1",
+                f'DELETE FROM "{schema}"."recommendations" WHERE doc->> \'user_id\' = $1',
                 user_id,
             )
             await conn.execute(
-                f"DELETE FROM \"{schema}\".\"conversations\" WHERE doc->> 'user_id' = $1",
+                f'DELETE FROM "{schema}"."conversations" WHERE doc->> \'user_id\' = $1',
                 user_id,
             )
             await conn.execute(
-                f"DELETE FROM \"{schema}\".\"refresh_tokens\" WHERE doc->> 'user_id' = $1",
+                f'DELETE FROM "{schema}"."refresh_tokens" WHERE doc->> \'user_id\' = $1',
                 user_id,
             )
             await conn.execute(
-                f"DELETE FROM \"{schema}\".\"password_resets\" WHERE doc->> 'user_id' = $1",
+                f'DELETE FROM "{schema}"."password_resets" WHERE doc->> \'user_id\' = $1',
                 user_id,
             )
             await conn.execute(
-                f"DELETE FROM \"{schema}\".\"mfa_challenges\" WHERE doc->> 'user_id' = $1",
+                f'DELETE FROM "{schema}"."mfa_challenges" WHERE doc->> \'user_id\' = $1',
                 user_id,
             )
             await conn.execute(
-                f"DELETE FROM \"{schema}\".\"users\" WHERE id = $1",
+                f'DELETE FROM "{schema}"."users" WHERE id = $1',
                 user_id,
             )
         finally:
@@ -163,6 +164,7 @@ def test_end_to_end_user_journey():
             )
             assert advisory_response.status_code == 200
             assert advisory_response.json()["data"]["reply"]
+            assert advisory_response.json()["data"]["provider"] == "bedrock"
 
             feedback_response = client.post(
                 "/api/v1/feedback/outcome",
@@ -180,7 +182,9 @@ def test_end_to_end_user_journey():
             assert feedback_response.status_code == 200
             assert feedback_response.json()["data"]["sustainability_score"] >= 0
 
-            hero_summary_response = client.get("/api/v1/dashboard/hero-summary", headers=farmer_headers)
+            hero_summary_response = client.get(
+                "/api/v1/dashboard/hero-summary", headers=farmer_headers
+            )
             assert hero_summary_response.status_code == 200
             hero_summary = hero_summary_response.json()["data"]
             assert hero_summary["latest_recommendation_id"]
@@ -190,6 +194,17 @@ def test_end_to_end_user_journey():
             assert hero_summary["latest_water_savings_percent"] is not None
             assert hero_summary["latest_sustainability_score"] is not None
             assert hero_summary["total_feedback"] >= 1
+
+            market_price_response = client.get(
+                "/api/v1/dashboard/market-prices",
+                headers=farmer_headers,
+                params={"commodity": "rice", "page": 1, "page_size": 10},
+            )
+            assert market_price_response.status_code == 200
+            market_price_payload = market_price_response.json()["data"]
+            assert isinstance(market_price_payload["items"], list)
+            assert market_price_payload["page"] == 1
+            assert market_price_payload["page_size"] == 10
 
             officer_payload = {
                 "name": "Journey Officer",
@@ -205,7 +220,7 @@ def test_end_to_end_user_journey():
                 "assigned_regions": ["Patna, Bihar"],
                 "email": "officer@example.com",
             }
-            _register_user(client, officer_payload)
+            asyncio.run(seed_user(payload=officer_payload))
             officer_token = _login(client, officer_phone, "StrongPass123!")
             officer_headers = {"Authorization": f"Bearer {officer_token}"}
 

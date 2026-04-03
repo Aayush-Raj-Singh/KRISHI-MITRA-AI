@@ -9,12 +9,12 @@ import authReducer from "../../store/authSlice";
 import type { UserPublic } from "../../services/auth";
 
 const { fetchCurrentUserMock } = vi.hoisted(() => ({
-  fetchCurrentUserMock: vi.fn()
+  fetchCurrentUserMock: vi.fn(),
 }));
 
 vi.mock("../../services/auth", async () => {
   return {
-    fetchCurrentUser: fetchCurrentUserMock
+    fetchCurrentUser: fetchCurrentUserMock,
   };
 });
 
@@ -25,12 +25,15 @@ const renderProtectedRoute = (authState: {
 }) => {
   const store = configureStore({
     reducer: { auth: authReducer },
-    preloadedState: { auth: authState }
+    preloadedState: { auth: authState },
   });
 
   const utils = render(
     <Provider store={store}>
-      <MemoryRouter initialEntries={["/dashboard"]}>
+      <MemoryRouter
+        future={{ v7_relativeSplatPath: true, v7_startTransition: true }}
+        initialEntries={["/dashboard"]}
+      >
         <Routes>
           <Route path="/login" element={<div>Login Screen</div>} />
           <Route element={<ProtectedRoute />}>
@@ -38,7 +41,7 @@ const renderProtectedRoute = (authState: {
           </Route>
         </Routes>
       </MemoryRouter>
-    </Provider>
+    </Provider>,
   );
 
   return { store, ...utils };
@@ -53,7 +56,7 @@ describe("ProtectedRoute", () => {
     const { findByText } = renderProtectedRoute({
       accessToken: null,
       refreshToken: null,
-      user: null
+      user: null,
     });
 
     expect(await findByText("Login Screen")).toBeInTheDocument();
@@ -74,13 +77,13 @@ describe("ProtectedRoute", () => {
       language: "en",
       assigned_regions: [],
       risk_view_consent: false,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     });
 
     const { findByText, store } = renderProtectedRoute({
       accessToken: "token",
       refreshToken: "refresh",
-      user: null
+      user: null,
     });
 
     expect(await findByText("Dashboard Screen")).toBeInTheDocument();
@@ -96,7 +99,7 @@ describe("ProtectedRoute", () => {
     const { findByText, store } = renderProtectedRoute({
       accessToken: "token",
       refreshToken: "refresh",
-      user: null
+      user: null,
     });
 
     expect(await findByText("Login Screen")).toBeInTheDocument();

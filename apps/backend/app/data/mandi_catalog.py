@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Dict, List
 
-
 MANDI_CROP_CATEGORIES: Dict[str, List[str]] = {
     "cereals": [
         "Rice",
@@ -139,6 +138,7 @@ MANDI_MARKETS: List[str] = [
     "Patna",
     "Gaya",
     "Muzaffarpur",
+    "Sitamarhi",
     "Bhagalpur",
     "Purnia",
     "Darbhanga",

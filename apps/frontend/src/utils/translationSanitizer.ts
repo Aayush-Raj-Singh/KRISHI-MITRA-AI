@@ -17,8 +17,8 @@ const SCRIPT_RANGES: Record<string, Array<[number, number]>> = {
     [0x0750, 0x077f],
     [0x08a0, 0x08ff],
     [0xfb50, 0xfdff],
-    [0xfe70, 0xfeff]
-  ]
+    [0xfe70, 0xfeff],
+  ],
 };
 
 const normalizeLanguage = (language?: string) => (language || "en").toLowerCase().split("-")[0];

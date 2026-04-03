@@ -1,0 +1,22 @@
+{
+  "name": "krishimitra-ai-advisor-service",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.916.0",
+    "@aws-sdk/client-translate": "^3.916.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0"
+  }
+}

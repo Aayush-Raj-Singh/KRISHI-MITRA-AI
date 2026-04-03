@@ -1,22 +1,19 @@
-import {
-  ApiError,
-  createKrishiMitraApi,
-  type ApiEnvelope,
-} from "@krishimitra/shared";
+import { ApiError, createKrishiMitraApi, type ApiEnvelope } from "@krishimitra/shared";
 import { getCached, setCached } from "./cache";
 import {
   clearAuthTokens,
   clearStoredUser,
   getAccessToken,
   getRefreshToken,
-  setAuthTokens
+  setAuthTokens,
 } from "./authStorage";
 import { resolveApiBaseUrl } from "./runtimeConfig";
 import {
   enqueueOfflineMutation,
   listOfflineMutations,
   removeOfflineMutation,
-  updateOfflineMutation
+  scheduleOfflineMutationRetry,
+  updateOfflineMutation,
 } from "../utils/offlineStorage";
 
 export type ApiResponse<T> = ApiEnvelope<T>;
@@ -39,7 +36,13 @@ const logApiError = (error: any, message: string) => {
       ? new URL(error?.config?.url ?? "", error?.config?.baseURL).toString()
       : error?.config?.url;
     const status = error?.response?.status;
-    console.error("api_request_failed", { method, url, status, message, data: error?.response?.data });
+    console.error("api_request_failed", {
+      method,
+      url,
+      status,
+      message,
+      data: error?.response?.data,
+    });
   } catch {
     console.error("api_request_failed", { message });
   }
@@ -51,9 +54,9 @@ const { api, unwrap } = createKrishiMitraApi({
     getAccessToken,
     getRefreshToken,
     setTokens: (tokens) => setAuthTokens(tokens.access_token, tokens.refresh_token),
-    clear: clearAuthStorage
+    clear: clearAuthStorage,
   },
-  onError: ({ message, error }) => logApiError(error, message)
+  onError: ({ message, error }) => logApiError(error, message),
 });
 
 const flushOfflineQueue = async () => {
@@ -62,15 +65,14 @@ const flushOfflineQueue = async () => {
   if (!queue.length) return;
 
   for (const item of queue) {
+    if (item.nextAttemptAt && new Date(item.nextAttemptAt).getTime() > Date.now()) {
+      continue;
+    }
     try {
       await api.post(item.url, item.payload);
       await removeOfflineMutation(item.id);
-    } catch {
-      await updateOfflineMutation({
-        ...item,
-        attempts: item.attempts + 1,
-        lastAttemptAt: new Date().toISOString()
-      });
+    } catch (error) {
+      await updateOfflineMutation(scheduleOfflineMutationRetry(item, error));
     }
   }
 };

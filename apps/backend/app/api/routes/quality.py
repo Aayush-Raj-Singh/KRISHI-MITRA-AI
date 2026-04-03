@@ -4,8 +4,8 @@ from datetime import date
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
-from app.core.database import Database
 
+from app.core.database import Database
 from app.core.dependencies import get_db, require_roles
 from app.schemas.quality import DataQualityReport
 from app.schemas.response import APIResponse
@@ -55,7 +55,13 @@ async def list_quality_issues(
     db: Database = Depends(get_db),
     __: str = Depends(require_roles(["admin"])),
 ) -> APIResponse[list[dict]]:
-    docs = await db["data_quality_issues"].find({}).sort("detected_at", -1).limit(limit).to_list(length=limit)
+    docs = (
+        await db["data_quality_issues"]
+        .find({})
+        .sort("detected_at", -1)
+        .limit(limit)
+        .to_list(length=limit)
+    )
     for doc in docs:
         doc["_id"] = str(doc.get("_id"))
     return success_response(docs, message="data quality issues")

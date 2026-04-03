@@ -4,21 +4,39 @@ import asyncio
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
-from app.core.database import Database
-
-from app.core.background_tasks import TaskDispatcher, get_task_dispatcher
-from app.core.config import settings
-from app.core.logging import get_logger
-from app.schemas.operations import OperationRunItem, SchedulerHook, SchedulerOverviewResponse, TriggerOperationResponse
-from app.services.external_data_service import ExternalDataService
 from ml.pipelines.retrain_all import run_pipeline
 from ml.pipelines.seasonal_crop_refresh import run_seasonal_refresh
 from ml.training.retrain_price_model import DEFAULT_PAIRS, retrain_price_models
+
+from app.core.background_tasks import TaskDispatcher, get_task_dispatcher
+from app.core.config import settings
+from app.core.database import Database
+from app.core.logging import get_logger
+from app.schemas.operations import (
+    OperationRunItem,
+    SchedulerHook,
+    SchedulerOverviewResponse,
+    TriggerOperationResponse,
+)
+from app.services.external_data_service import ExternalDataService
+from app.services.geo_hierarchy_service import GeoHierarchyService
+from app.services.state_portal_service import StatePortalService
 
 logger = get_logger(__name__)
 
 
 class OperationsService:
+    DEFAULT_MARKET_REFRESH_PAIRS = [
+        ("Rice", "Muzaffarpur"),
+        ("Rice", "Patna"),
+        ("Rice", "Samastipur"),
+        ("Rice", "Darbhanga"),
+        ("Wheat", "Patna"),
+        ("Wheat", "Lucknow"),
+        ("Maize", "Muzaffarpur"),
+        ("Maize", "Pune"),
+    ]
+
     def __init__(self, db: Database, dispatcher: Optional[TaskDispatcher] = None) -> None:
         self._db = db
         self._runs = db["operations_runs"]
@@ -42,11 +60,15 @@ class OperationsService:
 
     async def scheduler_overview(self, limit: int = 20) -> SchedulerOverviewResponse:
         hooks = await self._build_hooks()
-        run_docs = await self._runs.find({}).sort("triggered_at", -1).limit(limit).to_list(length=limit)
+        run_docs = (
+            await self._runs.find({}).sort("triggered_at", -1).limit(limit).to_list(length=limit)
+        )
         recent_runs = [self._to_run_item(item) for item in run_docs]
         return SchedulerOverviewResponse(hooks=hooks, recent_runs=recent_runs)
 
-    async def trigger_weekly_price_refresh(self, triggered_by: str, async_mode: bool = True) -> TriggerOperationResponse:
+    async def trigger_weekly_price_refresh(
+        self, triggered_by: str, async_mode: bool = True
+    ) -> TriggerOperationResponse:
         return await self._trigger_operation(
             operation="weekly_price_refresh",
             task_name="weekly_price_refresh",
@@ -55,37 +77,56 @@ class OperationsService:
             async_mode=async_mode,
         )
 
-    async def trigger_quarterly_retrain(self, triggered_by: str, async_mode: bool = True) -> TriggerOperationResponse:
+    async def trigger_quarterly_retrain(
+        self, triggered_by: str, async_mode: bool = True
+    ) -> TriggerOperationResponse:
         return await self._trigger_operation(
             operation="quarterly_full_retrain",
             task_name="quarterly_full_retrain",
             triggered_by=triggered_by,
-            task=run_pipeline,
+            task=lambda: run_pipeline(db=self._db),
             async_mode=async_mode,
         )
 
-    async def trigger_daily_data_refresh(self, triggered_by: str, async_mode: bool = True) -> TriggerOperationResponse:
+    async def trigger_daily_data_refresh(
+        self, triggered_by: str, async_mode: bool = True
+    ) -> TriggerOperationResponse:
         async def _refresh() -> dict:
             service = ExternalDataService(self._db)
-            markets = ["Patna", "Pune", "Lucknow"]
-            crops = ["Rice", "Wheat", "Maize"]
+            mandi_pairs = await self._recent_mandi_pairs(limit_pairs=12)
+            if not mandi_pairs:
+                mandi_pairs = list(self.DEFAULT_MARKET_REFRESH_PAIRS)
+            else:
+                seen = {(crop.lower(), market.lower()) for crop, market in mandi_pairs}
+                for crop, market in self.DEFAULT_MARKET_REFRESH_PAIRS:
+                    key = (crop.lower(), market.lower())
+                    if key in seen:
+                        continue
+                    mandi_pairs.append((crop, market))
+                    seen.add(key)
+
+            markets = sorted({market for _, market in mandi_pairs})
 
             weather_results = []
             mandi_results = []
             for market in markets:
                 weather = await service.fetch_weather(location=market, days=5)
-                weather_results.append({"location": market, "cached": weather.cached, "source": weather.source})
-            for market in markets:
-                for crop in crops:
-                    mandi = await service.fetch_mandi_prices(crop=crop, market=market, days=7)
-                    mandi_results.append(
-                        {"crop": crop, "market": market, "cached": mandi.cached, "source": mandi.source}
-                    )
+                weather_results.append(
+                    {"location": market, "cached": weather.cached, "source": weather.source}
+                )
+            for crop, market in mandi_pairs:
+                mandi = await service.fetch_mandi_prices(crop=crop, market=market, days=30)
+                mandi_results.append(
+                    {"crop": crop, "market": market, "cached": mandi.cached, "source": mandi.source}
+                )
             return {
                 "weather_jobs": len(weather_results),
                 "mandi_jobs": len(mandi_results),
                 "weather": weather_results,
                 "mandi": mandi_results,
+                "refreshed_pairs": [
+                    {"crop": crop, "market": market} for crop, market in mandi_pairs
+                ],
             }
 
         return await self._trigger_operation(
@@ -93,6 +134,28 @@ class OperationsService:
             task_name="daily_external_data_refresh",
             triggered_by=triggered_by,
             task=_refresh,
+            async_mode=async_mode,
+        )
+
+    async def trigger_state_portal_sync(
+        self, triggered_by: str, async_mode: bool = True
+    ) -> TriggerOperationResponse:
+        return await self._trigger_operation(
+            operation="state_portal_sync",
+            task_name="state_portal_sync",
+            triggered_by=triggered_by,
+            task=lambda: StatePortalService(self._db).sync_all_states(force=True),
+            async_mode=async_mode,
+        )
+
+    async def trigger_geo_hierarchy_sync(
+        self, triggered_by: str, async_mode: bool = True
+    ) -> TriggerOperationResponse:
+        return await self._trigger_operation(
+            operation="geo_hierarchy_sync",
+            task_name="geo_hierarchy_sync",
+            triggered_by=triggered_by,
+            task=lambda: GeoHierarchyService(self._db).sync_from_sources(force=True),
             async_mode=async_mode,
         )
 
@@ -114,7 +177,11 @@ class OperationsService:
             if latest:
                 last_result = latest[0].get("result") or {}
                 last_season = str(last_result.get("season_refresh", "")).strip().lower()
-                if last_season == season_key and latest[0].get("status") in {"queued", "running", "completed"}:
+                if last_season == season_key and latest[0].get("status") in {
+                    "queued",
+                    "running",
+                    "completed",
+                }:
                     return await self._record_skipped_run(
                         operation="seasonal_crop_refresh",
                         triggered_by=triggered_by,
@@ -154,7 +221,7 @@ class OperationsService:
             operation=operation,
             task_name=operation,
             triggered_by=triggered_by,
-            task=run_pipeline,
+            task=lambda: run_pipeline(db=self._db),
             async_mode=async_mode,
         )
 
@@ -238,7 +305,10 @@ class OperationsService:
                 },
             )
             logger.info("operation_completed", run_id=run_id, task_name=task_name)
-            return {"status": "completed", "result": result if isinstance(result, dict) else {"output": result}}
+            return {
+                "status": "completed",
+                "result": result if isinstance(result, dict) else {"output": result},
+            }
         except Exception as exc:
             completed_at = datetime.now(timezone.utc)
             await self._update_run(
@@ -293,6 +363,22 @@ class OperationsService:
                 "command": "python -m ml.pipelines.seasonal_crop_refresh",
                 "eventbridge_ready_note": "Trigger at season boundaries (Mar/Jun/Oct) via EventBridge",
             },
+            {
+                "key": "state_portal_sync",
+                "title": "State Portal Snapshot Sync",
+                "cadence": "daily",
+                "schedule_expression": "cron(30 2 * * ? *)",
+                "command": "POST /api/v1/operations/schedule/trigger/state-portal-sync",
+                "eventbridge_ready_note": "Refresh state portal and directory snapshots once per day",
+            },
+            {
+                "key": "geo_hierarchy_sync",
+                "title": "Geo Hierarchy Sync",
+                "cadence": "weekly",
+                "schedule_expression": "cron(15 2 ? * MON *)",
+                "command": "POST /api/v1/operations/schedule/trigger/geo-hierarchy-sync",
+                "eventbridge_ready_note": "Refresh block and village hierarchy datasets weekly when configured",
+            },
         ]
 
         hooks: List[SchedulerHook] = []
@@ -306,6 +392,31 @@ class OperationsService:
                 )
             )
         return hooks
+
+    async def _recent_mandi_pairs(self, limit_pairs: int = 12) -> List[tuple[str, str]]:
+        audit = self._db["integration_audit"]
+        docs = (
+            await audit.find({"event": "mandi_fetch"})
+            .sort("created_at", -1)
+            .limit(max(limit_pairs * 10, 50))
+            .to_list(length=max(limit_pairs * 10, 50))
+        )
+        pairs: List[tuple[str, str]] = []
+        seen: set[tuple[str, str]] = set()
+        for doc in docs:
+            payload = doc.get("payload") or {}
+            crop = str(payload.get("crop") or "").strip()
+            market = str(payload.get("market") or "").strip()
+            if not crop or not market:
+                continue
+            key = (crop.lower(), market.lower())
+            if key in seen:
+                continue
+            seen.add(key)
+            pairs.append((crop, market))
+            if len(pairs) >= limit_pairs:
+                break
+        return pairs
 
     async def _update_run(self, run_id: str, payload: Dict[str, Any]) -> None:
         run_key: str

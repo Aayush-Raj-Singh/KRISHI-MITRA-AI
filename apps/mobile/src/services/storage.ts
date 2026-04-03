@@ -1,8 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import type {
-  OutcomeFeedbackRequest,
-  QuickFeedbackRequest
-} from "@krishimitra/shared";
+import type { OutcomeFeedbackRequest, QuickFeedbackRequest } from "@krishimitra/shared";
 
 const CACHE_PREFIX = "krishimitra:mobile:cache:";
 const OFFLINE_QUEUE_KEY = "krishimitra:mobile:offline-queue";
@@ -17,6 +14,10 @@ export interface OfflineQueueItem {
   kind: "outcome_feedback" | "quick_feedback";
   payload: OutcomeFeedbackRequest | QuickFeedbackRequest;
   createdAt: string;
+  attempts: number;
+  lastAttemptAt?: string;
+  nextRetryAt?: string;
+  lastError?: string;
 }
 
 export const buildCacheKey = (scope: string, payload?: unknown) => {
@@ -41,7 +42,7 @@ export const readCacheRecord = async <T>(key: string): Promise<CacheRecord<T> | 
 export const writeCacheRecord = async <T>(key: string, value: T): Promise<void> => {
   const record: CacheRecord<T> = {
     value,
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
   await AsyncStorage.setItem(`${CACHE_PREFIX}${key}`, JSON.stringify(record));
 };
@@ -64,15 +65,37 @@ export const writeOfflineQueue = async (items: OfflineQueueItem[]): Promise<void
 };
 
 export const enqueueOfflineQueueItem = async (
-  item: Omit<OfflineQueueItem, "id" | "createdAt">
+  item: Omit<
+    OfflineQueueItem,
+    "id" | "createdAt" | "attempts" | "lastAttemptAt" | "nextRetryAt" | "lastError"
+  >,
 ): Promise<OfflineQueueItem> => {
   const nextItem: OfflineQueueItem = {
     id: `${item.kind}_${Date.now()}`,
     createdAt: new Date().toISOString(),
-    ...item
+    attempts: 0,
+    ...item,
   };
   const current = await readOfflineQueue();
   current.push(nextItem);
   await writeOfflineQueue(current);
   return nextItem;
+};
+
+export const scheduleOfflineQueueRetry = (
+  item: OfflineQueueItem,
+  error: unknown,
+): OfflineQueueItem => {
+  const attempts = item.attempts + 1;
+  const retryDelayMs = Math.min(15 * 60 * 1000, 1000 * 2 ** Math.min(attempts, 8));
+  return {
+    ...item,
+    attempts,
+    lastAttemptAt: new Date().toISOString(),
+    nextRetryAt: new Date(Date.now() + retryDelayMs).toISOString(),
+    lastError:
+      error instanceof Error
+        ? error.message.slice(0, 500)
+        : String(error || "Request failed").slice(0, 500),
+  };
 };

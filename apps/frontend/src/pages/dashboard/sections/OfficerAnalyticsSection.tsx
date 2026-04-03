@@ -14,7 +14,7 @@ import {
   Paper,
   Stack,
   TextField,
-  Typography
+  Typography,
 } from "@mui/material";
 import TipsAndUpdatesIcon from "@mui/icons-material/TipsAndUpdates";
 import { Bar } from "react-chartjs-2";
@@ -24,9 +24,12 @@ import type {
   AnalyticsReportFormat,
   AnalyticsOverview,
   FarmerAttentionItem,
-  FeedbackReliabilityStats
+  FeedbackReliabilityStats,
 } from "../../../services/analytics";
-import type { SchedulerOverviewResponse, TriggerOperationResponse } from "../../../services/operations";
+import type {
+  SchedulerOverviewResponse,
+  TriggerOperationResponse,
+} from "../../../services/operations";
 
 type Translate = (key: string, options?: Record<string, unknown>) => string;
 
@@ -61,7 +64,9 @@ interface OfficerAnalyticsSectionProps {
   triggerDailyDataMutation: UseMutationResult<TriggerOperationResponse, unknown, boolean, unknown>;
 }
 
-const operationStatusColor = (status: string): "default" | "success" | "error" | "warning" | "info" => {
+const operationStatusColor = (
+  status: string,
+): "default" | "success" | "error" | "warning" | "info" => {
   const normalized = status.toLowerCase();
   if (normalized === "success") return "success";
   if (normalized === "failed" || normalized === "error") return "error";
@@ -89,7 +94,7 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
   operationsOverviewMutation,
   triggerWeeklyMutation,
   triggerQuarterlyMutation,
-  triggerDailyDataMutation
+  triggerDailyDataMutation,
 }) => {
   if (!isOfficer) return null;
 
@@ -115,7 +120,9 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
                     justifyContent="space-between"
                   >
                     <Typography variant="subtitle1">
-                      {t("dashboard_page.officer.operations_control", { defaultValue: "Operations Control Panel" })}
+                      {t("dashboard_page.officer.operations_control", {
+                        defaultValue: "Operations Control Panel",
+                      })}
                     </Typography>
                     <Stack direction="row" spacing={1}>
                       <Button
@@ -125,8 +132,12 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
                         disabled={operationsOverviewMutation.isPending}
                       >
                         {operationsOverviewMutation.isPending
-                          ? t("dashboard_page.officer.refreshing", { defaultValue: "Refreshing..." })
-                          : t("dashboard_page.officer.refresh_runs", { defaultValue: "Refresh Runs" })}
+                          ? t("dashboard_page.officer.refreshing", {
+                              defaultValue: "Refreshing...",
+                            })
+                          : t("dashboard_page.officer.refresh_runs", {
+                              defaultValue: "Refresh Runs",
+                            })}
                       </Button>
                       <Button
                         size="small"
@@ -139,8 +150,12 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
                         }
                       >
                         {triggerWeeklyMutation.isPending
-                          ? t("dashboard_page.officer.triggering", { defaultValue: "Triggering..." })
-                          : t("dashboard_page.officer.run_weekly", { defaultValue: "Run Weekly Job" })}
+                          ? t("dashboard_page.officer.triggering", {
+                              defaultValue: "Triggering...",
+                            })
+                          : t("dashboard_page.officer.run_weekly", {
+                              defaultValue: "Run Weekly Job",
+                            })}
                       </Button>
                       <Button
                         size="small"
@@ -154,8 +169,12 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
                         }
                       >
                         {triggerQuarterlyMutation.isPending
-                          ? t("dashboard_page.officer.triggering", { defaultValue: "Triggering..." })
-                          : t("dashboard_page.officer.run_quarterly", { defaultValue: "Run Quarterly Job" })}
+                          ? t("dashboard_page.officer.triggering", {
+                              defaultValue: "Triggering...",
+                            })
+                          : t("dashboard_page.officer.run_quarterly", {
+                              defaultValue: "Run Quarterly Job",
+                            })}
                       </Button>
                       <Button
                         size="small"
@@ -169,8 +188,12 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
                         }
                       >
                         {triggerDailyDataMutation.isPending
-                          ? t("dashboard_page.officer.triggering", { defaultValue: "Triggering..." })
-                          : t("dashboard_page.officer.run_daily_refresh", { defaultValue: "Run Daily Data Refresh" })}
+                          ? t("dashboard_page.officer.triggering", {
+                              defaultValue: "Triggering...",
+                            })
+                          : t("dashboard_page.officer.run_daily_refresh", {
+                              defaultValue: "Run Daily Data Refresh",
+                            })}
                       </Button>
                     </Stack>
                   </Stack>
@@ -189,7 +212,7 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
                             : triggerDailyDataMutation.error instanceof Error
                               ? triggerDailyDataMutation.error.message
                               : t("dashboard_page.officer.operations_load_error", {
-                                  defaultValue: "Failed to load operation details."
+                                  defaultValue: "Failed to load operation details.",
                                 })}
                     </Alert>
                   )}
@@ -209,12 +232,16 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
 
                       <Divider />
                       <Typography variant="subtitle2">
-                        {t("dashboard_page.officer.recent_runs", { defaultValue: "Recent Operation Runs" })}
+                        {t("dashboard_page.officer.recent_runs", {
+                          defaultValue: "Recent Operation Runs",
+                        })}
                       </Typography>
                       <Stack spacing={1}>
                         {operationsOverview.recent_runs.length === 0 ? (
                           <Typography variant="body2" color="text.secondary">
-                            {t("dashboard_page.officer.no_runs", { defaultValue: "No operation runs yet." })}
+                            {t("dashboard_page.officer.no_runs", {
+                              defaultValue: "No operation runs yet.",
+                            })}
                           </Typography>
                         ) : (
                           operationsOverview.recent_runs.slice(0, 6).map((run) => (
@@ -226,16 +253,25 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
                                 justifyContent="space-between"
                               >
                                 <Box>
-                                  <Typography variant="subtitle2" sx={{ textTransform: "capitalize" }}>
+                                  <Typography
+                                    variant="subtitle2"
+                                    sx={{ textTransform: "capitalize" }}
+                                  >
                                     {run.operation.replace(/_/g, " ")}
                                   </Typography>
                                   <Typography variant="caption" color="text.secondary">
                                     {new Date(run.triggered_at).toLocaleString()} •{" "}
-                                    {t("dashboard_page.officer.triggered_by", { defaultValue: "by" })}{" "}
+                                    {t("dashboard_page.officer.triggered_by", {
+                                      defaultValue: "by",
+                                    })}{" "}
                                     {run.triggered_by}
                                   </Typography>
                                   {run.error && (
-                                    <Typography variant="caption" color="error.main" sx={{ display: "block" }}>
+                                    <Typography
+                                      variant="caption"
+                                      color="error.main"
+                                      sx={{ display: "block" }}
+                                    >
                                       {run.error}
                                     </Typography>
                                   )}
@@ -275,7 +311,9 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
               <TextField
                 label={t("dashboard_page.forms.crop")}
                 value={analyticsFilters.crop}
-                onChange={(event) => setAnalyticsFilters((prev) => ({ ...prev, crop: event.target.value }))}
+                onChange={(event) =>
+                  setAnalyticsFilters((prev) => ({ ...prev, crop: event.target.value }))
+                }
                 fullWidth
               />
             </Grid>
@@ -327,8 +365,14 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
             </Grid>
           </Grid>
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
-            <Button variant="contained" onClick={handleAnalyticsFetch} disabled={analyticsMutation.isPending}>
-              {analyticsMutation.isPending ? t("actions.loading") : t("dashboard_page.analytics.generate")}
+            <Button
+              variant="contained"
+              onClick={handleAnalyticsFetch}
+              disabled={analyticsMutation.isPending}
+            >
+              {analyticsMutation.isPending
+                ? t("actions.loading")
+                : t("dashboard_page.analytics.generate")}
             </Button>
             <Button
               variant="outlined"
@@ -362,7 +406,9 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
               <Grid item xs={12} md={4}>
                 <Card variant="outlined">
                   <CardContent>
-                    <Typography variant="subtitle2">{t("dashboard_page.analytics.total_farmers")}</Typography>
+                    <Typography variant="subtitle2">
+                      {t("dashboard_page.analytics.total_farmers")}
+                    </Typography>
                     <Typography variant="h5">{analyticsData.total_farmers}</Typography>
                     <Typography variant="caption" color="text.secondary">
                       {t("dashboard_page.analytics.feedback")}: {analyticsData.total_feedback}
@@ -373,10 +419,13 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
               <Grid item xs={12} md={4}>
                 <Card variant="outlined">
                   <CardContent>
-                    <Typography variant="subtitle2">{t("dashboard_page.analytics.avg_sustainability")}</Typography>
+                    <Typography variant="subtitle2">
+                      {t("dashboard_page.analytics.avg_sustainability")}
+                    </Typography>
                     <Typography variant="h5">{analyticsData.average_sustainability}</Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {t("dashboard_page.analytics.at_risk_farmers")}: {analyticsData.at_risk_farmers}
+                      {t("dashboard_page.analytics.at_risk_farmers")}:{" "}
+                      {analyticsData.at_risk_farmers}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -384,10 +433,13 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
               <Grid item xs={12} md={4}>
                 <Card variant="outlined">
                   <CardContent>
-                    <Typography variant="subtitle2">{t("dashboard_page.analytics.avg_yield")}</Typography>
+                    <Typography variant="subtitle2">
+                      {t("dashboard_page.analytics.avg_yield")}
+                    </Typography>
                     <Typography variant="h5">{analyticsData.average_yield_kg_per_acre}</Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {t("dashboard_page.analytics.water")}: {analyticsData.average_water_usage_l_per_acre}{" "}
+                      {t("dashboard_page.analytics.water")}:{" "}
+                      {analyticsData.average_water_usage_l_per_acre}{" "}
                       {t("dashboard_page.units.liter_per_acre")}
                     </Typography>
                   </CardContent>
@@ -404,7 +456,9 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
                       sx={{ mb: 1 }}
                     >
                       <Typography variant="subtitle1">
-                        {t("dashboard_page.officer.feedback_reliability", { defaultValue: "Feedback Reliability" })}
+                        {t("dashboard_page.officer.feedback_reliability", {
+                          defaultValue: "Feedback Reliability",
+                        })}
                       </Typography>
                       {analyticsMutation.isPending && <CircularProgress size={18} />}
                     </Stack>
@@ -415,7 +469,7 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
                             size="small"
                             label={t("dashboard_page.officer.avg_rating", {
                               defaultValue: "Avg rating {{value}}",
-                              value: feedbackReliability.average_rating
+                              value: feedbackReliability.average_rating,
                             })}
                             variant="outlined"
                           />
@@ -423,23 +477,29 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
                             size="small"
                             label={t("dashboard_page.officer.negative_outcomes", {
                               defaultValue: "Negative outcomes {{value}}%",
-                              value: feedbackReliability.negative_outcome_rate
+                              value: feedbackReliability.negative_outcome_rate,
                             })}
-                            color={feedbackReliability.negative_outcome_rate > 30 ? "warning" : "success"}
+                            color={
+                              feedbackReliability.negative_outcome_rate > 30 ? "warning" : "success"
+                            }
                             variant="outlined"
                           />
                           <Chip
                             size="small"
                             label={t("dashboard_page.officer.pending_reviews", {
                               defaultValue: "Pending expert reviews {{value}}",
-                              value: feedbackReliability.expert_review_pending
+                              value: feedbackReliability.expert_review_pending,
                             })}
-                            color={feedbackReliability.expert_review_pending > 0 ? "warning" : "default"}
+                            color={
+                              feedbackReliability.expert_review_pending > 0 ? "warning" : "default"
+                            }
                             variant="outlined"
                           />
                         </Stack>
                         <Typography variant="caption" color="text.secondary">
-                          {t("dashboard_page.officer.rating_distribution", { defaultValue: "Rating distribution:" })}{" "}
+                          {t("dashboard_page.officer.rating_distribution", {
+                            defaultValue: "Rating distribution:",
+                          })}{" "}
                           {Object.entries(feedbackReliability.rating_distribution)
                             .map(([star, count]) => `${star}★=${count}`)
                             .join(" | ")}
@@ -448,7 +508,7 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
                     ) : (
                       <Typography variant="body2" color="text.secondary">
                         {t("dashboard_page.officer.reliability_placeholder", {
-                          defaultValue: "Generate analytics to view reliability statistics."
+                          defaultValue: "Generate analytics to view reliability statistics.",
                         })}
                       </Typography>
                     )}
@@ -467,7 +527,7 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
                     >
                       <Typography variant="subtitle1">
                         {t("dashboard_page.officer.farmers_needing_attention", {
-                          defaultValue: "Farmers Needing Attention"
+                          defaultValue: "Farmers Needing Attention",
                         })}
                       </Typography>
                       {analyticsMutation.isPending && <CircularProgress size={18} />}
@@ -475,7 +535,7 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
                     {farmersNeedingAttention.length === 0 ? (
                       <Typography variant="body2" color="text.secondary">
                         {t("dashboard_page.officer.no_high_risk", {
-                          defaultValue: "No high-risk farmers found for selected filters."
+                          defaultValue: "No high-risk farmers found for selected filters.",
                         })}
                       </Typography>
                     ) : (
@@ -499,7 +559,9 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
                                 {farmer.is_masked && (
                                   <Chip
                                     size="small"
-                                    label={t("dashboard_page.officer.consent_safe", { defaultValue: "Consent-safe view" })}
+                                    label={t("dashboard_page.officer.consent_safe", {
+                                      defaultValue: "Consent-safe view",
+                                    })}
                                     color="warning"
                                     variant="outlined"
                                   />
@@ -508,7 +570,7 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
                                   size="small"
                                   label={t("dashboard_page.officer.risk_label", {
                                     defaultValue: "Risk {{value}}",
-                                    value: farmer.risk_score
+                                    value: farmer.risk_score,
                                   })}
                                   color="error"
                                   variant="outlined"
@@ -517,7 +579,7 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
                                   size="small"
                                   label={t("dashboard_page.officer.sustainability_label", {
                                     defaultValue: "Sustainability {{value}}",
-                                    value: farmer.sustainability_score
+                                    value: farmer.sustainability_score,
                                   })}
                                   variant="outlined"
                                 />
@@ -525,7 +587,7 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
                                   size="small"
                                   label={t("dashboard_page.officer.yield_trend_label", {
                                     defaultValue: "Yield trend {{value}}%",
-                                    value: farmer.yield_trend_percent
+                                    value: farmer.yield_trend_percent,
                                   })}
                                   variant="outlined"
                                 />
@@ -562,15 +624,18 @@ const OfficerAnalyticsSection: React.FC<OfficerAnalyticsSectionProps> = ({
                     </Typography>
                     <Stack spacing={1}>
                       <Typography variant="body2">
-                        {t("dashboard_page.analytics.fertilizer")}: {analyticsData.average_fertilizer_kg_per_acre}{" "}
+                        {t("dashboard_page.analytics.fertilizer")}:{" "}
+                        {analyticsData.average_fertilizer_kg_per_acre}{" "}
                         {t("dashboard_page.units.kg_per_acre")}
                       </Typography>
                       <Typography variant="body2">
-                        {t("dashboard_page.analytics.water")}: {analyticsData.average_water_usage_l_per_acre}{" "}
+                        {t("dashboard_page.analytics.water")}:{" "}
+                        {analyticsData.average_water_usage_l_per_acre}{" "}
                         {t("dashboard_page.units.liter_per_acre")}
                       </Typography>
                       <Typography variant="body2">
-                        {t("dashboard_page.analytics.yield")}: {analyticsData.average_yield_kg_per_acre}{" "}
+                        {t("dashboard_page.analytics.yield")}:{" "}
+                        {analyticsData.average_yield_kg_per_acre}{" "}
                         {t("dashboard_page.units.kg_per_acre")}
                       </Typography>
                     </Stack>

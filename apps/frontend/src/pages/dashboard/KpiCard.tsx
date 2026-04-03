@@ -26,7 +26,7 @@ const KpiCard: React.FC<KpiCardProps> = ({ label, value, caption, icon, loading 
           : "linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 252, 249, 0.98) 100%)",
         boxShadow: isDark ? "0 12px 26px rgba(0,0,0,0.35)" : "0 12px 26px rgba(20, 20, 20, 0.08)",
         position: "relative",
-        overflow: "hidden"
+        overflow: "hidden",
       }}
     >
       <Box
@@ -37,7 +37,7 @@ const KpiCard: React.FC<KpiCardProps> = ({ label, value, caption, icon, loading 
           height: 4,
           background: isDark
             ? "linear-gradient(90deg, rgba(95, 209, 139, 0.25), rgba(95, 209, 139, 0.7), rgba(95, 209, 139, 0.18))"
-            : "linear-gradient(90deg, rgba(27, 107, 58, 0.18), rgba(27, 107, 58, 0.72), rgba(27, 107, 58, 0.16))"
+            : "linear-gradient(90deg, rgba(27, 107, 58, 0.18), rgba(27, 107, 58, 0.72), rgba(27, 107, 58, 0.16))",
         }}
       />
       <CardContent sx={{ p: spacingScale.sm, "&:last-child": { pb: spacingScale.sm } }}>
@@ -53,13 +53,17 @@ const KpiCard: React.FC<KpiCardProps> = ({ label, value, caption, icon, loading 
               justifyContent: "center",
               boxShadow: isDark
                 ? "inset 0 0 0 1px rgba(255,255,255,0.12)"
-                : "inset 0 0 0 1px rgba(27, 107, 58, 0.15)"
+                : "inset 0 0 0 1px rgba(27, 107, 58, 0.15)",
             }}
           >
             {icon}
           </Box>
           <Box>
-            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, letterSpacing: 0.2 }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ fontWeight: 600, letterSpacing: 0.2 }}
+            >
               {label}
             </Typography>
             {loading ? (
@@ -73,7 +77,11 @@ const KpiCard: React.FC<KpiCardProps> = ({ label, value, caption, icon, loading 
                   {value}
                 </Typography>
                 {caption ? (
-                  <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.4 }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: "block", mt: 0.4 }}
+                  >
                     {caption}
                   </Typography>
                 ) : null}

@@ -31,7 +31,7 @@ const WEATHER_LABELS = {
   86: "Snow showers",
   95: "Thunderstorm",
   96: "Thunderstorm with hail",
-  99: "Severe thunderstorm"
+  99: "Severe thunderstorm",
 };
 
 const isFresh = (ts) => typeof ts === "number" && Date.now() - ts < TEN_MINUTES_MS;
@@ -41,12 +41,23 @@ const cacheKey = (prefix, lat, lon) => `${prefix}:${lat.toFixed(3)}:${lon.toFixe
 const fetchWithCache = async (key, fetcher, offlineStoreKey) => {
   const cached = getCachedWithMeta(key);
   if (cached && isFresh(cached.ts)) {
-    return { ...cached.value, cached: true, offline: false, lastUpdated: new Date(cached.ts).toISOString() };
+    return {
+      ...cached.value,
+      cached: true,
+      offline: false,
+      lastUpdated: new Date(cached.ts).toISOString(),
+    };
   }
   if (!isOnline()) {
     const offline = await getOfflineRecord("weather", offlineStoreKey);
     if (offline) {
-      return { ...offline.value, cached: true, offline: true, stale: true, lastUpdated: offline.updatedAt };
+      return {
+        ...offline.value,
+        cached: true,
+        offline: true,
+        stale: true,
+        lastUpdated: offline.updatedAt,
+      };
     }
   }
   try {
@@ -56,11 +67,23 @@ const fetchWithCache = async (key, fetcher, offlineStoreKey) => {
     return { ...data, offline: false, lastUpdated: new Date().toISOString() };
   } catch (error) {
     if (cached) {
-      return { ...cached.value, cached: true, stale: true, offline: false, lastUpdated: new Date(cached.ts).toISOString() };
+      return {
+        ...cached.value,
+        cached: true,
+        stale: true,
+        offline: false,
+        lastUpdated: new Date(cached.ts).toISOString(),
+      };
     }
     const offline = await getOfflineRecord("weather", offlineStoreKey);
     if (offline) {
-      return { ...offline.value, cached: true, stale: true, offline: true, lastUpdated: offline.updatedAt };
+      return {
+        ...offline.value,
+        cached: true,
+        stale: true,
+        offline: true,
+        lastUpdated: offline.updatedAt,
+      };
     }
     throw error;
   }
@@ -69,48 +92,56 @@ const fetchWithCache = async (key, fetcher, offlineStoreKey) => {
 export const getCurrentWeather = async (lat, lon) => {
   const key = cacheKey("weather_current", lat, lon);
   const offlineKey = cacheKey("weather_current", lat, lon);
-  return fetchWithCache(key, async () => {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=auto`;
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error("Unable to fetch weather.");
-    }
-    const payload = await response.json();
-    const current = payload?.current || {};
-    const code = Number(current.weather_code);
-    return {
-      temperatureC: Number(current.temperature_2m),
-      humidity: Number(current.relative_humidity_2m),
-      windSpeedKph: Number(current.wind_speed_10m),
-      weatherCode: Number.isNaN(code) ? 0 : code,
-      condition: WEATHER_LABELS[code] || "Clear",
-      observedAt: current.time || new Date().toISOString(),
-      source: "open-meteo"
-    };
-  }, offlineKey);
+  return fetchWithCache(
+    key,
+    async () => {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=auto`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Unable to fetch weather.");
+      }
+      const payload = await response.json();
+      const current = payload?.current || {};
+      const code = Number(current.weather_code);
+      return {
+        temperatureC: Number(current.temperature_2m),
+        humidity: Number(current.relative_humidity_2m),
+        windSpeedKph: Number(current.wind_speed_10m),
+        weatherCode: Number.isNaN(code) ? 0 : code,
+        condition: WEATHER_LABELS[code] || "Clear",
+        observedAt: current.time || new Date().toISOString(),
+        source: "open-meteo",
+      };
+    },
+    offlineKey,
+  );
 };
 
 export const getAQI = async (lat, lon) => {
   const key = cacheKey("weather_aqi", lat, lon);
   const offlineKey = cacheKey("weather_aqi", lat, lon);
-  return fetchWithCache(key, async () => {
-    const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi,pm10,pm2_5,carbon_monoxide,ozone,nitrogen_dioxide,sulphur_dioxide&timezone=auto`;
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error("Unable to fetch air quality.");
-    }
-    const payload = await response.json();
-    const current = payload?.current || {};
-    return {
-      aqi: Number(current.us_aqi),
-      pm10: Number(current.pm10),
-      pm2_5: Number(current.pm2_5),
-      o3: Number(current.ozone),
-      co: Number(current.carbon_monoxide),
-      no2: Number(current.nitrogen_dioxide),
-      so2: Number(current.sulphur_dioxide),
-      observedAt: current.time || new Date().toISOString(),
-      source: "open-meteo"
-    };
-  }, offlineKey);
+  return fetchWithCache(
+    key,
+    async () => {
+      const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi,pm10,pm2_5,carbon_monoxide,ozone,nitrogen_dioxide,sulphur_dioxide&timezone=auto`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Unable to fetch air quality.");
+      }
+      const payload = await response.json();
+      const current = payload?.current || {};
+      return {
+        aqi: Number(current.us_aqi),
+        pm10: Number(current.pm10),
+        pm2_5: Number(current.pm2_5),
+        o3: Number(current.ozone),
+        co: Number(current.carbon_monoxide),
+        no2: Number(current.nitrogen_dioxide),
+        so2: Number(current.sulphur_dioxide),
+        observedAt: current.time || new Date().toISOString(),
+        source: "open-meteo",
+      };
+    },
+    offlineKey,
+  );
 };

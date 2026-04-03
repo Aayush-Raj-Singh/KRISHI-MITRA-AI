@@ -14,7 +14,7 @@ import {
   Stack,
   Switch,
   TextField,
-  Typography
+  Typography,
 } from "@mui/material";
 import AgricultureIcon from "@mui/icons-material/Agriculture";
 import { useTranslation } from "react-i18next";
@@ -33,9 +33,9 @@ const ProfilePage: React.FC = () => {
   const languageOptions = useMemo(
     () => [
       { code: "en", label: t("languages.en") },
-      { code: "hi", label: t("languages.hi") }
+      { code: "hi", label: t("languages.hi") },
     ],
-    [t]
+    [t],
   );
 
   const [form, setForm] = useState({
@@ -50,7 +50,7 @@ const ProfilePage: React.FC = () => {
     language: user?.language || "en",
     risk_view_consent: Boolean(user?.risk_view_consent),
     notifications: user?.preferences?.notifications ?? true,
-    voice_input: user?.preferences?.voice_input ?? true
+    voice_input: user?.preferences?.voice_input ?? true,
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,8 +70,8 @@ const ProfilePage: React.FC = () => {
       setPhotoError(
         t("profile.photo_too_large", {
           defaultValue: "Image must be under {{size}}MB.",
-          size: maxSizeMb
-        })
+          size: maxSizeMb,
+        }),
       );
       return;
     }
@@ -97,7 +97,7 @@ const ProfilePage: React.FC = () => {
       language: user?.language || "en",
       risk_view_consent: Boolean(user?.risk_view_consent),
       notifications: user?.preferences?.notifications ?? true,
-      voice_input: user?.preferences?.voice_input ?? true
+      voice_input: user?.preferences?.voice_input ?? true,
     });
   }, [user]);
 
@@ -116,14 +116,17 @@ const ProfilePage: React.FC = () => {
         soil_type: form.soil_type || undefined,
         water_source: form.water_source || undefined,
         primary_crops: form.primary_crops
-          ? form.primary_crops.split(",").map((item) => item.trim()).filter(Boolean)
+          ? form.primary_crops
+              .split(",")
+              .map((item) => item.trim())
+              .filter(Boolean)
           : undefined,
         language: form.language || undefined,
         risk_view_consent: form.risk_view_consent,
         preferences: {
           notifications: form.notifications,
-          voice_input: form.voice_input
-        }
+          voice_input: form.voice_input,
+        },
       };
       const updated = await updateProfile(payload);
       dispatch(setUser(updated));
@@ -149,23 +152,29 @@ const ProfilePage: React.FC = () => {
     { label: t("auth.location"), value: user?.location || "-" },
     {
       label: t("auth.farm_size"),
-      value: user?.farm_size ? `${user.farm_size}` : "-"
+      value: user?.farm_size ? `${user.farm_size}` : "-",
     },
     { label: t("auth.soil_type"), value: user?.soil_type || "-" },
     { label: t("auth.water_source"), value: user?.water_source || "-" },
     { label: t("auth.language"), value: user?.language ? user.language.toUpperCase() : "-" },
     {
       label: t("profile.notifications", { defaultValue: "Notifications" }),
-      value: user?.preferences?.notifications ? t("profile.yes", { defaultValue: "Yes" }) : t("profile.no", { defaultValue: "No" })
+      value: user?.preferences?.notifications
+        ? t("profile.yes", { defaultValue: "Yes" })
+        : t("profile.no", { defaultValue: "No" }),
     },
     {
       label: t("profile.voice_input", { defaultValue: "Voice input" }),
-      value: user?.preferences?.voice_input ? t("profile.yes", { defaultValue: "Yes" }) : t("profile.no", { defaultValue: "No" })
+      value: user?.preferences?.voice_input
+        ? t("profile.yes", { defaultValue: "Yes" })
+        : t("profile.no", { defaultValue: "No" }),
     },
     {
       label: t("profile.risk_consent", { defaultValue: "Share risk profile with officers" }),
-      value: user?.risk_view_consent ? t("profile.yes", { defaultValue: "Yes" }) : t("profile.no", { defaultValue: "No" })
-    }
+      value: user?.risk_view_consent
+        ? t("profile.yes", { defaultValue: "Yes" })
+        : t("profile.no", { defaultValue: "No" }),
+    },
   ];
 
   return (
@@ -174,7 +183,9 @@ const ProfilePage: React.FC = () => {
         <AgricultureHero
           icon={<AgricultureIcon color="primary" />}
           title={t("profile.title", { defaultValue: "Farmer Profile" })}
-          subtitle={t("profile.subtitle", { defaultValue: "Update your KrishiMitra profile and preferences." })}
+          subtitle={t("profile.subtitle", {
+            defaultValue: "Update your KrishiMitra profile and preferences.",
+          })}
           badges={[roleLabel, t("auth.location"), t("dashboard.crop")]}
           imageSrc="/assets/agri-slider/slide-03.png"
         />
@@ -196,7 +207,7 @@ const ProfilePage: React.FC = () => {
                       width: 96,
                       height: 96,
                       border: "2px solid rgba(27, 107, 58, 0.2)",
-                      boxShadow: "0 12px 24px rgba(16, 66, 35, 0.2)"
+                      boxShadow: "0 12px 24px rgba(16, 66, 35, 0.2)",
                     }}
                   />
                   <Box>
@@ -264,7 +275,9 @@ const ProfilePage: React.FC = () => {
                     </Typography>
                     <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }}>
                       {(user?.primary_crops || []).length > 0 ? (
-                        user?.primary_crops.map((crop) => <Chip key={crop} label={crop} size="small" />)
+                        user?.primary_crops.map((crop) => (
+                          <Chip key={crop} label={crop} size="small" />
+                        ))
                       ) : (
                         <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                           -
@@ -281,11 +294,21 @@ const ProfilePage: React.FC = () => {
         <Card sx={{ border: "1px solid #e7ddcc" }}>
           <CardContent>
             <Stack spacing={2}>
-              <Typography variant="h6">{t("profile.edit_title", { defaultValue: "Profile Details" })}</Typography>
+              <Typography variant="h6">
+                {t("profile.edit_title", { defaultValue: "Profile Details" })}
+              </Typography>
               {error && <Alert severity="error">{error}</Alert>}
-              {saved && <Alert severity="success">{t("profile.saved", { defaultValue: "Profile updated." })}</Alert>}
+              {saved && (
+                <Alert severity="success">
+                  {t("profile.saved", { defaultValue: "Profile updated." })}
+                </Alert>
+              )}
               {photoError && <Alert severity="warning">{photoError}</Alert>}
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems={{ xs: "flex-start", sm: "center" }}>
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={2}
+                alignItems={{ xs: "flex-start", sm: "center" }}
+              >
                 <Avatar
                   src={form.profile_image_url || undefined}
                   alt={form.name || t("profile.title", { defaultValue: "Farmer Profile" })}
@@ -297,7 +320,7 @@ const ProfilePage: React.FC = () => {
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {t("profile.photo_helper", {
-                      defaultValue: "Upload a clear photo (JPG or PNG, max 2MB)."
+                      defaultValue: "Upload a clear photo (JPG or PNG, max 2MB).",
                     })}
                   </Typography>
                   <Stack direction="row" spacing={1}>
@@ -327,19 +350,16 @@ const ProfilePage: React.FC = () => {
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    label={t("auth.phone")}
-                    value={user?.phone || ""}
-                    disabled
-                  />
+                  <TextField fullWidth label={t("auth.phone")} value={user?.phone || ""} disabled />
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <TextField
                     fullWidth
                     label={t("profile.email", { defaultValue: "Email" })}
                     value={form.email}
-                    onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, email: event.target.value }))
+                    }
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -347,7 +367,9 @@ const ProfilePage: React.FC = () => {
                     fullWidth
                     label={t("auth.location")}
                     value={form.location}
-                    onChange={(event) => setForm((prev) => ({ ...prev, location: event.target.value }))}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, location: event.target.value }))
+                    }
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -355,7 +377,9 @@ const ProfilePage: React.FC = () => {
                     fullWidth
                     label={t("auth.farm_size")}
                     value={form.farm_size}
-                    onChange={(event) => setForm((prev) => ({ ...prev, farm_size: event.target.value }))}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, farm_size: event.target.value }))
+                    }
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -363,7 +387,9 @@ const ProfilePage: React.FC = () => {
                     fullWidth
                     label={t("auth.soil_type")}
                     value={form.soil_type}
-                    onChange={(event) => setForm((prev) => ({ ...prev, soil_type: event.target.value }))}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, soil_type: event.target.value }))
+                    }
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -371,7 +397,9 @@ const ProfilePage: React.FC = () => {
                     fullWidth
                     label={t("auth.water_source")}
                     value={form.water_source}
-                    onChange={(event) => setForm((prev) => ({ ...prev, water_source: event.target.value }))}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, water_source: event.target.value }))
+                    }
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -379,7 +407,9 @@ const ProfilePage: React.FC = () => {
                     fullWidth
                     label={t("auth.primary_crops")}
                     value={form.primary_crops}
-                    onChange={(event) => setForm((prev) => ({ ...prev, primary_crops: event.target.value }))}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, primary_crops: event.target.value }))
+                    }
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -388,7 +418,9 @@ const ProfilePage: React.FC = () => {
                     fullWidth
                     label={t("auth.language")}
                     value={form.language}
-                    onChange={(event) => setForm((prev) => ({ ...prev, language: event.target.value }))}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, language: event.target.value }))
+                    }
                   >
                     {languageOptions.map((option) => (
                       <MenuItem key={option.code} value={option.code}>
@@ -399,7 +431,9 @@ const ProfilePage: React.FC = () => {
                 </Grid>
               </Grid>
 
-              <Typography variant="subtitle1">{t("profile.preferences_title", { defaultValue: "Preferences" })}</Typography>
+              <Typography variant="subtitle1">
+                {t("profile.preferences_title", { defaultValue: "Preferences" })}
+              </Typography>
               <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
                 <FormControlLabel
                   control={
@@ -416,7 +450,9 @@ const ProfilePage: React.FC = () => {
                   control={
                     <Switch
                       checked={form.voice_input}
-                      onChange={(event) => setForm((prev) => ({ ...prev, voice_input: event.target.checked }))}
+                      onChange={(event) =>
+                        setForm((prev) => ({ ...prev, voice_input: event.target.checked }))
+                      }
                     />
                   }
                   label={t("profile.voice_input", { defaultValue: "Voice input" })}
@@ -430,12 +466,16 @@ const ProfilePage: React.FC = () => {
                       }
                     />
                   }
-                  label={t("profile.risk_consent", { defaultValue: "Share risk profile with officers" })}
+                  label={t("profile.risk_consent", {
+                    defaultValue: "Share risk profile with officers",
+                  })}
                 />
               </Stack>
 
               <Button variant="contained" onClick={handleSave} disabled={saving}>
-                {saving ? t("actions.submitting") : t("profile.save", { defaultValue: "Save changes" })}
+                {saving
+                  ? t("actions.submitting")
+                  : t("profile.save", { defaultValue: "Save changes" })}
               </Button>
             </Stack>
           </CardContent>

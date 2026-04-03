@@ -4,7 +4,8 @@ import {
   enqueueOfflineMutation,
   listOfflineMutations,
   removeOfflineMutation,
-  saveOfflineRecord
+  scheduleOfflineMutationRetry,
+  saveOfflineRecord,
 } from "./offlineStorage";
 
 const resetOfflineDb = async () => {
@@ -46,5 +47,14 @@ describe("offlineStorage", () => {
 
     expect(record?.key).toBe("weather:patna");
     expect(record?.value).toEqual({ temp: 31 });
+  });
+
+  it("backs off queued mutations after a failed attempt", async () => {
+    const queued = await enqueueOfflineMutation("/feedback/outcome", { rating: 2 });
+    const updated = scheduleOfflineMutationRetry(queued!, new Error("offline"));
+
+    expect(updated.attempts).toBe(1);
+    expect(updated.lastError).toBe("offline");
+    expect(new Date(updated.nextAttemptAt!).getTime()).toBeGreaterThan(Date.now());
   });
 });

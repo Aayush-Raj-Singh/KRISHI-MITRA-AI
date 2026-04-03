@@ -10,16 +10,19 @@ export const createDiseaseApi = ({ api, unwrap }: FeatureApiContext) => ({
       formData,
       {
         headers: {
-          "Content-Type": "multipart/form-data"
-        }
-      }
+          "Content-Type": "multipart/form-data",
+        },
+      },
     );
     return unwrap(response.data);
   },
   getHistory: async (limit = 10): Promise<DiseaseHistoryItem[]> => {
-    const response = await api.get<ApiEnvelope<DiseaseHistoryItem[]>>(API_ENDPOINTS.disease.history, {
-      params: { limit }
-    });
+    const response = await api.get<ApiEnvelope<DiseaseHistoryItem[]>>(
+      API_ENDPOINTS.disease.history,
+      {
+        params: { limit },
+      },
+    );
     return unwrap(response.data);
-  }
+  },
 });

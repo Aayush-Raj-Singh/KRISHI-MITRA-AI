@@ -18,7 +18,7 @@ const HeroCarouselSection: React.FC<HeroCarouselSectionProps> = ({
   carouselRef,
   onScroll,
   onPrev,
-  onNext
+  onNext,
 }) => (
   <Paper
     className="dashboard-hero-carousel"
@@ -30,8 +30,9 @@ const HeroCarouselSection: React.FC<HeroCarouselSectionProps> = ({
       overflow: "hidden",
       border: "1px solid #cfe3cb",
       borderRadius: 2,
+      contain: "layout paint style",
       breakInside: "avoid",
-      pageBreakInside: "avoid"
+      pageBreakInside: "avoid",
     }}
   >
     <Box
@@ -45,7 +46,7 @@ const HeroCarouselSection: React.FC<HeroCarouselSectionProps> = ({
         overflowX: "auto",
         scrollSnapType: "x mandatory",
         scrollbarWidth: "none",
-        "&::-webkit-scrollbar": { display: "none" }
+        "&::-webkit-scrollbar": { display: "none" },
       }}
     >
       {slides.map((slide, index) => (
@@ -56,18 +57,19 @@ const HeroCarouselSection: React.FC<HeroCarouselSectionProps> = ({
             flex: `0 0 calc(100% / ${visibleSlideCount})`,
             height: "100%",
             scrollSnapAlign: "start",
-            borderRight: "none"
+            borderRight: "none",
           }}
         >
           <Box
             component="img"
             src={slide.src}
             alt={slide.alt}
-            loading={index < 8 ? "eager" : "lazy"}
+            loading={index < 2 ? "eager" : "lazy"}
+            decoding="async"
             sx={{
               width: "100%",
               height: "100%",
-              objectFit: "cover"
+              objectFit: "cover",
             }}
           />
           <Box
@@ -75,7 +77,7 @@ const HeroCarouselSection: React.FC<HeroCarouselSectionProps> = ({
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(to top, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.03) 50%, rgba(0,0,0,0) 100%)"
+                "linear-gradient(to top, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.03) 50%, rgba(0,0,0,0) 100%)",
             }}
           />
         </Box>
@@ -93,7 +95,7 @@ const HeroCarouselSection: React.FC<HeroCarouselSectionProps> = ({
         bgcolor: "rgba(0,0,0,0.26)",
         color: "#fff",
         zIndex: 2,
-        "&:hover": { bgcolor: "rgba(0,0,0,0.4)" }
+        "&:hover": { bgcolor: "rgba(0,0,0,0.4)" },
       }}
     >
       <ChevronLeftIcon />
@@ -109,7 +111,7 @@ const HeroCarouselSection: React.FC<HeroCarouselSectionProps> = ({
         bgcolor: "rgba(0,0,0,0.26)",
         color: "#fff",
         zIndex: 2,
-        "&:hover": { bgcolor: "rgba(0,0,0,0.4)" }
+        "&:hover": { bgcolor: "rgba(0,0,0,0.4)" },
       }}
     >
       <ChevronRightIcon />

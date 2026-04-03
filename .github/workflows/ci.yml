@@ -23,6 +23,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: apps/backend/requirements.txt
 
       - name: Install backend dependencies
         run: |
@@ -31,6 +33,41 @@ jobs:
 
       - name: Run backend smoke tests
         run: python -m pytest apps/backend/tests -q
+
+  backend_runtime_profile:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: apps/backend
+      ENVIRONMENT: test
+      ALLOW_INMEMORY_DB_FALLBACK: "true"
+      MONGODB_SERVER_SELECTION_TIMEOUT_MS: "200"
+      REDIS_URL: ""
+      RUNTIME_VALIDATION_MOCK_MODE: "true"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: apps/backend/requirements.txt
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install backend dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r apps/backend/requirements.txt
+
+      - name: Validate Bedrock runtime profile
+        run: |
+          node scripts/switch-backend-runtime-profile.mjs bedrock
+          python apps/backend/scripts/validate_runtime_profile.py
 
   frontend:
     runs-on: ubuntu-latest
@@ -49,9 +86,17 @@ jobs:
         working-directory: apps/frontend
         run: npm ci
 
+      - name: Install shared package dependencies
+        working-directory: packages/shared
+        run: npm install
+
       - name: Lint frontend
         working-directory: apps/frontend
         run: npm run lint
+
+      - name: Typecheck shared contracts
+        working-directory: packages/shared
+        run: npm run typecheck
 
       - name: Run frontend tests
         working-directory: apps/frontend
@@ -60,6 +105,51 @@ jobs:
       - name: Build frontend
         working-directory: apps/frontend
         run: npm run build
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+
+      - name: Enforce runtime npm vulnerability policy
+        run: npm run security:check
+
+  mobile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+
+      - name: Install mobile dependencies
+        working-directory: apps/mobile
+        run: npm install
+
+      - name: Typecheck mobile
+        working-directory: apps/mobile
+        run: npm run typecheck
+
+      - name: Run mobile tests
+        working-directory: apps/mobile
+        run: npm run test:run
+
+      - name: Validate Expo config
+        working-directory: apps/mobile
+        run: npx expo config --type public
 
   mobile_shell:
     runs-on: ubuntu-latest
@@ -88,15 +178,49 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
 
-      - name: Terraform init
-        working-directory: infra/terraform
-        run: terraform init -backend=false
+      - name: Terraform fmt, init, validate, and plan
+        run: npm run infra:validate -- --check-fmt
 
-      - name: Terraform validate
-        working-directory: infra/terraform
-        run: terraform validate
+  aws_runtime_validate:
+    if: ${{ secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != '' }}
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: apps/backend
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/krishi_db
+      ALLOW_INMEMORY_DB_FALLBACK: "true"
+      REDIS_URL: ""
+      AWS_VALIDATION_MOCK_MODE: "false"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: apps/backend/requirements.txt
+
+      - name: Install backend dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r apps/backend/requirements.txt
+
+      - name: Validate AWS runtime wiring
+        run: python apps/backend/scripts/validate_aws_runtime.py

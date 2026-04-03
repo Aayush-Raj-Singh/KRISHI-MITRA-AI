@@ -30,7 +30,9 @@ def _sort_value(document: dict, field: str) -> Any:
 
 
 class MemoryCursor:
-    def __init__(self, collection: "MemoryCollection", filter_spec: dict, projection: Optional[dict]) -> None:
+    def __init__(
+        self, collection: "MemoryCollection", filter_spec: dict, projection: Optional[dict]
+    ) -> None:
         self._collection = collection
         self._filter = filter_spec
         self._projection = projection
@@ -38,7 +40,9 @@ class MemoryCursor:
         self._limit: Optional[int] = None
         self._skip: int = 0
 
-    def sort(self, key: str | Sequence[Tuple[str, int]], direction: Optional[int] = None) -> "MemoryCursor":
+    def sort(
+        self, key: str | Sequence[Tuple[str, int]], direction: Optional[int] = None
+    ) -> "MemoryCursor":
         if isinstance(key, str):
             self._sort = [(key, direction or 1)]
         else:
@@ -88,7 +92,9 @@ class MemoryCollection:
             output.append(hydrated)
         return output
 
-    def find(self, filter_spec: Optional[dict] = None, projection: Optional[dict] = None) -> MemoryCursor:
+    def find(
+        self, filter_spec: Optional[dict] = None, projection: Optional[dict] = None
+    ) -> MemoryCursor:
         return MemoryCursor(self, filter_spec or {}, projection)
 
     async def find_one(
@@ -125,7 +131,9 @@ class MemoryCollection:
                 inserted_ids.append(doc_id)
         return InsertManyResult(inserted_ids)
 
-    async def update_one(self, filter_spec: dict, update: dict, upsert: bool = False) -> UpdateResult:
+    async def update_one(
+        self, filter_spec: dict, update: dict, upsert: bool = False
+    ) -> UpdateResult:
         async with self._database._lock:
             for doc_id, stored in self._database._collections[self._name].items():
                 if _match_doc(stored, filter_spec):
@@ -146,7 +154,9 @@ class MemoryCollection:
             self._database._collections[self._name][doc_id] = stored
             return UpdateResult(matched_count=0, modified_count=0, upserted_id=doc_id)
 
-    async def update_many(self, filter_spec: dict, update: dict, upsert: bool = False) -> UpdateResult:
+    async def update_many(
+        self, filter_spec: dict, update: dict, upsert: bool = False
+    ) -> UpdateResult:
         matched = 0
         modified = 0
         async with self._database._lock:
@@ -161,7 +171,9 @@ class MemoryCollection:
                 self._database._collections[self._name][doc_id] = updated
 
             if matched or not upsert:
-                return UpdateResult(matched_count=matched, modified_count=modified, upserted_id=None)
+                return UpdateResult(
+                    matched_count=matched, modified_count=modified, upserted_id=None
+                )
 
             base_doc = _extract_upsert_base(filter_spec)
             base_doc = _apply_update(base_doc, update, is_insert=True)

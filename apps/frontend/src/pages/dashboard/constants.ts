@@ -12,7 +12,7 @@ export const buildForecast = (days: number): WeatherDay[] => {
     return {
       date: toISODate(day),
       rainfall_mm: 2 + idx * 0.5,
-      temperature_c: 28 + idx * 0.4
+      temperature_c: 28 + idx * 0.4,
     };
   });
 };
@@ -42,20 +42,21 @@ const DASHBOARD_GALLERY_FILES = [
   "agri-025.jpg",
   "agri-026.jpg",
   "agri-028.jpg",
-  "agri-029.jpg"
+  "agri-029.jpg",
 ];
 
-export const AGRI_SLIDES: Array<{ src: string; alt: string }> = AGRO_SLIDER_IMAGES.map((fileName, index) => ({
-  src: `/assets/agri-slider/${fileName}`,
-  alt: `Agriculture slider image ${index + 1}`
-}));
-
-export const DASHBOARD_GALLERY_IMAGES: Array<{ src: string; alt: string }> = DASHBOARD_GALLERY_FILES.map(
+export const AGRI_SLIDES: Array<{ src: string; alt: string }> = AGRO_SLIDER_IMAGES.map(
   (fileName, index) => ({
-    src: `/assets/agri-gallery/${fileName}`,
-    alt: `Agriculture gallery image ${index + 1}`
-  })
+    src: `/assets/agri-slider/${fileName}`,
+    alt: `Agriculture slider image ${index + 1}`,
+  }),
 );
+
+export const DASHBOARD_GALLERY_IMAGES: Array<{ src: string; alt: string }> =
+  DASHBOARD_GALLERY_FILES.map((fileName, index) => ({
+    src: `/assets/agri-gallery/${fileName}`,
+    alt: `Agriculture gallery image ${index + 1}`,
+  }));
 
 export const GALLERY_PAGE_SIZE = 6;
 export const SLIDER_AUTOPLAY_MS = 6500;
@@ -66,7 +67,7 @@ export const spacingScale = {
   md: 3,
   lg: 4,
   xl: 6,
-  section: 8
+  section: 8,
 } as const;
 
 export const FALLBACK_MANDI_CATALOG: MandiCatalogResponse = {
@@ -87,14 +88,14 @@ export const FALLBACK_MANDI_CATALOG: MandiCatalogResponse = {
     { crop: "Mango", category: "fruits" },
     { crop: "Guava", category: "fruits" },
     { crop: "Turmeric", category: "spices" },
-    { crop: "Ginger", category: "spices" }
+    { crop: "Ginger", category: "spices" },
   ],
-  markets: ["Patna", "Muzaffarpur", "Bhagalpur", "Pune", "Nashik"]
+  markets: ["Patna", "Muzaffarpur", "Sitamarhi", "Bhagalpur", "Pune", "Nashik"],
 };
 
 export const IMPORTANT_LINKS = [
   { key: "dashboard_page.links.beneficiary_status", url: "https://pmkisan.gov.in/" },
   { key: "dashboard_page.links.farmer_registration", url: "https://farmer.gov.in/" },
   { key: "dashboard_page.links.market_price_bulletin", url: "https://agmarknet.gov.in/" },
-  { key: "dashboard_page.links.helpline_support", url: "https://pgportal.gov.in/" }
+  { key: "dashboard_page.links.helpline_support", url: "https://pgportal.gov.in/" },
 ];

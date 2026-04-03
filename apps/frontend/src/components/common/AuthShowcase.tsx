@@ -22,7 +22,7 @@ const showcaseSlides = [
   "/assets/agri-slider/slide-07.jpg",
   "/assets/agri-slider/slide-08.jpg",
   "/assets/agri-slider/slide-09.jpg",
-  "/assets/agri-slider/slide-10.jpg"
+  "/assets/agri-slider/slide-10.jpg",
 ];
 
 const AuthShowcase: React.FC<AuthShowcaseProps> = ({ title, subtitle, points }) => {
@@ -43,11 +43,18 @@ const AuthShowcase: React.FC<AuthShowcaseProps> = ({ title, subtitle, points }) 
         borderRadius: 3,
         border: "1px solid #e6dcc9",
         bgcolor: "rgba(255,255,255,0.9)",
-        height: "100%"
+        height: "100%",
       }}
     >
       <Stack spacing={2}>
-        <Box sx={{ position: "relative", height: { xs: 200, md: 280 }, borderRadius: 2.2, overflow: "hidden" }}>
+        <Box
+          sx={{
+            position: "relative",
+            height: { xs: 200, md: 280 },
+            borderRadius: 2.2,
+            overflow: "hidden",
+          }}
+        >
           {showcaseSlides.map((src, idx) => (
             <Box
               key={src}
@@ -61,7 +68,7 @@ const AuthShowcase: React.FC<AuthShowcaseProps> = ({ title, subtitle, points }) 
                 height: "100%",
                 objectFit: "cover",
                 opacity: idx === activeSlide ? 1 : 0,
-                transition: "opacity 700ms ease"
+                transition: "opacity 700ms ease",
               }}
             />
           ))}
@@ -70,7 +77,7 @@ const AuthShowcase: React.FC<AuthShowcaseProps> = ({ title, subtitle, points }) 
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(140deg, rgba(10,38,21,0.3) 0%, rgba(10,38,21,0.16) 35%, rgba(10,38,21,0.05) 100%)"
+                "linear-gradient(140deg, rgba(10,38,21,0.3) 0%, rgba(10,38,21,0.16) 35%, rgba(10,38,21,0.05) 100%)",
             }}
           />
           <Stack
@@ -84,7 +91,7 @@ const AuthShowcase: React.FC<AuthShowcaseProps> = ({ title, subtitle, points }) 
               bgcolor: "rgba(0,0,0,0.22)",
               borderRadius: 999,
               px: 1,
-              py: 0.5
+              py: 0.5,
             }}
           >
             {showcaseSlides.map((src, idx) => (
@@ -96,7 +103,7 @@ const AuthShowcase: React.FC<AuthShowcaseProps> = ({ title, subtitle, points }) 
                   height: 8,
                   borderRadius: "50%",
                   cursor: "pointer",
-                  bgcolor: idx === activeSlide ? "#fff" : "rgba(255,255,255,0.45)"
+                  bgcolor: idx === activeSlide ? "#fff" : "rgba(255,255,255,0.45)",
                 }}
               />
             ))}
@@ -110,7 +117,14 @@ const AuthShowcase: React.FC<AuthShowcaseProps> = ({ title, subtitle, points }) 
           </Typography>
         </Box>
 
-        <Paper sx={{ p: 2, borderRadius: 2, border: "1px dashed #d7c7ad", bgcolor: "rgba(255,255,255,0.85)" }}>
+        <Paper
+          sx={{
+            p: 2,
+            borderRadius: 2,
+            border: "1px dashed #d7c7ad",
+            bgcolor: "rgba(255,255,255,0.85)",
+          }}
+        >
           <Stack spacing={1.25}>
             {duplicatedPoints.map((point) => (
               <Stack key={point.text} direction="row" spacing={1} alignItems="center">
@@ -122,7 +136,7 @@ const AuthShowcase: React.FC<AuthShowcaseProps> = ({ title, subtitle, points }) 
                     bgcolor: "rgba(27,107,58,0.12)",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center"
+                    justifyContent: "center",
                   }}
                 >
                   {point.icon}

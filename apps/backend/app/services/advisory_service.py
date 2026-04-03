@@ -1,21 +1,20 @@
 from __future__ import annotations
 
+import asyncio
 import math
 from datetime import datetime, timezone
 from time import perf_counter
-import asyncio
 from typing import Any, Dict, List, Tuple
 
-from app.core.database import Database
-
 from app.core.config import settings
+from app.core.database import Database
 from app.core.exceptions import ExternalServiceUnavailableError
 from app.core.logging import get_logger
 from app.models.conversation import default_conversation_record
 from app.models.user import UserInDB
 from app.rag import KnowledgeBaseRetriever
 from app.schemas.advisory import SUPPORTED_ADVISORY_LANGUAGES, AdvisorySlaTelemetry
-from app.services.bedrock_service import BedrockService
+from app.services.llm_factory import get_llm_service
 
 logger = get_logger(__name__)
 
@@ -27,12 +26,12 @@ class AdvisoryService:
         self._recommendations = db["recommendations"]
         self._retriever = KnowledgeBaseRetriever()
         try:
-            self._bedrock = BedrockService()
+            self._llm = get_llm_service()
         except Exception as exc:
-            logger.warning("bedrock_client_init_failed", error=str(exc))
+            logger.warning("llm_client_init_failed", provider=settings.llm_provider, error=str(exc))
             if settings.is_production:
-                raise ExternalServiceUnavailableError("Amazon Bedrock advisory runtime is unavailable") from exc
-            self._bedrock = None
+                raise ExternalServiceUnavailableError("AI advisory runtime is unavailable") from exc
+            self._llm = None
 
     async def _get_conversation(self, user_id: str) -> Tuple[str, List[Dict[str, str]]]:
         conversation = await self._collection.find_one({"user_id": user_id})
@@ -62,7 +61,11 @@ class AdvisoryService:
                     top = recs[0]
                     crop = top.get("crop", "crop")
                     confidence = top.get("confidence", None)
-                    suffix = f" ({round(float(confidence) * 100, 1)}% confidence)" if confidence is not None else ""
+                    suffix = (
+                        f" ({round(float(confidence) * 100, 1)}% confidence)"
+                        if confidence is not None
+                        else ""
+                    )
                     summaries.append(f"Crop recommendation: {crop}{suffix}")
             elif kind == "price":
                 crop = payload.get("crop")
@@ -75,7 +78,9 @@ class AdvisoryService:
                 crop = payload.get("crop")
                 savings = payload.get("water_savings_percent")
                 if crop:
-                    suffix = f" (savings {round(float(savings), 1)}%)" if savings is not None else ""
+                    suffix = (
+                        f" (savings {round(float(savings), 1)}%)" if savings is not None else ""
+                    )
                     summaries.append(f"Water plan for {crop}{suffix}")
         return summaries
 
@@ -113,14 +118,17 @@ class AdvisoryService:
         }
         return localized.get(language, localized["en"])
 
-
-    async def advisory_sla_telemetry(self, window_minutes: int = 1440, sla_target_ms: float | None = None) -> AdvisorySlaTelemetry:
+    async def advisory_sla_telemetry(
+        self, window_minutes: int = 1440, sla_target_ms: float | None = None
+    ) -> AdvisorySlaTelemetry:
         effective_sla = sla_target_ms or float(settings.advisory_sla_ms)
         now = datetime.now(timezone.utc)
         since_epoch = now.timestamp() - (window_minutes * 60)
         docs = await self._telemetry.find({"ts_epoch": {"$gte": since_epoch}}).to_list(length=None)
 
-        latencies = sorted(float(doc.get("latency_ms", 0.0)) for doc in docs if doc.get("latency_ms") is not None)
+        latencies = sorted(
+            float(doc.get("latency_ms", 0.0)) for doc in docs if doc.get("latency_ms") is not None
+        )
         total_requests = len(docs)
         successful_requests = len([doc for doc in docs if str(doc.get("status")) == "success"])
         fallback_responses = len([doc for doc in docs if bool(doc.get("is_fallback"))])
@@ -158,7 +166,9 @@ class AdvisoryService:
         conversation_id, history = await self._get_conversation(user.id)
         language_code = (language or user.language or "en").lower().strip()
         if language_code not in SUPPORTED_ADVISORY_LANGUAGES:
-            logger.warning("unsupported_advisory_language_fallback", language=language_code, user_id=user.id)
+            logger.warning(
+                "unsupported_advisory_language_fallback", language=language_code, user_id=user.id
+            )
             language_code = "en"
         history = history[-12:]
 
@@ -188,11 +198,11 @@ class AdvisoryService:
         source_names = [doc.name for doc in retrieved]
 
         status = "fallback"
-        if self._bedrock:
+        if self._llm:
             try:
                 reply, model_used, is_fallback = await asyncio.wait_for(
                     asyncio.to_thread(
-                        self._bedrock.generate_reply,
+                        self._llm.generate_reply,
                         system_prompt=self._system_prompt(),
                         user_context=user_context,
                         conversation=history,
@@ -206,15 +216,21 @@ class AdvisoryService:
             except asyncio.TimeoutError:
                 if settings.is_production:
                     raise ExternalServiceUnavailableError("AI advisory timed out") from None
-                logger.warning("advisory_timeout_fallback", timeout=settings.advisory_timeout_seconds)
+                logger.warning(
+                    "advisory_timeout_fallback", timeout=settings.advisory_timeout_seconds
+                )
                 reply = self._fallback_response(language_code)
                 model_used = "timeout-fallback"
                 is_fallback = True
                 status = "timeout"
             except Exception as exc:
                 if settings.is_production:
-                    raise ExternalServiceUnavailableError("AI advisory is temporarily unavailable") from exc
-                logger.warning("bedrock_unavailable_using_fallback", error=str(exc))
+                    raise ExternalServiceUnavailableError(
+                        "AI advisory is temporarily unavailable"
+                    ) from exc
+                logger.warning(
+                    "llm_unavailable_using_fallback", provider=settings.llm_provider, error=str(exc)
+                )
                 reply = self._fallback_response(language_code)
                 model_used = "fallback"
                 is_fallback = True
@@ -240,8 +256,18 @@ class AdvisoryService:
 
         now = datetime.now(timezone.utc)
         new_history = history + [
-            {"role": "user", "content": message, "language": language_code, "timestamp": now.isoformat()},
-            {"role": "assistant", "content": reply, "language": language_code, "timestamp": now.isoformat()},
+            {
+                "role": "user",
+                "content": message,
+                "language": language_code,
+                "timestamp": now.isoformat(),
+            },
+            {
+                "role": "assistant",
+                "content": reply,
+                "language": language_code,
+                "timestamp": now.isoformat(),
+            },
         ]
 
         query_id = conversation_id
@@ -256,6 +282,7 @@ class AdvisoryService:
             {
                 "user_id": user.id,
                 "language": language_code,
+                "provider": settings.llm_provider,
                 "latency_ms": latency_ms,
                 "status": status,
                 "is_fallback": is_fallback,
@@ -270,6 +297,7 @@ class AdvisoryService:
         return {
             "reply": reply,
             "language": language_code,
+            "provider": settings.llm_provider,
             "model": model_used,
             "sources": source_items,
             "is_fallback": is_fallback,

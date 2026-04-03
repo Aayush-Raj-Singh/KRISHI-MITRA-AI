@@ -34,16 +34,14 @@ const writeValue = (storage: Storage | null, key: string, value: string): void =
   if (!storage) return;
   try {
     storage.setItem(key, value);
-  } catch {
-  }
+  } catch {}
 };
 
 const removeValue = (storage: Storage | null, key: string): void => {
   if (!storage) return;
   try {
     storage.removeItem(key);
-  } catch {
-  }
+  } catch {}
 };
 
 const migrateLegacyStorage = (): void => {

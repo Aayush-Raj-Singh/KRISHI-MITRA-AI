@@ -9,7 +9,7 @@ import {
   StepLabel,
   Stepper,
   Stack,
-  Typography
+  Typography,
 } from "@mui/material";
 
 import { useTranslatedStrings } from "../../utils/useTranslatedStrings";
@@ -38,9 +38,9 @@ const OnboardingDialog: React.FC<OnboardingDialogProps> = ({ open, onClose, onCo
       next: "Next",
       back: "Back",
       skip: "Skip",
-      done: "Finish"
+      done: "Finish",
     }),
-    []
+    [],
   );
 
   const translated = useTranslatedStrings(baseStrings);
@@ -49,7 +49,7 @@ const OnboardingDialog: React.FC<OnboardingDialogProps> = ({ open, onClose, onCo
     { title: translated.step1Title, body: translated.step1Body },
     { title: translated.step2Title, body: translated.step2Body },
     { title: translated.step3Title, body: translated.step3Body },
-    { title: translated.step4Title, body: translated.step4Body }
+    { title: translated.step4Title, body: translated.step4Body },
   ];
 
   useEffect(() => {

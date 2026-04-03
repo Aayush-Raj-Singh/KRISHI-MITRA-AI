@@ -10,7 +10,7 @@ import {
   createMandiEntry,
   fetchMandiEntries,
   rejectMandiEntry,
-  submitMandiEntry
+  submitMandiEntry,
 } from "../services/mandiEntries";
 import { useAppSelector } from "../store/hooks";
 import useMandiFilterOptions from "../hooks/useMandiFilterOptions";
@@ -33,20 +33,25 @@ const OfficerWorkflowPage: React.FC = () => {
     min_price: "",
     max_price: "",
     modal_price: "",
-    arrivals_qtl: ""
+    arrivals_qtl: "",
   });
   const selectedState = form.state.trim();
   const selectedDistrict = form.district.trim();
   const districtsForState = selectedState ? mandiOptions.getDistrictsForState(selectedState) : [];
   const mandisForDistrict =
-    selectedState && selectedDistrict ? mandiOptions.getMandisForDistrict(selectedState, selectedDistrict) : [];
-  const commoditySuggestions = useLocalSuggestions("mandi_entry.commodity", mandiOptions.commodities);
+    selectedState && selectedDistrict
+      ? mandiOptions.getMandisForDistrict(selectedState, selectedDistrict)
+      : [];
+  const commoditySuggestions = useLocalSuggestions(
+    "mandi_entry.commodity",
+    mandiOptions.commodities,
+  );
   const varietySuggestions = useLocalSuggestions("mandi_entry.variety");
   const gradeSuggestions = useLocalSuggestions("mandi_entry.grade");
 
   const { data, isLoading } = useQuery({
     queryKey: ["mandi-entries"],
-    queryFn: () => fetchMandiEntries({ limit: 50 })
+    queryFn: () => fetchMandiEntries({ limit: 50 }),
   });
 
   const handleCreate = async () => {
@@ -58,7 +63,7 @@ const OfficerWorkflowPage: React.FC = () => {
       min_price: Number(form.min_price),
       max_price: Number(form.max_price),
       modal_price: Number(form.modal_price),
-      arrivals_qtl: Number(form.arrivals_qtl)
+      arrivals_qtl: Number(form.arrivals_qtl),
     });
     setForm({
       state: "",
@@ -71,7 +76,7 @@ const OfficerWorkflowPage: React.FC = () => {
       min_price: "",
       max_price: "",
       modal_price: "",
-      arrivals_qtl: ""
+      arrivals_qtl: "",
     });
     await queryClient.invalidateQueries({ queryKey: ["mandi-entries"] });
   };
@@ -88,8 +93,11 @@ const OfficerWorkflowPage: React.FC = () => {
 
   const handleReject = async (entryId: string) => {
     const reason =
-      window.prompt(t("officer_workflow_page.rejection_reason", { defaultValue: "Rejection reason (optional)" })) ||
-      undefined;
+      window.prompt(
+        t("officer_workflow_page.rejection_reason", {
+          defaultValue: "Rejection reason (optional)",
+        }),
+      ) || undefined;
     await rejectMandiEntry(entryId, reason);
     await queryClient.invalidateQueries({ queryKey: ["mandi-entries"] });
   };
@@ -126,35 +134,35 @@ const OfficerWorkflowPage: React.FC = () => {
                 {
                   key: "state",
                   label: t("filters.state", { defaultValue: "State" }),
-                  options: mandiOptions.states
+                  options: mandiOptions.states,
                 },
                 {
                   key: "district",
                   label: t("filters.district", { defaultValue: "District" }),
                   options: districtsForState,
-                  disabled: !selectedState
+                  disabled: !selectedState,
                 },
                 {
                   key: "market",
                   label: t("filters.mandi", { defaultValue: "Mandi" }),
                   options: mandisForDistrict,
-                  disabled: !selectedState || !selectedDistrict
+                  disabled: !selectedState || !selectedDistrict,
                 },
                 {
                   key: "commodity",
                   label: t("filters.commodity", { defaultValue: "Commodity" }),
-                  options: commoditySuggestions.suggestions
+                  options: commoditySuggestions.suggestions,
                 },
                 {
                   key: "variety",
                   label: t("filters.variety", { defaultValue: "Variety" }),
-                  options: varietySuggestions.suggestions
+                  options: varietySuggestions.suggestions,
                 },
                 {
                   key: "grade",
                   label: t("filters.grade", { defaultValue: "Grade" }),
-                  options: gradeSuggestions.suggestions
-                }
+                  options: gradeSuggestions.suggestions,
+                },
               ].map((field) => (
                 <Grid item xs={12} sm={6} md={4} key={field.key}>
                   <FilterAutocomplete
@@ -173,27 +181,39 @@ const OfficerWorkflowPage: React.FC = () => {
                   type="date"
                   InputLabelProps={{ shrink: true }}
                   value={form.arrival_date}
-                  onChange={(event) => setForm((prev) => ({ ...prev, arrival_date: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, arrival_date: event.target.value }))
+                  }
                 />
               </Grid>
               {[
-                { key: "min_price", label: t("officer_workflow_page.min_price", { defaultValue: "Min Price" }) },
-                { key: "max_price", label: t("officer_workflow_page.max_price", { defaultValue: "Max Price" }) },
+                {
+                  key: "min_price",
+                  label: t("officer_workflow_page.min_price", { defaultValue: "Min Price" }),
+                },
+                {
+                  key: "max_price",
+                  label: t("officer_workflow_page.max_price", { defaultValue: "Max Price" }),
+                },
                 {
                   key: "modal_price",
-                  label: t("officer_workflow_page.modal_price", { defaultValue: "Modal Price" })
+                  label: t("officer_workflow_page.modal_price", { defaultValue: "Modal Price" }),
                 },
                 {
                   key: "arrivals_qtl",
-                  label: t("officer_workflow_page.arrivals_qtl", { defaultValue: "Arrivals (qtl)" })
-                }
+                  label: t("officer_workflow_page.arrivals_qtl", {
+                    defaultValue: "Arrivals (qtl)",
+                  }),
+                },
               ].map((field) => (
                 <Grid item xs={12} sm={6} md={3} key={field.key}>
                   <TextField
                     fullWidth
                     label={field.label}
                     value={(form as Record<string, string>)[field.key]}
-                    onChange={(event) => setForm((prev) => ({ ...prev, [field.key]: event.target.value }))}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, [field.key]: event.target.value }))
+                    }
                   />
                 </Grid>
               ))}
@@ -206,9 +226,13 @@ const OfficerWorkflowPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Typography variant="h6">{t("officer_workflow_page.recent_entries", { defaultValue: "Recent Entries" })}</Typography>
+        <Typography variant="h6">
+          {t("officer_workflow_page.recent_entries", { defaultValue: "Recent Entries" })}
+        </Typography>
         {isLoading && (
-          <Typography>{t("officer_workflow_page.loading_entries", { defaultValue: "Loading entries..." })}</Typography>
+          <Typography>
+            {t("officer_workflow_page.loading_entries", { defaultValue: "Loading entries..." })}
+          </Typography>
         )}
         <Grid container spacing={2}>
           {data?.items.map((entry) => (
@@ -223,20 +247,38 @@ const OfficerWorkflowPage: React.FC = () => {
                     {entry.commodity} - {entry.arrival_date}
                   </Typography>
                   <Typography variant="body2" sx={{ mt: 1 }}>
-                    {t("officer_workflow_page.modal_label", { defaultValue: "Modal" })}: {entry.modal_price} |{" "}
-                    {t("officer_workflow_page.arrivals_label", { defaultValue: "Arrivals" })}: {entry.arrivals_qtl} qtl
+                    {t("officer_workflow_page.modal_label", { defaultValue: "Modal" })}:{" "}
+                    {entry.modal_price} |{" "}
+                    {t("officer_workflow_page.arrivals_label", { defaultValue: "Arrivals" })}:{" "}
+                    {entry.arrivals_qtl} qtl
                   </Typography>
                   {entry.status === "draft" && (
-                    <Button variant="outlined" size="small" sx={{ mt: 1 }} onClick={() => handleSubmit(entry._id)}>
-                      {t("officer_workflow_page.submit_for_approval", { defaultValue: "Submit for Approval" })}
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      sx={{ mt: 1 }}
+                      onClick={() => handleSubmit(entry._id)}
+                    >
+                      {t("officer_workflow_page.submit_for_approval", {
+                        defaultValue: "Submit for Approval",
+                      })}
                     </Button>
                   )}
                   {entry.status === "submitted" && isAdmin && (
                     <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                      <Button variant="contained" size="small" onClick={() => handleApprove(entry._id)}>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => handleApprove(entry._id)}
+                      >
                         {t("officer_workflow_page.approve", { defaultValue: "Approve" })}
                       </Button>
-                      <Button variant="outlined" size="small" color="error" onClick={() => handleReject(entry._id)}>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        color="error"
+                        onClick={() => handleReject(entry._id)}
+                      >
                         {t("officer_workflow_page.reject", { defaultValue: "Reject" })}
                       </Button>
                     </Stack>

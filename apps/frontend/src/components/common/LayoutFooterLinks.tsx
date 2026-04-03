@@ -28,7 +28,7 @@ const LayoutFooterLinks: React.FC<LayoutFooterLinksProps> = ({
   footerFeatureColumns,
   onNavigate,
   horizontalSectionPaddingSx,
-  contentShellSx
+  contentShellSx,
 }) => (
   <Box
     component="footer"
@@ -37,7 +37,7 @@ const LayoutFooterLinks: React.FC<LayoutFooterLinksProps> = ({
       background: "linear-gradient(90deg, #134b28 0%, #1c6b38 55%, #15532b 100%)",
       color: "#fff",
       ...horizontalSectionPaddingSx,
-      py: { xs: 2.2, md: 2.8 }
+      py: { xs: 2.2, md: 2.8 },
     }}
   >
     <Box sx={contentShellSx}>
@@ -51,7 +51,7 @@ const LayoutFooterLinks: React.FC<LayoutFooterLinksProps> = ({
           display: "grid",
           gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" },
           gap: { xs: 0.75, md: 1.1 },
-          mb: 2.2
+          mb: 2.2,
         }}
       >
         {footerFeatureColumns.map((column, columnIndex) => (
@@ -68,7 +68,7 @@ const LayoutFooterLinks: React.FC<LayoutFooterLinksProps> = ({
                   py: 0.15,
                   textAlign: "left",
                   whiteSpace: "normal",
-                  lineHeight: 1.2
+                  lineHeight: 1.2,
                 }}
               >
                 {link.label}

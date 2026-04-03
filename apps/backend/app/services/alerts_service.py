@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import List, Optional
 
 from app.core.database import Database
-
 from app.schemas.trends import PriceSpikeAlert, TrendFilters
 from app.services.trend_service import TrendAnalyticsService
 

@@ -13,7 +13,7 @@ import {
   TableHead,
   TableRow,
   TableCell,
-  TableBody
+  TableBody,
 } from "@mui/material";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -31,7 +31,7 @@ import {
   fetchSeasons,
   createSeason,
   fetchMspRates,
-  createMspRate
+  createMspRate,
 } from "../services/masterData";
 
 const AdminMasterDataPage: React.FC = () => {
@@ -53,9 +53,13 @@ const AdminMasterDataPage: React.FC = () => {
   return (
     <AppLayout>
       <Stack spacing={3}>
-        <Typography variant="h4">{t("admin_master_data_page.title", { defaultValue: "Admin Master Data" })}</Typography>
+        <Typography variant="h4">
+          {t("admin_master_data_page.title", { defaultValue: "Admin Master Data" })}
+        </Typography>
         <Tabs value={tab} onChange={(_, value) => setTab(value)}>
-          <Tab label={t("admin_master_data_page.tabs.commodities", { defaultValue: "Commodities" })} />
+          <Tab
+            label={t("admin_master_data_page.tabs.commodities", { defaultValue: "Commodities" })}
+          />
           <Tab label={t("admin_master_data_page.tabs.varieties", { defaultValue: "Varieties" })} />
           <Tab label={t("admin_master_data_page.tabs.grades", { defaultValue: "Grades" })} />
           <Tab label={t("admin_master_data_page.tabs.units", { defaultValue: "Units" })} />
@@ -71,27 +75,38 @@ const AdminMasterDataPage: React.FC = () => {
               </Typography>
               <MasterForm
                 fields={[
-                  { key: "name", label: t("admin_master_data_page.field_name", { defaultValue: "Name" }) },
-                  { key: "code", label: t("admin_master_data_page.field_code", { defaultValue: "Code" }) },
+                  {
+                    key: "name",
+                    label: t("admin_master_data_page.field_name", { defaultValue: "Name" }),
+                  },
+                  {
+                    key: "code",
+                    label: t("admin_master_data_page.field_code", { defaultValue: "Code" }),
+                  },
                   {
                     key: "categories",
                     label: t("admin_master_data_page.field_categories", {
-                      defaultValue: "Categories (comma separated)"
-                    })
-                  }
+                      defaultValue: "Categories (comma separated)",
+                    }),
+                  },
                 ]}
                 onSubmit={async (values) => {
                   await createCommodity({
                     name: values.name,
                     code: values.code,
-                    categories: values.categories.split(",").map((item) => item.trim()).filter(Boolean),
-                    active: true
+                    categories: values.categories
+                      .split(",")
+                      .map((item) => item.trim())
+                      .filter(Boolean),
+                    active: true,
                   });
                   handleRefresh();
                 }}
               />
               <MasterTable
-                title={t("admin_master_data_page.tabs.commodities", { defaultValue: "Commodities" })}
+                title={t("admin_master_data_page.tabs.commodities", {
+                  defaultValue: "Commodities",
+                })}
                 rows={commoditiesQuery.data || []}
               />
             </CardContent>
@@ -108,17 +123,25 @@ const AdminMasterDataPage: React.FC = () => {
                 fields={[
                   {
                     key: "commodity_id",
-                    label: t("admin_master_data_page.field_commodity_id", { defaultValue: "Commodity ID" })
+                    label: t("admin_master_data_page.field_commodity_id", {
+                      defaultValue: "Commodity ID",
+                    }),
                   },
-                  { key: "name", label: t("admin_master_data_page.field_name", { defaultValue: "Name" }) },
-                  { key: "code", label: t("admin_master_data_page.field_code", { defaultValue: "Code" }) }
+                  {
+                    key: "name",
+                    label: t("admin_master_data_page.field_name", { defaultValue: "Name" }),
+                  },
+                  {
+                    key: "code",
+                    label: t("admin_master_data_page.field_code", { defaultValue: "Code" }),
+                  },
                 ]}
                 onSubmit={async (values) => {
                   await createVariety({
                     commodity_id: values.commodity_id || "",
                     name: values.name || "",
                     code: values.code || "",
-                    active: true
+                    active: true,
                   });
                   handleRefresh();
                 }}
@@ -141,17 +164,25 @@ const AdminMasterDataPage: React.FC = () => {
                 fields={[
                   {
                     key: "commodity_id",
-                    label: t("admin_master_data_page.field_commodity_id", { defaultValue: "Commodity ID" })
+                    label: t("admin_master_data_page.field_commodity_id", {
+                      defaultValue: "Commodity ID",
+                    }),
                   },
-                  { key: "name", label: t("admin_master_data_page.field_name", { defaultValue: "Name" }) },
-                  { key: "code", label: t("admin_master_data_page.field_code", { defaultValue: "Code" }) }
+                  {
+                    key: "name",
+                    label: t("admin_master_data_page.field_name", { defaultValue: "Name" }),
+                  },
+                  {
+                    key: "code",
+                    label: t("admin_master_data_page.field_code", { defaultValue: "Code" }),
+                  },
                 ]}
                 onSubmit={async (values) => {
                   await createGrade({
                     commodity_id: values.commodity_id || "",
                     name: values.name || "",
                     code: values.code || "",
-                    active: true
+                    active: true,
                   });
                   handleRefresh();
                 }}
@@ -172,15 +203,24 @@ const AdminMasterDataPage: React.FC = () => {
               </Typography>
               <MasterForm
                 fields={[
-                  { key: "name", label: t("admin_master_data_page.field_name", { defaultValue: "Name" }) },
-                  { key: "symbol", label: t("admin_master_data_page.field_symbol", { defaultValue: "Symbol" }) },
-                  { key: "type", label: t("admin_master_data_page.field_type", { defaultValue: "Type" }) }
+                  {
+                    key: "name",
+                    label: t("admin_master_data_page.field_name", { defaultValue: "Name" }),
+                  },
+                  {
+                    key: "symbol",
+                    label: t("admin_master_data_page.field_symbol", { defaultValue: "Symbol" }),
+                  },
+                  {
+                    key: "type",
+                    label: t("admin_master_data_page.field_type", { defaultValue: "Type" }),
+                  },
                 ]}
                 onSubmit={async (values) => {
                   await createUnit({
                     name: values.name || "",
                     symbol: values.symbol || "",
-                    type: values.type || ""
+                    type: values.type || "",
                   });
                   handleRefresh();
                 }}
@@ -201,22 +241,29 @@ const AdminMasterDataPage: React.FC = () => {
               </Typography>
               <MasterForm
                 fields={[
-                  { key: "name", label: t("admin_master_data_page.field_name", { defaultValue: "Name" }) },
+                  {
+                    key: "name",
+                    label: t("admin_master_data_page.field_name", { defaultValue: "Name" }),
+                  },
                   {
                     key: "start_month",
-                    label: t("admin_master_data_page.field_start_month", { defaultValue: "Start Month" })
+                    label: t("admin_master_data_page.field_start_month", {
+                      defaultValue: "Start Month",
+                    }),
                   },
                   {
                     key: "end_month",
-                    label: t("admin_master_data_page.field_end_month", { defaultValue: "End Month" })
-                  }
+                    label: t("admin_master_data_page.field_end_month", {
+                      defaultValue: "End Month",
+                    }),
+                  },
                 ]}
                 onSubmit={async (values) => {
                   await createSeason({
                     name: values.name,
                     start_month: Number(values.start_month),
                     end_month: Number(values.end_month),
-                    active: true
+                    active: true,
                   });
                   handleRefresh();
                 }}
@@ -239,24 +286,36 @@ const AdminMasterDataPage: React.FC = () => {
                 fields={[
                   {
                     key: "commodity_id",
-                    label: t("admin_master_data_page.field_commodity_id", { defaultValue: "Commodity ID" })
+                    label: t("admin_master_data_page.field_commodity_id", {
+                      defaultValue: "Commodity ID",
+                    }),
                   },
                   {
                     key: "variety_id",
-                    label: t("admin_master_data_page.field_variety_id", { defaultValue: "Variety ID (optional)" })
+                    label: t("admin_master_data_page.field_variety_id", {
+                      defaultValue: "Variety ID (optional)",
+                    }),
                   },
-                  { key: "season", label: t("admin_master_data_page.field_season", { defaultValue: "Season" }) },
+                  {
+                    key: "season",
+                    label: t("admin_master_data_page.field_season", { defaultValue: "Season" }),
+                  },
                   {
                     key: "price_per_quintal",
-                    label: t("admin_master_data_page.field_price_per_quintal", { defaultValue: "Price per Quintal" })
+                    label: t("admin_master_data_page.field_price_per_quintal", {
+                      defaultValue: "Price per Quintal",
+                    }),
                   },
-                  { key: "source", label: t("admin_master_data_page.field_source", { defaultValue: "Source" }) },
+                  {
+                    key: "source",
+                    label: t("admin_master_data_page.field_source", { defaultValue: "Source" }),
+                  },
                   {
                     key: "effective_from",
                     label: t("admin_master_data_page.field_effective_from", {
-                      defaultValue: "Effective From (YYYY-MM-DD)"
-                    })
-                  }
+                      defaultValue: "Effective From (YYYY-MM-DD)",
+                    }),
+                  },
                 ]}
                 onSubmit={async (values) => {
                   await createMspRate({
@@ -265,7 +324,7 @@ const AdminMasterDataPage: React.FC = () => {
                     season: values.season,
                     price_per_quintal: Number(values.price_per_quintal),
                     source: values.source || undefined,
-                    effective_from: values.effective_from || undefined
+                    effective_from: values.effective_from || undefined,
                   });
                   handleRefresh();
                 }}
@@ -309,7 +368,9 @@ const MasterForm: React.FC<{
               fullWidth
               label={field.label}
               value={values[field.key] || ""}
-              onChange={(event) => setValues((prev) => ({ ...prev, [field.key]: event.target.value }))}
+              onChange={(event) =>
+                setValues((prev) => ({ ...prev, [field.key]: event.target.value }))
+              }
             />
           </Grid>
         ))}
@@ -331,9 +392,15 @@ const MasterTable: React.FC<{ title: string; rows: unknown[] }> = ({ title, rows
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>{t("admin_master_data_page.table_name", { defaultValue: "Name" })}</TableCell>
-            <TableCell>{t("admin_master_data_page.table_details", { defaultValue: "Code/Details" })}</TableCell>
-            <TableCell>{t("admin_master_data_page.table_status", { defaultValue: "Status" })}</TableCell>
+            <TableCell>
+              {t("admin_master_data_page.table_name", { defaultValue: "Name" })}
+            </TableCell>
+            <TableCell>
+              {t("admin_master_data_page.table_details", { defaultValue: "Code/Details" })}
+            </TableCell>
+            <TableCell>
+              {t("admin_master_data_page.table_status", { defaultValue: "Status" })}
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

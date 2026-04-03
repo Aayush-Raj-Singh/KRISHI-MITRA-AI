@@ -2,16 +2,15 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
-from typing import Dict, Iterable, Optional, List
+from typing import Any, Dict, Iterable, List, Optional
 
-import httpx
 from botocore.exceptions import ClientError
 
-from app.core.config import settings
 from app.core.cache import Cache, get_cache
+from app.core.config import settings
 from app.core.exceptions import ExternalServiceUnavailableError
 from app.core.logging import get_logger
-from app.services.bedrock_service import BedrockService
+from app.services.aws_translate_service import AWSTranslateService
 
 logger = get_logger(__name__)
 
@@ -23,39 +22,29 @@ class TranslationService:
     _CACHE_TTL_SECONDS = 60 * 60 * 24 * 7
     _MAX_CONCURRENCY = 8
 
-    _LANG_TO_PUBLIC_CODE = {
-        "en": "en",
-        "hi": "hi",
-        "bn": "bn",
-        "ta": "ta",
-        "te": "te",
-        "mr": "mr",
-        "gu": "gu",
-        "kn": "kn",
-        "pa": "pa",
-        "as": "as",
-        "ml": "ml",
-        "or": "or",
-        "ur": "ur",
-        "ne": "ne",
-        "sa": "sa",
-        "auto": "auto",
-    }
-
     def __init__(self) -> None:
-        self._aws_translate_enabled = settings.aws_translate_enabled
-        if TranslationService._AWS_TRANSLATE_AVAILABLE is False:
+        self._translation_provider = settings.translation_provider
+        self._aws_translate_enabled = bool(
+            self._translation_provider == "aws" and settings.aws_translate_enabled
+        )
+        if (
+            self._translation_provider == "aws"
+            and TranslationService._AWS_TRANSLATE_AVAILABLE is False
+        ):
             self._aws_translate_enabled = False
-        try:
-            self._bedrock = BedrockService() if self._aws_translate_enabled else None
-        except Exception as exc:
-            logger.warning("aws_translate_unavailable", error=str(exc))
-            if settings.is_production and self._aws_translate_enabled:
-                raise ExternalServiceUnavailableError("AWS translation runtime is unavailable") from exc
-            self._bedrock = None
-            TranslationService._AWS_TRANSLATE_AVAILABLE = False
-        else:
-            if self._bedrock is not None and TranslationService._AWS_TRANSLATE_AVAILABLE is None:
+        self._aws_translate: AWSTranslateService | None = None
+        if self._aws_translate_enabled:
+            try:
+                self._aws_translate = AWSTranslateService()
+            except Exception as exc:
+                logger.warning("aws_translate_unavailable", error=str(exc))
+                if settings.is_production:
+                    raise ExternalServiceUnavailableError(
+                        "AWS translation runtime is unavailable"
+                    ) from exc
+                self._aws_translate_enabled = False
+                TranslationService._AWS_TRANSLATE_AVAILABLE = False
+            else:
                 TranslationService._AWS_TRANSLATE_AVAILABLE = True
         self._cache: Cache = get_cache()
 
@@ -108,10 +97,6 @@ class TranslationService:
         return not has_ascii_letters
 
     @classmethod
-    def _public_code(cls, language: str) -> str:
-        return cls._LANG_TO_PUBLIC_CODE.get(language.lower().strip(), language.lower().strip())
-
-    @classmethod
     def _cache_key(cls, source_language: str, target_language: str, text: str) -> str:
         digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
         return f"translate:{source_language}:{target_language}:{digest}"
@@ -154,43 +139,8 @@ class TranslationService:
         except Exception:
             return
 
-    async def _translate_via_public_endpoint(
-        self,
-        client: httpx.AsyncClient,
-        text: str,
-        source_language: str,
-        target_language: str,
-    ) -> str | None:
-        source_code = self._public_code(source_language)
-        target_code = self._public_code(target_language)
-        if source_code == target_code:
-            return text
-
-        try:
-            response = await client.get(
-                "https://translate.googleapis.com/translate_a/single",
-                params={
-                    "client": "gtx",
-                    "sl": source_code,
-                    "tl": target_code,
-                    "dt": "t",
-                    "q": text,
-                },
-            )
-            response.raise_for_status()
-            payload = response.json()
-            segments = payload[0] if isinstance(payload, list) and payload else []
-            translated = "".join(
-                part[0] for part in segments if isinstance(part, list) and part and isinstance(part[0], str)
-            ).strip()
-            return translated or None
-        except Exception as exc:
-            logger.warning("public_translate_failed", error=str(exc), target_language=target_language)
-            return None
-
     async def _translate_single(
         self,
-        client: httpx.AsyncClient,
         text: str,
         source_language: str,
         target_language: str,
@@ -199,10 +149,10 @@ class TranslationService:
         async with semaphore:
             translated: str | None = None
 
-            if self._bedrock is not None and self._aws_translate_enabled:
+            if self._aws_translate is not None and self._aws_translate_enabled:
                 try:
                     candidate = await asyncio.to_thread(
-                        self._bedrock.translate_text,
+                        self._aws_translate.translate_text,
                         text,
                         source_language,
                         target_language,
@@ -222,7 +172,7 @@ class TranslationService:
                         "UnauthorizedOperation",
                     } or "SubscriptionRequiredException" in str(exc):
                         self._aws_translate_enabled = False
-                        self._bedrock = None
+                        self._aws_translate = None
                         TranslationService._AWS_TRANSLATE_AVAILABLE = False
                         logger.warning(
                             "aws_translate_disabled",
@@ -230,14 +180,13 @@ class TranslationService:
                             error=str(exc),
                         )
                     else:
-                        logger.warning("aws_translate_failed", error=str(exc), target_language=target_language)
+                        logger.warning(
+                            "aws_translate_failed", error=str(exc), target_language=target_language
+                        )
                 except Exception as exc:
-                    logger.warning("aws_translate_failed", error=str(exc), target_language=target_language)
-
-            if translated is None and settings.allow_runtime_fallbacks and settings.public_translate_fallback_enabled:
-                candidate = await self._translate_via_public_endpoint(client, text, source_language, target_language)
-                if candidate and self._is_effective_translation(text, candidate, target_language):
-                    translated = candidate
+                    logger.warning(
+                        "aws_translate_failed", error=str(exc), target_language=target_language
+                    )
 
             if translated is None and settings.is_production:
                 raise ExternalServiceUnavailableError("Translation service is unavailable")
@@ -284,14 +233,52 @@ class TranslationService:
             return results
 
         semaphore = asyncio.Semaphore(self._MAX_CONCURRENCY)
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            tasks = [
-                self._translate_single(client, text, source, target, semaphore)
-                for text in missing_texts
-            ]
-            for text, translated in await asyncio.gather(*tasks):
-                results[text] = translated
-                if self._is_effective_translation(text, translated, target):
-                    await self._set_cached(cache_keys[text], translated)
+        tasks = [self._translate_single(text, source, target, semaphore) for text in missing_texts]
+        for text, translated in await asyncio.gather(*tasks):
+            results[text] = translated
+            if self._is_effective_translation(text, translated, target):
+                await self._set_cached(cache_keys[text], translated)
 
         return results
+
+    async def health_check(self) -> Dict[str, Any]:
+        result: Dict[str, Any] = {
+            "provider": self._translation_provider,
+            "configured": True,
+        }
+        if not self._aws_translate_enabled:
+            result.update(
+                {
+                    "available": False,
+                    "configured": False,
+                    "reason": "AWS translation provider is not active",
+                }
+            )
+            return result
+
+        if settings.should_mock_runtime_validation:
+            result.update(
+                {
+                    "available": True,
+                    "mocked": True,
+                    "sample": "नमस्ते किसान",
+                }
+            )
+            return result
+
+        try:
+            sample_map = await self.translate_many(["Hello farmer"], "en", "hi")
+            sample = sample_map.get("Hello farmer", "")
+            result["available"] = bool(sample and sample != "Hello farmer")
+            result["sample"] = sample
+            if not result["available"]:
+                result["reason"] = "Translation sample did not produce a distinct output"
+            return result
+        except Exception as exc:
+            result.update(
+                {
+                    "available": False,
+                    "error": str(exc),
+                }
+            )
+            return result

@@ -8,7 +8,9 @@ const isLocalHost = () => {
 
 const isNativeShell = () => {
   if (!isBrowser) return false;
-  return window.location.protocol === "capacitor:" || window.location.origin.startsWith("capacitor://");
+  return (
+    window.location.protocol === "capacitor:" || window.location.origin.startsWith("capacitor://")
+  );
 };
 
 const defaultNativeApiBase = () => {
@@ -26,7 +28,9 @@ const defaultNativeWsBase = () => {
     return explicit.replace(/\/$/, "");
   }
   const isAndroid = typeof navigator !== "undefined" && /Android/i.test(navigator.userAgent);
-  return isAndroid ? "ws://10.0.2.2:8000/api/v1/ws/updates" : "ws://127.0.0.1:8000/api/v1/ws/updates";
+  return isAndroid
+    ? "ws://10.0.2.2:8000/api/v1/ws/updates"
+    : "ws://127.0.0.1:8000/api/v1/ws/updates";
 };
 
 export const resolveApiBaseUrl = (value?: string) => {

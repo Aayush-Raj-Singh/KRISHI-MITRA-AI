@@ -4,8 +4,8 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
-from app.core.database import Database
 
+from app.core.database import Database
 from app.core.dependencies import get_db, require_roles
 from app.models.user import UserInDB
 from app.schemas.response import APIResponse

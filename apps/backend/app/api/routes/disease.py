@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import hashlib
 import io
 from datetime import datetime, timezone
-import hashlib
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status, Query
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from PIL import Image, UnidentifiedImageError
 
 from app.core.database import Database
@@ -37,12 +37,16 @@ async def predict_disease(
     if not data:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Empty image upload")
     if len(data) > MAX_IMAGE_BYTES:
-        raise HTTPException(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail="Image too large")
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail="Image too large"
+        )
     try:
         with Image.open(io.BytesIO(data)) as uploaded:
             uploaded.verify()
     except (UnidentifiedImageError, OSError) as exc:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Uploaded file is not a valid image") from exc
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Uploaded file is not a valid image"
+        ) from exc
 
     try:
         result = service.predict(data)

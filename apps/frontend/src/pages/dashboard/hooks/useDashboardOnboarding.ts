@@ -4,7 +4,7 @@ import { useTranslatedStrings } from "../../../utils/useTranslatedStrings";
 
 const useDashboardOnboarding = () => {
   const onboardingLabels = useTranslatedStrings({
-    startTour: "Start tutorial"
+    startTour: "Start tutorial",
   });
   const [onboardingOpen, setOnboardingOpen] = useState(false);
 
@@ -14,15 +14,13 @@ const useDashboardOnboarding = () => {
       if (!seen) {
         setOnboardingOpen(true);
       }
-    } catch {
-    }
+    } catch {}
   }, []);
 
   const handleOnboardingComplete = () => {
     try {
       localStorage.setItem("krishimitra:onboarding_seen", "true");
-    } catch {
-    }
+    } catch {}
     setOnboardingOpen(false);
   };
 
@@ -30,7 +28,7 @@ const useDashboardOnboarding = () => {
     onboardingLabels,
     onboardingOpen,
     setOnboardingOpen,
-    handleOnboardingComplete
+    handleOnboardingComplete,
   };
 };
 

@@ -92,7 +92,9 @@ class SustainabilityService:
         benchmark = self._benchmark_for_location(location)
         history_scores = history_scores or []
 
-        water_efficiency = self._clamp(100 * (benchmark["water_usage_l_per_acre"] / water_usage_l_per_acre))
+        water_efficiency = self._clamp(
+            100 * (benchmark["water_usage_l_per_acre"] / water_usage_l_per_acre)
+        )
         fertilizer_efficiency = self._clamp(
             100 * (benchmark["fertilizer_kg_per_acre"] / fertilizer_kg_per_acre)
         )
@@ -103,13 +105,21 @@ class SustainabilityService:
 
         recommendations: List[str] = []
         if water_efficiency < 70:
-            recommendations.append("Reduce water usage through stage-wise irrigation and rain-adjusted scheduling.")
+            recommendations.append(
+                "Reduce water usage through stage-wise irrigation and rain-adjusted scheduling."
+            )
         if fertilizer_efficiency < 70:
-            recommendations.append("Improve nutrient efficiency with soil-test based split fertilizer application.")
+            recommendations.append(
+                "Improve nutrient efficiency with soil-test based split fertilizer application."
+            )
         if yield_optimization < 70:
-            recommendations.append("Review sowing window, seed quality and crop management for yield recovery.")
+            recommendations.append(
+                "Review sowing window, seed quality and crop management for yield recovery."
+            )
         if not recommendations:
-            recommendations.append("Performance is aligned with regional best practices. Continue current strategy.")
+            recommendations.append(
+                "Performance is aligned with regional best practices. Continue current strategy."
+            )
 
         comparison = {
             "water_vs_region_percent": round(

@@ -17,7 +17,7 @@ const FilterAutocomplete: React.FC<FilterAutocompleteProps> = ({
   options,
   onChange,
   placeholder,
-  disabled
+  disabled,
 }) => (
   <Autocomplete
     freeSolo
@@ -31,7 +31,13 @@ const FilterAutocomplete: React.FC<FilterAutocompleteProps> = ({
     onInputChange={(_, newInput) => onChange(newInput)}
     onChange={(_, newValue) => onChange(typeof newValue === "string" ? newValue : newValue || "")}
     renderInput={(params) => (
-      <TextField {...params} fullWidth label={label} placeholder={placeholder} disabled={disabled} />
+      <TextField
+        {...params}
+        fullWidth
+        label={label}
+        placeholder={placeholder}
+        disabled={disabled}
+      />
     )}
   />
 );

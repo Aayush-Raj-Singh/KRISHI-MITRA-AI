@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-KrishiMitra AI is an AI-powered rural decision intelligence platform designed to address critical challenges faced by Indian farmers: income instability, unpredictable climate impacts, market price volatility, and inefficient resource utilization. Unlike traditional rule-based agricultural advisory systems, KrishiMitra AI leverages machine learning models and Amazon Bedrock to deliver predictive, personalized, and actionable intelligence.
+KrishiMitra AI is an AI-powered rural decision intelligence platform designed to address critical challenges faced by Indian farmers: income instability, unpredictable climate impacts, market price volatility, and inefficient resource utilization. Unlike traditional rule-based agricultural advisory systems, KrishiMitra AI leverages machine learning models and a switchable AI runtime to deliver predictive, personalized, and actionable intelligence.
 
 The platform provides crop recommendations based on soil and climate data, forecasts market prices using time-series analysis, optimizes water usage through intelligent suggestions, and offers multilingual AI-powered advisory services. By transforming raw agricultural data into decision intelligence, KrishiMitra AI empowers farmers to make informed decisions that improve yields, reduce resource waste, and enhance income stability.
 
@@ -45,7 +45,7 @@ These challenges result in reduced agricultural productivity, environmental degr
 - Crop recommendation engine using ML models trained on soil, climate, and historical yield data
 - Market price forecasting for major crops using time-series analysis
 - Water optimization advisory based on crop type, soil moisture, and weather predictions
-- Multilingual conversational AI advisory powered by Amazon Bedrock
+- Multilingual conversational AI advisory powered by a switchable AI runtime
 - Sustainability scoring system to evaluate resource efficiency
 - Web and mobile interfaces for farmer access
 - Dashboard for agricultural extension officers and cooperatives
@@ -87,7 +87,7 @@ These challenges result in reduced agricultural productivity, environmental degr
 - **Crop_Recommender**: The ML-based subsystem that suggests optimal crops based on input parameters
 - **Price_Forecaster**: The time-series analysis subsystem that predicts future mandi prices
 - **Water_Optimizer**: The subsystem that provides irrigation recommendations
-- **AI_Advisory**: The Amazon Bedrock-powered conversational interface for farmer queries
+- **AI_Advisory**: The switchable-runtime conversational interface for farmer queries
 - **Sustainability_Scorer**: The subsystem that calculates resource efficiency metrics
 - **User**: Any authenticated person interacting with the platform (farmer, officer, or administrator)
 - **Mandi**: Traditional Indian agricultural marketplace where crops are traded
@@ -163,7 +163,7 @@ These challenges result in reduced agricultural productivity, environmental degr
 #### Acceptance Criteria
 
 1. WHEN a user asks a question in any supported language (Hindi, English, Tamil, Telugu, Marathi, Bengali, Gujarati, Kannada, Punjabi), THE AI_Advisory SHALL understand the query and respond in the same language
-2. THE AI_Advisory SHALL use Amazon Bedrock (Claude or Titan models) to generate contextually relevant responses
+2. THE AI_Advisory SHALL use the configured AI runtime provider to generate contextually relevant responses
 3. WHEN answering queries, THE AI_Advisory SHALL incorporate user-specific context (location, crops, soil type, farm size)
 4. THE AI_Advisory SHALL provide responses within 5 seconds for 95% of queries
 5. WHEN the AI_Advisory cannot answer a query confidently, THE KrishiMitra_Platform SHALL indicate uncertainty and suggest alternative resources
@@ -329,7 +329,7 @@ Traditional rule-based agricultural advisory systems have fundamental limitation
 
 **Rule-Based Limitation**: Handling diverse farmer queries in multiple languages with varying phrasings requires extensive manual programming and cannot handle context or ambiguity.
 
-**AI Advantage**: Large language models (Amazon Bedrock) understand intent, context, and nuance across languages, providing conversational interactions that feel natural and helpful.
+**AI Advantage**: Large language models in the active AI runtime understand intent, context, and nuance across languages, providing conversational interactions that feel natural and helpful.
 
 ### 6. Continuous Improvement
 
@@ -357,7 +357,7 @@ Traditional rule-based agricultural advisory systems have fundamental limitation
 4. Government mandi price data and weather APIs remain accessible
 5. Farmers are willing to provide farm profile data and feedback
 6. Agricultural extension officers will support platform adoption and training
-7. AWS infrastructure and Amazon Bedrock services are available and cost-effective for the project scale
+7. AWS infrastructure and at least one supported AI runtime profile are available and cost-effective for the project scale
 
 ### Constraints
 
@@ -416,9 +416,10 @@ Traditional rule-based agricultural advisory systems have fundamental limitation
 ### Technical Risks
 
 **Risk 1: ML Model Accuracy**
+
 - **Description**: Models may provide inaccurate recommendations due to insufficient training data or changing conditions
 - **Impact**: High - Could lead to crop failures and loss of farmer trust
-- **Mitigation**: 
+- **Mitigation**:
   - Use ensemble models to improve robustness
   - Provide confidence scores with all predictions
   - Implement continuous model monitoring and retraining
@@ -426,6 +427,7 @@ Traditional rule-based agricultural advisory systems have fundamental limitation
   - Include disclaimers that recommendations are advisory, not guaranteed
 
 **Risk 2: Data Quality and Availability**
+
 - **Description**: Historical agricultural data may be incomplete, inconsistent, or unavailable for certain regions
 - **Impact**: Medium - Limits model training and prediction accuracy
 - **Mitigation**:
@@ -435,6 +437,7 @@ Traditional rule-based agricultural advisory systems have fundamental limitation
   - Collect user feedback to build proprietary datasets over time
 
 **Risk 3: API Dependencies**
+
 - **Description**: External APIs (weather, mandi prices) may become unavailable or change formats
 - **Impact**: Medium - Disrupts real-time recommendations
 - **Mitigation**:
@@ -444,6 +447,7 @@ Traditional rule-based agricultural advisory systems have fundamental limitation
   - Maintain local copies of critical historical data
 
 **Risk 4: Scalability Challenges**
+
 - **Description**: System may not handle rapid user growth or peak loads during critical farming periods
 - **Impact**: High - Poor performance could drive users away
 - **Mitigation**:
@@ -455,6 +459,7 @@ Traditional rule-based agricultural advisory systems have fundamental limitation
 ### User Adoption Risks
 
 **Risk 5: Low Digital Literacy**
+
 - **Description**: Target users may struggle with smartphone apps or digital interfaces
 - **Impact**: High - Limits platform adoption and usage
 - **Mitigation**:
@@ -465,6 +470,7 @@ Traditional rule-based agricultural advisory systems have fundamental limitation
   - Offer helpline support in multiple languages
 
 **Risk 6: Trust and Credibility**
+
 - **Description**: Farmers may not trust AI recommendations, especially if early predictions are inaccurate
 - **Impact**: High - Could prevent adoption or cause early abandonment
 - **Mitigation**:
@@ -475,6 +481,7 @@ Traditional rule-based agricultural advisory systems have fundamental limitation
   - Provide human expert backup for complex queries
 
 **Risk 7: Language and Cultural Barriers**
+
 - **Description**: Platform may not adequately address linguistic diversity or cultural farming practices
 - **Impact**: Medium - Limits reach to certain communities
 - **Mitigation**:
@@ -486,6 +493,7 @@ Traditional rule-based agricultural advisory systems have fundamental limitation
 ### Business and Operational Risks
 
 **Risk 8: Funding and Sustainability**
+
 - **Description**: Project may lack funding for long-term operations and scaling
 - **Impact**: High - Could lead to project shutdown
 - **Mitigation**:
@@ -495,6 +503,7 @@ Traditional rule-based agricultural advisory systems have fundamental limitation
   - Consider freemium model with premium features for cooperatives
 
 **Risk 9: Regulatory and Compliance**
+
 - **Description**: Platform may face regulatory challenges related to data privacy or agricultural advice
 - **Impact**: Medium - Could delay launch or require significant changes
 - **Mitigation**:
@@ -504,6 +513,7 @@ Traditional rule-based agricultural advisory systems have fundamental limitation
   - Obtain necessary certifications and approvals before launch
 
 **Risk 10: Competition and Market Dynamics**
+
 - **Description**: Existing players or new entrants may offer similar solutions
 - **Impact**: Medium - Could limit market share and growth
 - **Mitigation**:

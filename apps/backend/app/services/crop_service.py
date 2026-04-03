@@ -2,16 +2,16 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Dict, List
 
 import joblib
 import numpy as np
 import pandas as pd
+from ml.training.train_crop_model import FEATURE_COLUMNS, train_crop_model
 
+from app.core.config import settings
 from app.core.logging import get_logger
 from app.schemas.recommendations import CropRecommendationItem, CropRecommendationRequest
-from ml.training.train_crop_model import FEATURE_COLUMNS, train_crop_model
 
 logger = get_logger(__name__)
 
@@ -26,7 +26,8 @@ class CropModelBundle:
 
 class CropRecommender:
     def __init__(self) -> None:
-        self._artifact_path = Path(__file__).resolve().parents[2] / "ml" / "crop_model" / "crop_model.joblib"
+        self._artifact_path = settings.crop_model_artifact_resolved_path
+        self._legacy_artifact_path = settings.crop_model_legacy_artifact_path
         self._bundle = self._load_or_train()
 
     @staticmethod
@@ -41,16 +42,28 @@ class CropRecommender:
         return (sum(ord(char) for char in (location or "")) % 1000) / 1000.0
 
     def _load_or_train(self) -> CropModelBundle:
-        if not self._artifact_path.exists():
+        artifact_path = self._artifact_path
+        if not artifact_path.exists() and self._legacy_artifact_path.exists():
+            artifact_path = self._legacy_artifact_path
+
+        if not artifact_path.exists():
+            self._artifact_path.parent.mkdir(parents=True, exist_ok=True)
             logger.info("crop_model_missing_training_started", artifact=str(self._artifact_path))
             metadata = train_crop_model(model_path=self._artifact_path)
-            logger.info("crop_model_training_completed", version=metadata["version"], accuracy=metadata["accuracy"])
+            logger.info(
+                "crop_model_training_completed",
+                version=metadata["version"],
+                accuracy=metadata["accuracy"],
+            )
+            artifact_path = self._artifact_path
 
-        payload = joblib.load(self._artifact_path)
+        payload = joblib.load(artifact_path)
         return CropModelBundle(
             model=payload["model"],
             feature_columns=list(payload["feature_columns"]),
-            feature_medians={key: float(value) for key, value in payload["feature_medians"].items()},
+            feature_medians={
+                key: float(value) for key, value in payload["feature_medians"].items()
+            },
             version=str(payload.get("version", "rf-crop-v1")),
         )
 
@@ -70,13 +83,20 @@ class CropRecommender:
             "location_score": self._location_score(request.location),
             "historical_yield": historical_yield,
         }
-        values = [float(feature_map.get(column, self._bundle.feature_medians.get(column, 0.0))) for column in FEATURE_COLUMNS]
+        values = [
+            float(feature_map.get(column, self._bundle.feature_medians.get(column, 0.0)))
+            for column in FEATURE_COLUMNS
+        ]
         return pd.DataFrame([values], columns=FEATURE_COLUMNS)
 
     def _explanation(self, feature_values: pd.DataFrame) -> str:
         model = self._bundle.model
-        importances = np.array(getattr(model, "feature_importances_", np.zeros(len(FEATURE_COLUMNS))), dtype=float)
-        medians = np.array([self._bundle.feature_medians.get(name, 0.0) for name in FEATURE_COLUMNS], dtype=float)
+        importances = np.array(
+            getattr(model, "feature_importances_", np.zeros(len(FEATURE_COLUMNS))), dtype=float
+        )
+        medians = np.array(
+            [self._bundle.feature_medians.get(name, 0.0) for name in FEATURE_COLUMNS], dtype=float
+        )
         point = feature_values.iloc[0].to_numpy(dtype=float)
         delta = np.abs(point - medians) / (np.abs(medians) + 1.0)
         contribution = importances * delta
@@ -161,7 +181,8 @@ class CropRecommender:
         top_indices = np.argsort(adjusted_probabilities)[::-1][:3]
         explanation = self._explanation(feature_values)
         if personalization_context and (
-            personalization_context.get("preferred_crops") or personalization_context.get("seasonal_preference")
+            personalization_context.get("preferred_crops")
+            or personalization_context.get("seasonal_preference")
         ):
             explanation = f"{explanation} Personalized using your historical outcomes and seasonal success trends."
 

@@ -1,10 +1,5 @@
 import React, { Suspense } from "react";
-import {
-  Alert,
-  Box,
-  Typography,
-  Stack
-} from "@mui/material";
+import { Alert, Box, Typography, Stack } from "@mui/material";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -14,7 +9,7 @@ import {
   Title,
   Tooltip,
   Legend,
-  BarElement
+  BarElement,
 } from "chart.js";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -22,11 +17,7 @@ import { useTranslation } from "react-i18next";
 import AppLayout from "../components/common/AppLayout";
 import { useAppSelector } from "../store/hooks";
 import OnboardingDialog from "../components/onboarding/OnboardingDialog";
-import {
-  AGRI_SLIDES,
-  SLIDER_AUTOPLAY_MS,
-  spacingScale
-} from "./dashboard/constants";
+import { AGRI_SLIDES, SLIDER_AUTOPLAY_MS, spacingScale } from "./dashboard/constants";
 import useDashboardCarousel from "./dashboard/hooks/useDashboardCarousel";
 import useDashboardData from "./dashboard/hooks/useDashboardData";
 import useDashboardHashScroll from "./dashboard/hooks/useDashboardHashScroll";
@@ -35,11 +26,26 @@ import useDashboardRealtime from "./dashboard/hooks/useDashboardRealtime";
 import HeroCarouselSection from "./dashboard/sections/HeroCarouselSection";
 import HeroOverviewSection from "./dashboard/sections/HeroOverviewSection";
 const MarketDataSection = React.lazy(() => import("./dashboard/sections/MarketDataSection"));
-const NoticesGallerySection = React.lazy(() => import("./dashboard/sections/NoticesGallerySection"));
-const OfficerAnalyticsSection = React.lazy(() => import("./dashboard/sections/OfficerAnalyticsSection"));
-const ImportantLinksSection = React.lazy(() => import("./dashboard/sections/ImportantLinksSection"));
+const NoticesGallerySection = React.lazy(
+  () => import("./dashboard/sections/NoticesGallerySection"),
+);
+const OfficerAnalyticsSection = React.lazy(
+  () => import("./dashboard/sections/OfficerAnalyticsSection"),
+);
+const ImportantLinksSection = React.lazy(
+  () => import("./dashboard/sections/ImportantLinksSection"),
+);
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, BarElement);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+);
 
 const DashboardPage: React.FC = () => {
   const { t } = useTranslation();
@@ -52,12 +58,13 @@ const DashboardPage: React.FC = () => {
   const isAdmin = user?.role === "admin";
   const visibleSlideCount = 1;
 
-  const { onboardingLabels, onboardingOpen, setOnboardingOpen, handleOnboardingComplete } = useDashboardOnboarding();
+  const { onboardingLabels, onboardingOpen, setOnboardingOpen, handleOnboardingComplete } =
+    useDashboardOnboarding();
   const { wsStatus, wsUrl } = useDashboardRealtime(accessToken);
   const { carouselRef, handleCarouselScroll, showPrevSlide, showNextSlide } = useDashboardCarousel({
     slideCount: AGRI_SLIDES.length,
     visibleSlideCount,
-    autoplayMs: SLIDER_AUTOPLAY_MS
+    autoplayMs: SLIDER_AUTOPLAY_MS,
   });
 
   const {
@@ -92,10 +99,23 @@ const DashboardPage: React.FC = () => {
     mandiMarkets,
     nearestMarkets,
     mandiCards,
+    resolvedMandiState,
+    tradingSnapshot,
+    tradingTransportMode,
+    tradingFeedStatus,
+    tradingRecentTape,
+    tradingIsRefreshing,
+    tradingIsLoading,
+    tradingError,
+    refreshTradingSnapshot,
     locationLabel,
+    locationCoords,
+    locationAccuracyMeters,
+    locationStatus,
+    refreshLocation,
     handleAnalyticsFetch,
     handleAnalyticsExport,
-    errorMessage
+    errorMessage,
   } = useDashboardData({ isOfficer, isAdmin, t });
 
   const isOffline = typeof navigator !== "undefined" ? !navigator.onLine : false;
@@ -103,7 +123,10 @@ const DashboardPage: React.FC = () => {
     if (!value) return null;
     const parsed = new Date(value);
     if (Number.isNaN(parsed.getTime())) return null;
-    return new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short" }).format(parsed);
+    return new Intl.DateTimeFormat(undefined, {
+      day: "numeric",
+      month: "short",
+    }).format(parsed);
   };
   const formatRecommendationKind = (kind?: string | null) => {
     if (!kind) return null;
@@ -117,33 +140,50 @@ const DashboardPage: React.FC = () => {
     ? heroSummary.latest_recommendation_id.slice(0, 8).toUpperCase()
     : t("dashboard_page.hero.no_recommendation");
   const latestRecommendationCaption = heroSummary?.latest_recommendation_id
-    ? [formatRecommendationKind(heroSummary.latest_recommendation_kind), heroSummary.latest_recommendation_context, formatHeroDate(heroSummary.latest_recommendation_created_at)]
+    ? [
+        formatRecommendationKind(heroSummary.latest_recommendation_kind),
+        heroSummary.latest_recommendation_context,
+        formatHeroDate(heroSummary.latest_recommendation_created_at),
+      ]
         .filter(Boolean)
         .join(" • ")
-    : t("dashboard_page.hero.saved_count", { count: heroSummary?.total_recommendations ?? 0 });
+    : t("dashboard_page.hero.saved_count", {
+        count: heroSummary?.total_recommendations ?? 0,
+      });
   const waterSavingsValue =
     typeof heroSummary?.latest_water_savings_percent === "number"
       ? `${heroSummary.latest_water_savings_percent.toFixed(1)}%`
       : t("dashboard_page.hero.no_water_plan");
   const waterSavingsCaption =
     typeof heroSummary?.latest_water_savings_percent === "number"
-      ? [heroSummary.latest_water_crop, formatHeroDate(heroSummary.latest_water_created_at)].filter(Boolean).join(" • ")
-      : t("dashboard_page.hero.saved_count", { count: heroSummary?.water_recommendation_count ?? 0 });
+      ? [heroSummary.latest_water_crop, formatHeroDate(heroSummary.latest_water_created_at)]
+          .filter(Boolean)
+          .join(" • ")
+      : t("dashboard_page.hero.saved_count", {
+          count: heroSummary?.water_recommendation_count ?? 0,
+        });
   const sustainabilityValue =
     typeof heroSummary?.latest_sustainability_score === "number"
       ? `${heroSummary.latest_sustainability_score.toFixed(1)}`
       : t("dashboard_page.hero.no_feedback");
   const sustainabilityCaption =
     typeof heroSummary?.latest_sustainability_score === "number"
-      ? [heroSummary.latest_sustainability_trend, formatHeroDate(heroSummary.latest_feedback_created_at)].filter(Boolean).join(" • ")
-      : t("dashboard_page.hero.feedback_count", { count: heroSummary?.total_feedback ?? 0 });
+      ? [
+          heroSummary.latest_sustainability_trend,
+          formatHeroDate(heroSummary.latest_feedback_created_at),
+        ]
+          .filter(Boolean)
+          .join(" • ")
+      : t("dashboard_page.hero.feedback_count", {
+          count: heroSummary?.total_feedback ?? 0,
+        });
   const sectionFallback = (
     <Box
       sx={{
         p: 2,
         borderRadius: 2,
         border: "1px dashed var(--surface-border)",
-        background: "var(--surface-soft)"
+        background: "var(--surface-soft)",
       }}
     >
       <Typography variant="body2" color="text.secondary">
@@ -175,7 +215,9 @@ const DashboardPage: React.FC = () => {
           wsUrl={wsUrl}
           wsStatus={wsStatus}
           isOffline={isOffline}
-          statusCaption={t(`dashboard_page.ws_status.${wsStatus}`, { defaultValue: wsStatus })}
+          statusCaption={t(`dashboard_page.ws_status.${wsStatus}`, {
+            defaultValue: wsStatus,
+          })}
           latestRecommendation={latestRecommendation}
           latestRecommendationCaption={latestRecommendationCaption}
           waterSavingsValue={waterSavingsValue}
@@ -230,7 +272,20 @@ const DashboardPage: React.FC = () => {
             mandiRowsWithChange={mandiRowsWithChange}
             nearestMarkets={nearestMarkets}
             mandiCards={mandiCards}
+            resolvedMandiState={resolvedMandiState}
+            tradingSnapshot={tradingSnapshot}
+            tradingTransportMode={tradingTransportMode}
+            tradingFeedStatus={tradingFeedStatus}
+            tradingRecentTape={tradingRecentTape}
+            tradingIsRefreshing={tradingIsRefreshing}
+            tradingIsLoading={tradingIsLoading}
+            tradingError={tradingError}
+            refreshTradingSnapshot={refreshTradingSnapshot}
             locationLabel={locationLabel}
+            locationCoords={locationCoords}
+            locationAccuracyMeters={locationAccuracyMeters}
+            locationStatus={locationStatus}
+            refreshLocation={refreshLocation}
           />
         </Suspense>
 
@@ -252,5 +307,3 @@ const DashboardPage: React.FC = () => {
 };
 
 export default DashboardPage;
-
-

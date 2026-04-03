@@ -18,8 +18,7 @@ const writeSuggestions = (key: string, values: string[]) => {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(`krishimitra:suggestions:${key}`, JSON.stringify(values));
-  } catch {
-  }
+  } catch {}
 };
 
 const normalize = (value: string) => value.trim();
@@ -34,11 +33,14 @@ export const useLocalSuggestions = (key: string, seed: string[] = []) => {
     (value: string) => {
       const cleaned = normalize(value);
       if (!cleaned) return;
-      const next = [cleaned, ...suggestions.filter((item) => item !== cleaned)].slice(0, MAX_SUGGESTIONS);
+      const next = [cleaned, ...suggestions.filter((item) => item !== cleaned)].slice(
+        0,
+        MAX_SUGGESTIONS,
+      );
       setSuggestions(next);
       writeSuggestions(key, next);
     },
-    [key, suggestions]
+    [key, suggestions],
   );
 
   const merged = useMemo(() => Array.from(new Set([...seed, ...suggestions])), [seed, suggestions]);

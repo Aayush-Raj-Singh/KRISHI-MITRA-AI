@@ -7,7 +7,7 @@ from app.core.logging import get_logger
 from app.data.disease_catalog import get_disease_info
 from app.ml.disease_model import DiseasePredictor
 from app.schemas.disease import DiseasePredictionResponse
-from app.services.bedrock_service import BedrockService
+from app.services.llm_factory import get_llm_service
 
 logger = get_logger(__name__)
 
@@ -18,10 +18,10 @@ class DiseaseDetectionService:
     def __init__(self) -> None:
         self._predictor = DiseasePredictor()
         try:
-            self._bedrock = BedrockService()
+            self._llm = get_llm_service()
         except Exception as exc:
-            logger.warning("bedrock_init_failed", error=str(exc))
-            self._bedrock = None
+            logger.warning("llm_init_failed", error=str(exc))
+            self._llm = None
 
     def _severity_from_confidence(self, confidence: float) -> str:
         if confidence >= 0.8:
@@ -31,19 +31,20 @@ class DiseaseDetectionService:
         return "low"
 
     def _build_llm_fallback(self, crop: str, disease: str) -> Tuple[str, List[str]]:
-        if not self._bedrock:
+        if not self._llm:
             return (
                 "Low confidence. Please upload a clearer image or consult a local expert.",
-                ["Could you share close-up leaf photos?", "Are there visible spots, holes, or yellowing?"],
+                [
+                    "Could you share close-up leaf photos?",
+                    "Are there visible spots, holes, or yellowing?",
+                ],
             )
         try:
             system_prompt = "You are an agronomy expert helping farmers diagnose crop diseases."
             user_context = {"crop": crop, "suspected_disease": disease}
             conversation: List[dict] = []
-            user_message = (
-                "The model confidence is low. Provide likely diseases, ask clarifying questions, and give immediate care advice."
-            )
-            reply, _, _ = self._bedrock.generate_reply(
+            user_message = "The model confidence is low. Provide likely diseases, ask clarifying questions, and give immediate care advice."
+            reply, _, _ = self._llm.generate_reply(
                 system_prompt=system_prompt,
                 user_context=user_context,
                 conversation=conversation,
@@ -61,14 +62,18 @@ class DiseaseDetectionService:
         return reply, questions
 
     def _build_advisory(self, crop: str, disease: str) -> str:
-        if not self._bedrock:
+        if not self._llm:
             return f"Based on detected {disease} on {crop}, follow treatment and prevention steps provided."
         try:
-            system_prompt = "You are an agronomy advisor providing concise disease management guidance."
+            system_prompt = (
+                "You are an agronomy advisor providing concise disease management guidance."
+            )
             user_context = {"crop": crop, "disease": disease}
             conversation: List[dict] = []
-            user_message = "Provide 3 concise action steps for immediate treatment and 2 prevention tips."
-            reply, _, _ = self._bedrock.generate_reply(
+            user_message = (
+                "Provide 3 concise action steps for immediate treatment and 2 prevention tips."
+            )
+            reply, _, _ = self._llm.generate_reply(
                 system_prompt=system_prompt,
                 user_context=user_context,
                 conversation=conversation,
@@ -78,7 +83,9 @@ class DiseaseDetectionService:
             )
             return reply
         except Exception as exc:
-            logger.warning("disease_advisory_bedrock_unavailable", error=str(exc), crop=crop, disease=disease)
+            logger.warning(
+                "disease_advisory_llm_unavailable", error=str(exc), crop=crop, disease=disease
+            )
             return f"Based on detected {disease} on {crop}, follow treatment and prevention steps provided."
 
     def predict(self, image_bytes: bytes) -> DiseasePredictionResponse:
@@ -89,7 +96,9 @@ class DiseaseDetectionService:
         advisory = self._build_advisory(prediction.crop, prediction.disease)
         clarifying_questions: List[str] = []
         if prediction.confidence < self.CONFIDENCE_THRESHOLD:
-            advisory, clarifying_questions = self._build_llm_fallback(prediction.crop, prediction.disease)
+            advisory, clarifying_questions = self._build_llm_fallback(
+                prediction.crop, prediction.disease
+            )
 
         return DiseasePredictionResponse(
             crop=prediction.crop,

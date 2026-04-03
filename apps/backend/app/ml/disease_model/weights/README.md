@@ -7,5 +7,6 @@ Replace the placeholder with the real model weights before running production in
 
 Optional:
 Create a `labels.json` file with either:
+
 - Array of `["Crop", "Disease"]` pairs, or
 - Array of objects like `{ "crop": "Rice", "disease": "Leaf Blight" }`

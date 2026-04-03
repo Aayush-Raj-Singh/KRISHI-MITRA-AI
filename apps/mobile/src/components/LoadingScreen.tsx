@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "center",
-    padding: 24
+    padding: 24,
   },
   card: {
     width: "100%",
@@ -30,16 +30,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     alignItems: "center",
-    gap: 12
+    gap: 12,
   },
   title: {
     color: colors.text,
     fontSize: 22,
-    fontWeight: "800"
+    fontWeight: "800",
   },
   label: {
     color: colors.mutedText,
     fontSize: 14,
-    textAlign: "center"
-  }
+    textAlign: "center",
+  },
 });

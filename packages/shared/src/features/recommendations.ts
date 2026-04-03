@@ -6,39 +6,39 @@ import type {
   PriceForecastRequest,
   PriceForecastResponse,
   WaterOptimizationRequest,
-  WaterOptimizationResponse
+  WaterOptimizationResponse,
 } from "../contracts/recommendations";
 import {
   sanitizeCropRecommendationPayload,
   sanitizePriceForecastPayload,
-  sanitizeWaterOptimizationPayload
+  sanitizeWaterOptimizationPayload,
 } from "../validators/recommendations";
 import type { FeatureApiContext } from "./context";
 
 export const createRecommendationApi = ({ api, unwrap }: FeatureApiContext) => ({
   getCropRecommendation: async (
-    payload: CropRecommendationRequest
+    payload: CropRecommendationRequest,
   ): Promise<CropRecommendationResponse> => {
     const response = await api.post<ApiEnvelope<CropRecommendationResponse>>(
       API_ENDPOINTS.recommendations.crop,
-      sanitizeCropRecommendationPayload(payload)
+      sanitizeCropRecommendationPayload(payload),
     );
     return unwrap(response.data);
   },
   getPriceForecast: async (payload: PriceForecastRequest): Promise<PriceForecastResponse> => {
     const response = await api.post<ApiEnvelope<PriceForecastResponse>>(
       API_ENDPOINTS.recommendations.priceForecast,
-      sanitizePriceForecastPayload(payload)
+      sanitizePriceForecastPayload(payload),
     );
     return unwrap(response.data);
   },
   getWaterOptimization: async (
-    payload: WaterOptimizationRequest
+    payload: WaterOptimizationRequest,
   ): Promise<WaterOptimizationResponse> => {
     const response = await api.post<ApiEnvelope<WaterOptimizationResponse>>(
       API_ENDPOINTS.recommendations.waterOptimization,
-      sanitizeWaterOptimizationPayload(payload)
+      sanitizeWaterOptimizationPayload(payload),
     );
     return unwrap(response.data);
-  }
+  },
 });

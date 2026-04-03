@@ -1,9 +1,15 @@
 import {
   createDiseaseApi,
-  type DiseasePredictionResponse as DiseasePrediction
+  type DiseasePredictionResponse as DiseasePrediction,
 } from "@krishimitra/shared";
 import api, { unwrap } from "./api";
-import { getOfflineRecord, isOnline, listOfflineRecords, removeOfflineRecord, saveOfflineRecord } from "../utils/offlineStorage";
+import {
+  getOfflineRecord,
+  isOnline,
+  listOfflineRecords,
+  removeOfflineRecord,
+  saveOfflineRecord,
+} from "../utils/offlineStorage";
 import { compressImage, dataUrlToFile, fileToDataUrl } from "../utils/imageCompression";
 
 const diseaseApi = createDiseaseApi({ api, unwrap });
@@ -19,7 +25,9 @@ type QueuedDiseaseItem = {
 
 const listQueuedDiseaseItems = async (): Promise<QueuedDiseaseItem[]> => {
   const records = await listOfflineRecords<QueuedDiseaseItem>("images");
-  return records.map((record) => record.value).sort((left, right) => left.createdAt.localeCompare(right.createdAt));
+  return records
+    .map((record) => record.value)
+    .sort((left, right) => left.createdAt.localeCompare(right.createdAt));
 };
 
 export const queueDiseaseDetection = async (file: File) => {
@@ -29,7 +37,7 @@ export const queueDiseaseDetection = async (file: File) => {
     id: `disease_${Date.now()}`,
     filename: compressed.name,
     dataUrl,
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
   };
   await saveOfflineRecord("images", item.id, item);
   const queued = await listQueuedDiseaseItems();
@@ -48,8 +56,7 @@ export const processDiseaseQueue = async (): Promise<number> => {
       await predictDisease(file);
       processed += 1;
       await removeOfflineRecord("images", item.id);
-    } catch {
-    }
+    } catch {}
   }
   return processed;
 };

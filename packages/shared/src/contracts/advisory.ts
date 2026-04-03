@@ -11,6 +11,7 @@ export interface ChatSource {
 export interface ChatResponse {
   reply: string;
   language: string;
+  provider: string;
   model: string;
   sources: ChatSource[];
   is_fallback: boolean;

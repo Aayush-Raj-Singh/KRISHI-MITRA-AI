@@ -40,16 +40,22 @@ const ImportantLinksSection: React.FC<ImportantLinksSectionProps> = ({ t }) => {
           border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid #e7ddcc",
           background: isDark
             ? "linear-gradient(135deg, rgba(14, 38, 25, 0.98) 0%, rgba(13, 32, 23, 0.98) 100%)"
-            : "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(243, 237, 224, 0.96) 100%)"
+            : "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(243, 237, 224, 0.96) 100%)",
         }}
       >
         <Grid container spacing={spacingScale.md} alignItems="center">
           <Grid item xs={12} md={5}>
             <Stack spacing={1.2}>
-              <Typography variant="overline" sx={{ color: "text.secondary", letterSpacing: 0.6, fontWeight: 700 }}>
+              <Typography
+                variant="overline"
+                sx={{ color: "text.secondary", letterSpacing: 0.6, fontWeight: 700 }}
+              >
                 {t("layout.govt_caption")}
               </Typography>
-              <Typography variant="h4" sx={{ fontFamily: 'var(--app-heading-font), var(--app-body-font), serif' }}>
+              <Typography
+                variant="h4"
+                sx={{ fontFamily: "var(--app-heading-font), var(--app-body-font), serif" }}
+              >
                 {t("dashboard_page.links.title")}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -69,7 +75,9 @@ const ImportantLinksSection: React.FC<ImportantLinksSectionProps> = ({ t }) => {
                       justifyContent: "flex-start",
                       textAlign: "left",
                       borderRadius: 2,
-                      border: isDark ? "1px solid rgba(255,255,255,0.16)" : "1px solid rgba(231, 221, 204, 0.9)",
+                      border: isDark
+                        ? "1px solid rgba(255,255,255,0.16)"
+                        : "1px solid rgba(231, 221, 204, 0.9)",
                       bgcolor: isDark ? "rgba(16, 42, 30, 0.9)" : "rgba(255, 255, 255, 0.92)",
                       px: 2,
                       py: 1.5,
@@ -77,8 +85,10 @@ const ImportantLinksSection: React.FC<ImportantLinksSectionProps> = ({ t }) => {
                       transition: "transform 0.2s ease, box-shadow 0.2s ease",
                       "&:hover": {
                         transform: "translateY(-2px)",
-                        boxShadow: isDark ? "0 12px 24px rgba(0, 0, 0, 0.45)" : "0 10px 22px rgba(20, 20, 20, 0.12)"
-                      }
+                        boxShadow: isDark
+                          ? "0 12px 24px rgba(0, 0, 0, 0.45)"
+                          : "0 10px 22px rgba(20, 20, 20, 0.12)",
+                      },
                     }}
                   >
                     <Box
@@ -89,7 +99,7 @@ const ImportantLinksSection: React.FC<ImportantLinksSectionProps> = ({ t }) => {
                         bgcolor: isDark ? "rgba(95, 209, 139, 0.18)" : "rgba(27, 107, 58, 0.12)",
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "center"
+                        justifyContent: "center",
                       }}
                     >
                       <OpenInNewIcon fontSize="small" color="primary" />

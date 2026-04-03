@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import inspect
+from dataclasses import dataclass
 from typing import Any, Callable
 
 from app.core.config import settings
@@ -11,12 +11,16 @@ logger = get_logger(__name__)
 
 
 class TaskDispatcher:
-    async def dispatch(self, task_name: str, task: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
+    async def dispatch(
+        self, task_name: str, task: Callable[..., Any], *args: Any, **kwargs: Any
+    ) -> Any:
         raise NotImplementedError
 
 
 class LocalTaskDispatcher(TaskDispatcher):
-    async def dispatch(self, task_name: str, task: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
+    async def dispatch(
+        self, task_name: str, task: Callable[..., Any], *args: Any, **kwargs: Any
+    ) -> Any:
         logger.info("background_task_local_dispatch", task_name=task_name)
         result = task(*args, **kwargs)
         if inspect.isawaitable(result):
@@ -31,7 +35,9 @@ class CeleryTaskDispatcher(TaskDispatcher):
     Local mode intentionally no-ops to keep local setup lightweight.
     """
 
-    async def dispatch(self, task_name: str, task: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
+    async def dispatch(
+        self, task_name: str, task: Callable[..., Any], *args: Any, **kwargs: Any
+    ) -> Any:
         logger.info("background_task_celery_stub_dispatch", task_name=task_name)
         result = task(*args, **kwargs)
         if inspect.isawaitable(result):

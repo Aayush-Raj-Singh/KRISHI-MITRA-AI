@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import asyncio
 import smtplib
+from dataclasses import dataclass
 from email.message import EmailMessage
 from typing import Protocol
 
@@ -23,14 +23,15 @@ class OTPDeliveryPayload:
 
 
 class OTPDeliveryProvider(Protocol):
-    async def send_otp(self, payload: OTPDeliveryPayload) -> None:
-        ...
+    async def send_otp(self, payload: OTPDeliveryPayload) -> None: ...
 
 
 class ConsoleOTPProvider:
     async def send_otp(self, payload: OTPDeliveryPayload) -> None:
         if settings.is_production:
-            raise ExternalServiceUnavailableError("Console OTP delivery is not allowed in production")
+            raise ExternalServiceUnavailableError(
+                "Console OTP delivery is not allowed in production"
+            )
         logger.info(
             "otp_console_delivery",
             phone=payload.phone,
@@ -95,6 +96,16 @@ class TwilioOTPProvider:
     def configured(self) -> bool:
         return bool(self.account_sid and self.auth_token and self.from_number)
 
+    @staticmethod
+    def _is_retryable_http_error(exc: Exception) -> bool:
+        if isinstance(
+            exc, (httpx.TimeoutException, httpx.TransportError, httpx.RemoteProtocolError)
+        ):
+            return True
+        if isinstance(exc, httpx.HTTPStatusError):
+            return exc.response.status_code in {408, 409, 425, 429, 500, 502, 503, 504}
+        return False
+
     async def send_otp(self, payload: OTPDeliveryPayload) -> None:
         if payload.channel == "email":
             smtp_provider = SMTPOTPProvider()
@@ -121,12 +132,19 @@ class TwilioOTPProvider:
             data["StatusCallback"] = self.status_callback_url
 
         async with httpx.AsyncClient(timeout=10) as client:
-            response = await client.post(
-                url,
-                data=data,
-                auth=(self.account_sid or "", self.auth_token or ""),
-            )
-            response.raise_for_status()
+            for attempt in range(1, 4):
+                try:
+                    response = await client.post(
+                        url,
+                        data=data,
+                        auth=(self.account_sid or "", self.auth_token or ""),
+                    )
+                    response.raise_for_status()
+                    break
+                except Exception as exc:
+                    if attempt >= 3 or not self._is_retryable_http_error(exc):
+                        raise
+                    await asyncio.sleep(min(0.25 * attempt, 1.0))
         logger.info("otp_twilio_delivery_success", phone=payload.phone)
 
 

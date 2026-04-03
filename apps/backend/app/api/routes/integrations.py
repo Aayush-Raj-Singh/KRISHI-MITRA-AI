@@ -3,8 +3,8 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, Query
-from app.core.database import Database
 
+from app.core.database import Database
 from app.core.dependencies import get_db, require_roles
 from app.schemas.integrations import (
     IntegrationAuditItem,
@@ -36,7 +36,7 @@ async def weather(
 async def mandi_prices(
     crop: str = Query(min_length=2),
     market: str = Query(min_length=2),
-    days: int = Query(default=7, ge=1, le=30),
+    days: int = Query(default=30, ge=1, le=30),
     db: Database = Depends(get_db),
     __: str = Depends(require_roles(["farmer", "extension_officer", "admin"])),
 ) -> APIResponse[MandiPriceResponse]:
@@ -64,7 +64,13 @@ async def integration_audit(
     db: Database = Depends(get_db),
     __: str = Depends(require_roles(["admin"])),
 ) -> APIResponse[IntegrationAuditResponse]:
-    docs = await db["integration_audit"].find({}).sort("created_at", -1).limit(limit).to_list(length=limit)
+    docs = (
+        await db["integration_audit"]
+        .find({})
+        .sort("created_at", -1)
+        .limit(limit)
+        .to_list(length=limit)
+    )
     items = [
         IntegrationAuditItem(
             event=str(item.get("event", "unknown")),

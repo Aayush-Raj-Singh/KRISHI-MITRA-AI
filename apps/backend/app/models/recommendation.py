@@ -26,7 +26,9 @@ class RecommendationRecord(BaseModel):
         return cls(**data)
 
 
-def default_recommendation_record(user_id: str, kind: str, request_payload: Dict[str, Any], response_payload: Dict[str, Any]) -> Dict[str, Any]:
+def default_recommendation_record(
+    user_id: str, kind: str, request_payload: Dict[str, Any], response_payload: Dict[str, Any]
+) -> Dict[str, Any]:
     return {
         "user_id": user_id,
         "kind": kind,

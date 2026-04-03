@@ -5,9 +5,8 @@ from datetime import datetime, timezone
 from typing import Optional
 from urllib.parse import urlparse
 
-from app.core.database import Database
-
 from app.core.config import settings
+from app.core.database import Database
 from app.schemas.links import ExternalLinkCheckResponse
 
 
@@ -58,6 +57,8 @@ class ExternalLinkService:
 
         if safe:
             verified = self._is_allowed_domain(host)
+            if not verified:
+                reason = "Domain is not on the verified allowlist"
 
         response = ExternalLinkCheckResponse(
             url=url,

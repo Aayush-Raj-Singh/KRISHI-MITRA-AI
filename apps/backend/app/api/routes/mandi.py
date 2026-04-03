@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from datetime import datetime, date
+from datetime import date, datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
-from app.core.database import Database
 
+from app.core.database import Database
 from app.core.dependencies import get_db, require_roles
 from app.models.user import UserInDB
 from app.schemas.mandi import (
@@ -16,6 +16,7 @@ from app.schemas.mandi import (
 )
 from app.schemas.response import APIResponse
 from app.utils.audit import log_audit_event
+from app.utils.query_filters import build_case_insensitive_exact_filter
 from app.utils.responses import success_response
 
 router = APIRouter()
@@ -42,7 +43,9 @@ async def create_entry(
     now = datetime.utcnow()
     record = payload.model_dump()
     if not record.get("state") or not record.get("district"):
-        profile = await db["market_profiles"].find_one({"name": {"$regex": f"^{payload.market}$", "$options": "i"}})
+        profile = await db["market_profiles"].find_one(
+            {"name": build_case_insensitive_exact_filter(payload.market)}
+        )
         if profile:
             record["state"] = record.get("state") or profile.get("state")
             record["district"] = record.get("district") or profile.get("district")
@@ -60,7 +63,9 @@ async def create_entry(
     result = await db["mandi_entries"].insert_one(record)
     created = await db["mandi_entries"].find_one({"_id": result.inserted_id})
     created = _normalize(created)
-    await log_audit_event(db, user.id, user.role, "mandi_entry", created["_id"], "create", record, request.client.host)
+    await log_audit_event(
+        db, user.id, user.role, "mandi_entry", created["_id"], "create", record, request.client.host
+    )
     return success_response(MandiEntryDB(**created), message="Mandi entry created")
 
 
@@ -78,16 +83,23 @@ async def update_entry(
     if user.role != "admin" and entry.get("created_by") != user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not allowed")
     if entry.get("status") not in {"draft", "rejected"}:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Only draft/rejected entries can be edited")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only draft/rejected entries can be edited",
+        )
 
     updates = payload.model_dump(exclude_unset=True)
     if not updates:
         return success_response(MandiEntryDB(**_normalize(entry)), message="No changes applied")
 
     now = datetime.utcnow()
-    if ("state" not in updates or "district" not in updates) and updates.get("market", entry.get("market")):
+    if ("state" not in updates or "district" not in updates) and updates.get(
+        "market", entry.get("market")
+    ):
         market_name = updates.get("market") or entry.get("market")
-        profile = await db["market_profiles"].find_one({"name": {"$regex": f"^{market_name}$", "$options": "i"}})
+        profile = await db["market_profiles"].find_one(
+            {"name": build_case_insensitive_exact_filter(market_name)}
+        )
         if profile:
             updates.setdefault("state", profile.get("state"))
             updates.setdefault("district", profile.get("district"))
@@ -101,7 +113,16 @@ async def update_entry(
     )
     updated = await db["mandi_entries"].find_one({"_id": _coerce_id(entry_id)})
     updated = _normalize(updated)
-    await log_audit_event(db, user.id, user.role, "mandi_entry", updated["_id"], "update", updates, request.client.host)
+    await log_audit_event(
+        db,
+        user.id,
+        user.role,
+        "mandi_entry",
+        updated["_id"],
+        "update",
+        updates,
+        request.client.host,
+    )
     return success_response(MandiEntryDB(**updated), message="Mandi entry updated")
 
 
@@ -118,7 +139,10 @@ async def submit_entry(
     if user.role != "admin" and entry.get("created_by") != user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not allowed")
     if entry.get("status") not in {"draft", "rejected"}:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Only draft/rejected entries can be submitted")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only draft/rejected entries can be submitted",
+        )
 
     now = datetime.utcnow()
     await db["mandi_entries"].update_one(
@@ -130,7 +154,9 @@ async def submit_entry(
     )
     updated = await db["mandi_entries"].find_one({"_id": _coerce_id(entry_id)})
     updated = _normalize(updated)
-    await log_audit_event(db, user.id, user.role, "mandi_entry", updated["_id"], "submit", {}, request.client.host)
+    await log_audit_event(
+        db, user.id, user.role, "mandi_entry", updated["_id"], "submit", {}, request.client.host
+    )
     return success_response(MandiEntryDB(**updated), message="Mandi entry submitted")
 
 
@@ -145,19 +171,28 @@ async def approve_entry(
     if not entry:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Entry not found")
     if entry.get("status") != "submitted":
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Only submitted entries can be approved")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Only submitted entries can be approved"
+        )
 
     now = datetime.utcnow()
     await db["mandi_entries"].update_one(
         {"_id": _coerce_id(entry_id)},
         {
-            "$set": {"status": "approved", "reviewed_by": user.id, "review_reason": None, "updated_at": now},
+            "$set": {
+                "status": "approved",
+                "reviewed_by": user.id,
+                "review_reason": None,
+                "updated_at": now,
+            },
             "$push": {"history": {"ts": now.isoformat(), "actor": user.id, "action": "approve"}},
         },
     )
     updated = await db["mandi_entries"].find_one({"_id": _coerce_id(entry_id)})
     updated = _normalize(updated)
-    await log_audit_event(db, user.id, user.role, "mandi_entry", updated["_id"], "approve", {}, request.client.host)
+    await log_audit_event(
+        db, user.id, user.role, "mandi_entry", updated["_id"], "approve", {}, request.client.host
+    )
     return success_response(MandiEntryDB(**updated), message="Mandi entry approved")
 
 
@@ -173,20 +208,41 @@ async def reject_entry(
     if not entry:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Entry not found")
     if entry.get("status") != "submitted":
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Only submitted entries can be rejected")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Only submitted entries can be rejected"
+        )
 
     now = datetime.utcnow()
     await db["mandi_entries"].update_one(
         {"_id": _coerce_id(entry_id)},
         {
-            "$set": {"status": "rejected", "reviewed_by": user.id, "review_reason": reason, "updated_at": now},
-            "$push": {"history": {"ts": now.isoformat(), "actor": user.id, "action": "reject", "reason": reason}},
+            "$set": {
+                "status": "rejected",
+                "reviewed_by": user.id,
+                "review_reason": reason,
+                "updated_at": now,
+            },
+            "$push": {
+                "history": {
+                    "ts": now.isoformat(),
+                    "actor": user.id,
+                    "action": "reject",
+                    "reason": reason,
+                }
+            },
         },
     )
     updated = await db["mandi_entries"].find_one({"_id": _coerce_id(entry_id)})
     updated = _normalize(updated)
     await log_audit_event(
-        db, user.id, user.role, "mandi_entry", updated["_id"], "reject", {"reason": reason}, request.client.host
+        db,
+        user.id,
+        user.role,
+        "mandi_entry",
+        updated["_id"],
+        "reject",
+        {"reason": reason},
+        request.client.host,
     )
     return success_response(MandiEntryDB(**updated), message="Mandi entry rejected")
 
@@ -222,4 +278,6 @@ async def list_entries(
     cursor = db["mandi_entries"].find(query).sort("arrival_date", -1).skip(skip).limit(limit)
     items = [MandiEntryDB(**_normalize(doc)) for doc in await cursor.to_list(length=limit)]
     total = await db["mandi_entries"].count_documents(query)
-    return success_response(MandiEntryListResponse(items=items, total=total), message="Mandi entries")
+    return success_response(
+        MandiEntryListResponse(items=items, total=total), message="Mandi entries"
+    )

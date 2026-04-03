@@ -5,7 +5,6 @@ from datetime import datetime, timezone
 from typing import Iterable, List, Tuple
 
 from app.core.database import Database
-
 from app.schemas.integrations import MandiPricePoint
 
 
@@ -135,8 +134,14 @@ class PriceAccuracyService:
             if not actual_docs:
                 continue
 
-            actual_map = {str(doc.get("date"))[:10]: float(doc.get("price", 0.0)) for doc in actual_docs}
-            matched = [(actual_map[date], forecast_values[idx]) for idx, date in enumerate(date_keys) if date in actual_map]
+            actual_map = {
+                str(doc.get("date"))[:10]: float(doc.get("price", 0.0)) for doc in actual_docs
+            }
+            matched = [
+                (actual_map[date], forecast_values[idx])
+                for idx, date in enumerate(date_keys)
+                if date in actual_map
+            ]
             if not matched:
                 continue
 

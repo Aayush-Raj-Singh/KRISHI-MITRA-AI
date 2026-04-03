@@ -3,21 +3,23 @@ import {
   type OutcomeFeedbackRequest,
   type OutcomeFeedbackResponse,
   type QuickFeedbackRequest,
-  type QuickFeedbackResponse
+  type QuickFeedbackResponse,
 } from "@krishimitra/shared";
 
 import { feedbackApi } from "./api/client";
 import {
   enqueueOfflineQueueItem,
   readOfflineQueue,
-  writeOfflineQueue
+  scheduleOfflineQueueRetry,
+  writeOfflineQueue,
 } from "./storage";
 
 const isOfflineCandidate = (error: unknown) =>
-  error instanceof ApiError && (error.status === undefined || error.message.includes("Unable to reach"));
+  error instanceof ApiError &&
+  (error.status === undefined || error.message.includes("Unable to reach"));
 
 export const submitOutcomeFeedbackOrQueue = async (
-  payload: OutcomeFeedbackRequest
+  payload: OutcomeFeedbackRequest,
 ): Promise<OutcomeFeedbackResponse> => {
   try {
     return await feedbackApi.submitOutcomeFeedback(payload);
@@ -27,7 +29,7 @@ export const submitOutcomeFeedbackOrQueue = async (
     }
     await enqueueOfflineQueueItem({
       kind: "outcome_feedback",
-      payload
+      payload,
     });
     return {
       feedback_id: "queued",
@@ -35,16 +37,16 @@ export const submitOutcomeFeedbackOrQueue = async (
       sub_scores: {
         water_efficiency: 0,
         fertilizer_efficiency: 0,
-        yield_optimization: 0
+        yield_optimization: 0,
       },
       recommendations: ["Feedback queued. It will sync automatically when the app reconnects."],
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
   }
 };
 
 export const submitQuickFeedbackOrQueue = async (
-  payload: QuickFeedbackRequest
+  payload: QuickFeedbackRequest,
 ): Promise<QuickFeedbackResponse> => {
   try {
     return await feedbackApi.submitQuickFeedback(payload);
@@ -54,7 +56,7 @@ export const submitQuickFeedbackOrQueue = async (
     }
     await enqueueOfflineQueueItem({
       kind: "quick_feedback",
-      payload
+      payload,
     });
     return {
       feedback_id: "queued",
@@ -62,7 +64,7 @@ export const submitQuickFeedbackOrQueue = async (
       rating: payload.rating,
       service: payload.service,
       notes: payload.notes,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
   }
 };
@@ -73,10 +75,14 @@ export const syncOfflineQueue = async (): Promise<number> => {
     return 0;
   }
 
-  const remaining = [];
+  const remaining = [] as typeof queue;
   let processed = 0;
 
   for (const item of queue) {
+    if (item.nextRetryAt && new Date(item.nextRetryAt).getTime() > Date.now()) {
+      remaining.push(item);
+      continue;
+    }
     try {
       if (item.kind === "outcome_feedback") {
         await feedbackApi.submitOutcomeFeedback(item.payload as OutcomeFeedbackRequest);
@@ -85,8 +91,8 @@ export const syncOfflineQueue = async (): Promise<number> => {
         await feedbackApi.submitQuickFeedback(item.payload as QuickFeedbackRequest);
       }
       processed += 1;
-    } catch {
-      remaining.push(item);
+    } catch (error) {
+      remaining.push(scheduleOfflineQueueRetry(item, error));
     }
   }
 

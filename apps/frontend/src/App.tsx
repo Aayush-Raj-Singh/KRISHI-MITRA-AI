@@ -28,6 +28,9 @@ const ProfilePage = React.lazy(() => import("./pages/ProfilePage"));
 const ModernFarmingPage = React.lazy(() => import("./pages/ModernFarmingPage"));
 const ServicesPage = React.lazy(() => import("./pages/ServicesPage"));
 const FarmOperationsPage = React.lazy(() => import("./pages/FarmOperationsPage"));
+const NationalAgricultureIntelligencePage = React.lazy(
+  () => import("./pages/NationalAgricultureIntelligencePage"),
+);
 
 const LandingRoute: React.FC = () => {
   const accessToken = useAppSelector((state) => state.auth.accessToken);
@@ -47,10 +50,10 @@ const RouteLoadingFallback: React.FC = () => {
         display: "grid",
         placeItems: "center",
         background: "linear-gradient(180deg, #f4f1e8 0%, #eef4ed 100%)",
-        px: 3
+        px: 3,
       }}
     >
-      <Box sx={{ textAlign: "center" }}>
+      <Box className="app-shell-enter" sx={{ textAlign: "center" }}>
         <CircularProgress size={30} />
         <Typography variant="body2" sx={{ mt: 1.5, color: "text.secondary" }}>
           {`${t("actions.loading", { defaultValue: "Loading..." })} ${t("app.title")}`}
@@ -61,7 +64,7 @@ const RouteLoadingFallback: React.FC = () => {
 };
 
 const App: React.FC = () => (
-  <BrowserRouter>
+  <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
     <Suspense fallback={<RouteLoadingFallback />}>
       <Routes>
         <Route path="/" element={<LandingRoute />} />
@@ -75,19 +78,38 @@ const App: React.FC = () => (
             path="/dashboard/price-arrival"
             element={<Navigate to="/services/market-intelligence?tab=arrivals" replace />}
           />
-          <Route path="/analytics/trends" element={<Navigate to="/services/market-intelligence?tab=trends" replace />} />
+          <Route
+            path="/analytics/trends"
+            element={<Navigate to="/services/market-intelligence?tab=trends" replace />}
+          />
           <Route path="/mandi-directory" element={<MarketDirectoryPage />} />
           <Route path="/helpdesk" element={<HelpdeskPage />} />
-          <Route path="/alerts/market" element={<Navigate to="/services/market-intelligence?tab=alerts" replace />} />
+          <Route
+            path="/alerts/market"
+            element={<Navigate to="/services/market-intelligence?tab=alerts" replace />}
+          />
           <Route path="/portal" element={<PortalPage />} />
           <Route path="/advisory" element={<AdvisoryPage />} />
           <Route path="/notices" element={<NoticesPage />} />
           <Route path="/services" element={<ServicesPage />} />
+          <Route
+            path="/services/national-intelligence"
+            element={<NationalAgricultureIntelligencePage />}
+          />
           <Route path="/services/market-intelligence" element={<MarketIntelligencePage />} />
           <Route path="/services/farm-operations" element={<FarmOperationsPage />} />
-          <Route path="/services/crop" element={<Navigate to="/services/farm-operations?tab=crop" replace />} />
-          <Route path="/services/price" element={<Navigate to="/services/market-intelligence?tab=price" replace />} />
-          <Route path="/services/water" element={<Navigate to="/services/farm-operations?tab=water" replace />} />
+          <Route
+            path="/services/crop"
+            element={<Navigate to="/services/farm-operations?tab=crop" replace />}
+          />
+          <Route
+            path="/services/price"
+            element={<Navigate to="/services/market-intelligence?tab=price" replace />}
+          />
+          <Route
+            path="/services/water"
+            element={<Navigate to="/services/farm-operations?tab=water" replace />}
+          />
           <Route path="/services/feedback" element={<OutcomeFeedbackPage />} />
           <Route path="/services/modern-farming" element={<ModernFarmingPage />} />
           <Route path="/disease-detection" element={<DiseaseDetection />} />

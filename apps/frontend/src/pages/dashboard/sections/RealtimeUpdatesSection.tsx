@@ -38,10 +38,14 @@ const RealtimeUpdatesSection: React.FC<RealtimeUpdatesSectionProps> = ({ t, wsSt
               sx={{
                 p: 1.25,
                 borderColor: "rgba(27, 107, 58, 0.2)",
-                bgcolor: "rgba(255,255,255,0.9)"
+                bgcolor: "rgba(255,255,255,0.9)",
               }}
             >
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={1} justifyContent="space-between">
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={1}
+                justifyContent="space-between"
+              >
                 <Typography variant="body2">{item.summary}</Typography>
                 <Typography variant="caption" color="text.secondary">
                   {new Date(item.time).toLocaleString()}

@@ -37,12 +37,16 @@ def load_secrets_into_env() -> None:
             return
     except ClientError as exc:
         if _strict_mode():
-            raise RuntimeError("Failed to load application secrets from AWS Secrets Manager") from exc
+            raise RuntimeError(
+                "Failed to load application secrets from AWS Secrets Manager"
+            ) from exc
         logger.warning("secrets_manager_fetch_failed", error=str(exc))
         return
     except Exception as exc:
         if _strict_mode():
-            raise RuntimeError("Failed to load application secrets from AWS Secrets Manager") from exc
+            raise RuntimeError(
+                "Failed to load application secrets from AWS Secrets Manager"
+            ) from exc
         logger.warning("secrets_manager_unexpected_error", error=str(exc))
         return
 

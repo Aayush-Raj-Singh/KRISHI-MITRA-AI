@@ -1,11 +1,72 @@
 {
-  "generated_at": "2026-03-11T16:46:39.717807+00:00",
-  "models": [],
-  "failures": [
+  "generated_at": "2026-04-03T07:08:23.964467+00:00",
+  "models": [
     {
-      "crop": "banana",
-      "market": "mithapur",
-      "error": "Not enough historical data for banana/mithapur: 0 rows"
+      "key": "rice__patna",
+      "crop": "rice",
+      "market": "patna",
+      "model_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\ml\\price_model\\artifacts\\rice__patna.joblib",
+      "model_type": "prophet",
+      "version": "prophet-20260403070817",
+      "mape": 3.985,
+      "history_rows": 900,
+      "trained_at": "2026-04-03T07:08:17.009794+00:00"
+    },
+    {
+      "key": "rice__pune",
+      "crop": "rice",
+      "market": "pune",
+      "model_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\ml\\price_model\\artifacts\\rice__pune.joblib",
+      "model_type": "prophet",
+      "version": "prophet-20260403070818",
+      "mape": 3.9,
+      "history_rows": 900,
+      "trained_at": "2026-04-03T07:08:18.359535+00:00"
+    },
+    {
+      "key": "wheat__patna",
+      "crop": "wheat",
+      "market": "patna",
+      "model_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\ml\\price_model\\artifacts\\wheat__patna.joblib",
+      "model_type": "prophet",
+      "version": "prophet-20260403070819",
+      "mape": 3.303,
+      "history_rows": 900,
+      "trained_at": "2026-04-03T07:08:19.874144+00:00"
+    },
+    {
+      "key": "wheat__lucknow",
+      "crop": "wheat",
+      "market": "lucknow",
+      "model_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\ml\\price_model\\artifacts\\wheat__lucknow.joblib",
+      "model_type": "prophet",
+      "version": "prophet-20260403070821",
+      "mape": 3.567,
+      "history_rows": 900,
+      "trained_at": "2026-04-03T07:08:21.310938+00:00"
+    },
+    {
+      "key": "maize__nagpur",
+      "crop": "maize",
+      "market": "nagpur",
+      "model_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\ml\\price_model\\artifacts\\maize__nagpur.joblib",
+      "model_type": "prophet",
+      "version": "prophet-20260403070822",
+      "mape": 3.924,
+      "history_rows": 900,
+      "trained_at": "2026-04-03T07:08:22.613066+00:00"
+    },
+    {
+      "key": "mustard__jaipur",
+      "crop": "mustard",
+      "market": "jaipur",
+      "model_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\ml\\price_model\\artifacts\\mustard__jaipur.joblib",
+      "model_type": "prophet",
+      "version": "prophet-20260403070823",
+      "mape": 1.654,
+      "history_rows": 900,
+      "trained_at": "2026-04-03T07:08:23.963465+00:00"
     }
-  ]
+  ],
+  "failures": []
 }

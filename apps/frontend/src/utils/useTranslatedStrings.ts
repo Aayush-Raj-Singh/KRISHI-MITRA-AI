@@ -34,8 +34,7 @@ const saveCache = (language: string, cache: Record<string, string>) => {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(cacheKey(language), JSON.stringify(cache));
-  } catch {
-  }
+  } catch {}
 };
 
 export const useTranslatedStrings = (source: StringMap, enabled = true) => {

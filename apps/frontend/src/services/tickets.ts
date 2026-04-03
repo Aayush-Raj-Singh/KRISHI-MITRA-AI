@@ -24,12 +24,21 @@ export interface TicketListResponse {
   total: number;
 }
 
-export const createTicket = async (payload: { subject: string; body: string; category?: string }) => {
+export const createTicket = async (payload: {
+  subject: string;
+  body: string;
+  category?: string;
+}) => {
   const response = await api.post<ApiResponse<Ticket>>("/tickets", payload);
   return unwrap(response.data);
 };
 
-export const fetchTickets = async (params?: { scope?: string; status?: string; limit?: number; skip?: number }) => {
+export const fetchTickets = async (params?: {
+  scope?: string;
+  status?: string;
+  limit?: number;
+  skip?: number;
+}) => {
   const response = await api.get<ApiResponse<TicketListResponse>>("/tickets", { params });
   return unwrap(response.data);
 };
@@ -40,6 +49,9 @@ export const replyTicket = async (ticketId: string, body: string) => {
 };
 
 export const updateTicketStatus = async (ticketId: string, status: string, assignee?: string) => {
-  const response = await api.post<ApiResponse<Ticket>>(`/tickets/${ticketId}/status`, { status, assignee });
+  const response = await api.post<ApiResponse<Ticket>>(`/tickets/${ticketId}/status`, {
+    status,
+    assignee,
+  });
   return unwrap(response.data);
 };

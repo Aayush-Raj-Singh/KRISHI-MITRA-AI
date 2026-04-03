@@ -52,13 +52,14 @@ const HeroOverviewSection: React.FC<HeroOverviewSectionProps> = ({
   waterSavingsCaption,
   sustainabilityValue,
   sustainabilityCaption,
-  heroLoading = false
+  heroLoading = false,
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
 
   return (
     <Paper
+      className="render-smooth-section"
       id="home"
       sx={{
         position: "relative",
@@ -68,7 +69,7 @@ const HeroOverviewSection: React.FC<HeroOverviewSectionProps> = ({
         background: isDark
           ? "linear-gradient(135deg, rgba(16, 40, 28, 0.98) 0%, rgba(12, 32, 22, 0.96) 55%, rgba(14, 36, 26, 0.94) 100%)"
           : "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(244,238,226,0.96) 55%, rgba(231, 244, 235, 0.94) 100%)",
-        boxShadow: isDark ? "0 18px 36px rgba(0,0,0,0.35)" : "0 18px 36px rgba(20, 40, 24, 0.12)"
+        boxShadow: isDark ? "0 12px 22px rgba(0,0,0,0.22)" : "0 12px 22px rgba(20, 40, 24, 0.08)",
       }}
     >
       <Box
@@ -82,9 +83,9 @@ const HeroOverviewSection: React.FC<HeroOverviewSectionProps> = ({
           background: isDark
             ? `radial-gradient(circle, ${alpha(theme.palette.success.light, 0.16)} 0%, ${alpha(
                 theme.palette.success.light,
-                0.04
+                0.04,
               )} 60%, rgba(27, 107, 58, 0) 100%)`
-            : "radial-gradient(circle, rgba(27, 107, 58, 0.18) 0%, rgba(27, 107, 58, 0.04) 60%, rgba(27, 107, 58, 0) 100%)"
+            : "radial-gradient(circle, rgba(27, 107, 58, 0.18) 0%, rgba(27, 107, 58, 0.04) 60%, rgba(27, 107, 58, 0) 100%)",
         }}
       />
       <Grid container spacing={spacingScale.md} alignItems="center">
@@ -95,8 +96,8 @@ const HeroOverviewSection: React.FC<HeroOverviewSectionProps> = ({
               sx={{
                 fontSize: { xs: "2.2rem", md: "3.15rem" },
                 lineHeight: 1.08,
-                fontFamily: 'var(--app-heading-font), var(--app-body-font), serif',
-                letterSpacing: 0.2
+                fontFamily: "var(--app-heading-font), var(--app-body-font), serif",
+                letterSpacing: 0.2,
               }}
             >
               {t("dashboard_page.hero.title")}
@@ -117,16 +118,24 @@ const HeroOverviewSection: React.FC<HeroOverviewSectionProps> = ({
               <Button variant="text" onClick={onNavigateAdvisory} size="large">
                 {t("advisory.title")}
               </Button>
-              <Button variant="outlined" startIcon={<AutoAwesomeIcon />} onClick={onOpenOnboarding} size="large">
+              <Button
+                variant="outlined"
+                startIcon={<AutoAwesomeIcon />}
+                onClick={onOpenOnboarding}
+                size="large"
+              >
                 {onboardingStartLabel}
               </Button>
             </Stack>
             <Stack direction="row" spacing={spacingScale.xs} flexWrap="wrap">
               {wsUrl && (
                 <Chip
-                  label={`${t("dashboard_page.live_updates")}: ${t(`dashboard_page.ws_status.${wsStatus}`, {
-                    defaultValue: wsStatus
-                  })}`}
+                  label={`${t("dashboard_page.live_updates")}: ${t(
+                    `dashboard_page.ws_status.${wsStatus}`,
+                    {
+                      defaultValue: wsStatus,
+                    },
+                  )}`}
                   color={wsStatus === "open" ? "success" : "default"}
                 />
               )}
@@ -140,7 +149,9 @@ const HeroOverviewSection: React.FC<HeroOverviewSectionProps> = ({
               <Grid item xs={12} sm={6}>
                 <KpiCard
                   label={t("dashboard_page.kpi.status")}
-                  value={isOffline ? t("dashboard_page.kpi.offline") : t("dashboard_page.kpi.online")}
+                  value={
+                    isOffline ? t("dashboard_page.kpi.offline") : t("dashboard_page.kpi.online")
+                  }
                   caption={statusCaption}
                   icon={isOffline ? <WifiOffIcon color="warning" /> : <WifiIcon color="success" />}
                 />

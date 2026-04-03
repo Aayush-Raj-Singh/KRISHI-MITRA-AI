@@ -21,7 +21,7 @@ type BackendLocationLookup = {
 const GEO_CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 7;
 const API_BASE_URL = resolveApiBaseUrl(import.meta.env.VITE_API_BASE_URL as string | undefined);
 
-const formatCoordinate = (value: number) => (Number.isFinite(value) ? value.toFixed(4) : "--");
+const formatCoordinate = (value: number) => (Number.isFinite(value) ? value.toFixed(5) : "--");
 
 export const formatCoordinateLabel = (lat: number, lon: number) =>
   `Lat ${formatCoordinate(lat)}, Lon ${formatCoordinate(lon)}`;
@@ -46,7 +46,8 @@ const fetchBackendData = async <T>(path: string) => {
   return payload.data;
 };
 
-const isFresh = (ts?: number) => (typeof ts === "number" ? Date.now() - ts < GEO_CACHE_TTL_MS : false);
+const isFresh = (ts?: number) =>
+  typeof ts === "number" ? Date.now() - ts < GEO_CACHE_TTL_MS : false;
 
 const buildLabel = (city?: string, state?: string, country?: string) => {
   return [city, state, country].filter(Boolean).join(", ");
@@ -56,12 +57,12 @@ const createPlacePayload = (
   city?: string,
   state?: string,
   country?: string,
-  fallbackLabel?: string
+  fallbackLabel?: string,
 ): Omit<GeoPlace, "coords"> => ({
   city: city || undefined,
   state: state || undefined,
   country: country || undefined,
-  label: buildLabel(city, state, country) || fallbackLabel
+  label: buildLabel(city, state, country) || fallbackLabel,
 });
 
 const parseOpenMeteoReverse = (data: Record<string, unknown>) => {
@@ -88,8 +89,11 @@ const parseBigDataCloudReverse = (data: Record<string, unknown>) => {
   return createPlacePayload(city, state, country);
 };
 
-export const reverseGeocode = async (lat: number, lon: number): Promise<Omit<GeoPlace, "coords">> => {
-  const key = `geo_reverse:${lat.toFixed(4)}:${lon.toFixed(4)}`;
+export const reverseGeocode = async (
+  lat: number,
+  lon: number,
+): Promise<Omit<GeoPlace, "coords">> => {
+  const key = `geo_reverse:${lat.toFixed(5)}:${lon.toFixed(5)}`;
   const cached = getCachedWithMeta<Omit<GeoPlace, "coords">>(key);
   if (cached && isFresh(cached.ts)) {
     return cached.value;
@@ -97,14 +101,14 @@ export const reverseGeocode = async (lat: number, lon: number): Promise<Omit<Geo
 
   try {
     const payload = await fetchBackendData<BackendLocationLookup>(
-      `/data/location/reverse?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`
+      `/data/location/reverse?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`,
     );
     if (payload?.label) {
       const normalized = {
         city: payload.city,
         state: payload.state,
         country: payload.country,
-        label: payload.label
+        label: payload.label,
       };
       setCached(key, normalized);
       return normalized;
@@ -116,12 +120,12 @@ export const reverseGeocode = async (lat: number, lon: number): Promise<Omit<Geo
   const providers = [
     {
       url: `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&count=1&language=en&format=json`,
-      parser: parseOpenMeteoReverse
+      parser: parseOpenMeteoReverse,
     },
     {
       url: `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`,
-      parser: parseBigDataCloudReverse
-    }
+      parser: parseBigDataCloudReverse,
+    },
   ];
 
   for (const provider of providers) {
@@ -137,7 +141,12 @@ export const reverseGeocode = async (lat: number, lon: number): Promise<Omit<Geo
     }
   }
 
-  const payload = createPlacePayload(undefined, undefined, undefined, formatCoordinateLabel(lat, lon));
+  const payload = createPlacePayload(
+    undefined,
+    undefined,
+    undefined,
+    formatCoordinateLabel(lat, lon),
+  );
   setCached(key, payload);
   return payload;
 };
@@ -155,7 +164,7 @@ export const geocodeLocation = async (query: string): Promise<GeoPlace> => {
 
   try {
     const payload = await fetchBackendData<BackendLocationLookup>(
-      `/data/location/search?query=${encodeURIComponent(safeQuery)}`
+      `/data/location/search?query=${encodeURIComponent(safeQuery)}`,
     );
     if (payload?.label) {
       const normalized: GeoPlace = {
@@ -165,8 +174,8 @@ export const geocodeLocation = async (query: string): Promise<GeoPlace> => {
         label: payload.label,
         coords: {
           lat: payload.latitude,
-          lon: payload.longitude
-        }
+          lon: payload.longitude,
+        },
       };
       setCached(key, normalized);
       return normalized;
@@ -176,7 +185,7 @@ export const geocodeLocation = async (query: string): Promise<GeoPlace> => {
   }
 
   const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(
-    safeQuery
+    safeQuery,
   )}&count=1&language=en&format=json`;
   const data = await fetchJson(url);
   const result = Array.isArray(data?.results) ? data.results[0] : undefined;
@@ -193,8 +202,8 @@ export const geocodeLocation = async (query: string): Promise<GeoPlace> => {
     label: buildLabel(city, state, country),
     coords: {
       lat: Number(result.latitude),
-      lon: Number(result.longitude)
-    }
+      lon: Number(result.longitude),
+    },
   };
   setCached(key, payload);
   return payload;

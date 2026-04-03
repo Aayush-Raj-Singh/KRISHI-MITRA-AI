@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { colors } from "../theme/colors";
+import { colors, radius, shadows, spacing, typography } from "../theme";
 
 interface SectionCardProps {
   title: string;
@@ -11,32 +11,43 @@ interface SectionCardProps {
 
 export const SectionCard = ({ title, subtitle, children }: SectionCardProps) => (
   <View style={styles.card}>
-    <Text style={styles.title}>{title}</Text>
-    {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+    <View style={styles.header}>
+      <Text style={styles.title}>{title}</Text>
+      {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+    </View>
     <View style={styles.content}>{children}</View>
   </View>
 );
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: 22,
+    backgroundColor: colors.surfaceStrong,
+    borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: 18,
-    gap: 8
+    padding: spacing.lg,
+    gap: spacing.sm,
+    ...shadows.card,
+  },
+  header: {
+    gap: spacing.xs,
+    paddingBottom: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
   title: {
     color: colors.text,
-    fontSize: 18,
-    fontWeight: "800"
+    fontFamily: typography.headingFont,
+    fontSize: typography.titleSm,
+    lineHeight: 24,
   },
   subtitle: {
     color: colors.mutedText,
-    fontSize: 13,
-    lineHeight: 18
+    fontSize: typography.caption,
+    lineHeight: 18,
   },
   content: {
-    gap: 12
-  }
+    gap: spacing.md,
+    paddingTop: spacing.xs,
+  },
 });

@@ -22,6 +22,7 @@ _pool: Optional[asyncpg.Pool] = None
 COLLECTIONS = [
     "advisory_telemetry",
     "audit_logs",
+    "client_error_events",
     "commodities",
     "conversations",
     "data_quality_issues",
@@ -30,6 +31,7 @@ COLLECTIONS = [
     "external_links",
     "faqs",
     "feedback",
+    "geo_hierarchy_nodes",
     "grades",
     "integration_audit",
     "mandi_entries",
@@ -46,6 +48,7 @@ COLLECTIONS = [
     "recommendations",
     "refresh_tokens",
     "seasons",
+    "state_portal_snapshots",
     "tickets",
     "units",
     "users",
@@ -398,14 +401,21 @@ def _match_doc(document: dict, filter_spec: dict) -> bool:
                 flags = re.IGNORECASE if "i" in str(options).lower() else 0
                 if doc_value is None or re.search(pattern, str(doc_value), flags) is None:
                     return False
-            for operator_key, compare in (("$gte", ">="), ("$lte", "<="), ("$gt", ">"), ("$lt", "<")):
+            for operator_key, compare in (
+                ("$gte", ">="),
+                ("$lte", "<="),
+                ("$gt", ">"),
+                ("$lt", "<"),
+            ):
                 if operator_key in value:
                     threshold = value.get(operator_key)
                     left = doc_value
                     if isinstance(threshold, (datetime, date)):
                         left = _coerce_datetime(doc_value)
                         if isinstance(threshold, date) and not isinstance(threshold, datetime):
-                            threshold = datetime.combine(threshold, datetime.min.time(), tzinfo=timezone.utc)
+                            threshold = datetime.combine(
+                                threshold, datetime.min.time(), tzinfo=timezone.utc
+                            )
                     if left is None:
                         return False
                     if compare == ">=" and not (left >= threshold):
@@ -455,7 +465,9 @@ class Database:
     def schema(self) -> str:
         return self._schema
 
-    async def health_status(self, required_tables: Sequence[str] = DB_HEALTH_REQUIRED_TABLES) -> dict:
+    async def health_status(
+        self, required_tables: Sequence[str] = DB_HEALTH_REQUIRED_TABLES
+    ) -> dict:
         async with self._pool.acquire() as conn:
             summary = await conn.fetchrow(
                 """
@@ -491,7 +503,9 @@ class Database:
 
 
 class Cursor:
-    def __init__(self, collection: "Collection", filter_spec: dict, projection: Optional[dict]) -> None:
+    def __init__(
+        self, collection: "Collection", filter_spec: dict, projection: Optional[dict]
+    ) -> None:
         self._collection = collection
         self._filter = filter_spec
         self._projection = projection
@@ -499,7 +513,9 @@ class Cursor:
         self._limit: Optional[int] = None
         self._skip: int = 0
 
-    def sort(self, key: str | Sequence[Tuple[str, int]], direction: Optional[int] = None) -> "Cursor":
+    def sort(
+        self, key: str | Sequence[Tuple[str, int]], direction: Optional[int] = None
+    ) -> "Cursor":
         if isinstance(key, str):
             self._sort = [(key, direction or 1)]
         else:
@@ -621,7 +637,9 @@ class Collection:
             )
         return InsertManyResult(ids)
 
-    async def update_one(self, filter_spec: dict, update: dict, upsert: bool = False) -> UpdateResult:
+    async def update_one(
+        self, filter_spec: dict, update: dict, upsert: bool = False
+    ) -> UpdateResult:
         params: List[Any] = []
         where_clause = _build_where(filter_spec, params)
         async with self._pool.acquire() as conn:
@@ -635,7 +653,9 @@ class Collection:
                 base_doc = _extract_upsert_base(filter_spec)
                 base_doc = _apply_update(base_doc, update, is_insert=True)
                 insert_result = await self.insert_one(base_doc)
-                return UpdateResult(matched_count=0, modified_count=0, upserted_id=insert_result.inserted_id)
+                return UpdateResult(
+                    matched_count=0, modified_count=0, upserted_id=insert_result.inserted_id
+                )
 
             doc_id = row["id"]
             existing = _coerce_doc(row["doc"])
@@ -650,7 +670,9 @@ class Collection:
             )
             return UpdateResult(matched_count=1, modified_count=1, upserted_id=None)
 
-    async def update_many(self, filter_spec: dict, update: dict, upsert: bool = False) -> UpdateResult:
+    async def update_many(
+        self, filter_spec: dict, update: dict, upsert: bool = False
+    ) -> UpdateResult:
         params: List[Any] = []
         where_clause = _build_where(filter_spec, params)
         async with self._pool.acquire() as conn:
@@ -664,7 +686,9 @@ class Collection:
                 base_doc = _extract_upsert_base(filter_spec)
                 base_doc = _apply_update(base_doc, update, is_insert=True)
                 insert_result = await self.insert_one(base_doc)
-                return UpdateResult(matched_count=0, modified_count=0, upserted_id=insert_result.inserted_id)
+                return UpdateResult(
+                    matched_count=0, modified_count=0, upserted_id=insert_result.inserted_id
+                )
             modified = 0
             for row in rows:
                 doc_id = row["id"]
@@ -685,7 +709,9 @@ class Collection:
         params: List[Any] = []
         where_clause = _build_where(filter_spec, params)
         async with self._pool.acquire() as conn:
-            value = await conn.fetchval(f"SELECT COUNT(*) FROM {self._table} WHERE {where_clause}", *params)
+            value = await conn.fetchval(
+                f"SELECT COUNT(*) FROM {self._table} WHERE {where_clause}", *params
+            )
             return int(value or 0)
 
     def aggregate(self, pipeline: list) -> AggregateCursor:
@@ -787,7 +813,11 @@ class Collection:
                             continue
                         if isinstance(expr, dict) and "$avg" in expr:
                             source = expr["$avg"]
-                            value = _get_nested(doc, source[1:]) if isinstance(source, str) and source.startswith("$") else source
+                            value = (
+                                _get_nested(doc, source[1:])
+                                if isinstance(source, str) and source.startswith("$")
+                                else source
+                            )
                             if value is None:
                                 continue
                             key = (group_key, field)
@@ -798,24 +828,42 @@ class Collection:
                             if source == 1:
                                 groups[group_key][field] = groups[group_key].get(field, 0) + 1
                             else:
-                                value = _get_nested(doc, source[1:]) if isinstance(source, str) and source.startswith("$") else source
+                                value = (
+                                    _get_nested(doc, source[1:])
+                                    if isinstance(source, str) and source.startswith("$")
+                                    else source
+                                )
                                 if value is None:
                                     continue
-                                groups[group_key][field] = groups[group_key].get(field, 0) + float(value)
+                                groups[group_key][field] = groups[group_key].get(field, 0) + float(
+                                    value
+                                )
                         elif isinstance(expr, dict) and "$min" in expr:
                             source = expr["$min"]
-                            value = _get_nested(doc, source[1:]) if isinstance(source, str) and source.startswith("$") else source
+                            value = (
+                                _get_nested(doc, source[1:])
+                                if isinstance(source, str) and source.startswith("$")
+                                else source
+                            )
                             if value is None:
                                 continue
                             current = groups[group_key].get(field)
-                            groups[group_key][field] = value if current is None else min(current, value)
+                            groups[group_key][field] = (
+                                value if current is None else min(current, value)
+                            )
                         elif isinstance(expr, dict) and "$max" in expr:
                             source = expr["$max"]
-                            value = _get_nested(doc, source[1:]) if isinstance(source, str) and source.startswith("$") else source
+                            value = (
+                                _get_nested(doc, source[1:])
+                                if isinstance(source, str) and source.startswith("$")
+                                else source
+                            )
                             if value is None:
                                 continue
                             current = groups[group_key].get(field)
-                            groups[group_key][field] = value if current is None else max(current, value)
+                            groups[group_key][field] = (
+                                value if current is None else max(current, value)
+                            )
                 for key, total in sums.items():
                     group_key, field = key
                     count = counts.get(key, 0)
@@ -925,10 +973,94 @@ async def _ensure_schema(pool: asyncpg.Pool) -> None:
             f"((doc->>'created_at'))"
         )
         await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS recommendations_user_created_idx ON {_table_ref(schema, 'recommendations')} "
+            f"((doc->>'user_id'), (doc->>'created_at'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS recommendations_kind_created_idx ON {_table_ref(schema, 'recommendations')} "
+            f"((doc->>'kind'), (doc->>'created_at'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS feedback_user_created_idx ON {_table_ref(schema, 'feedback')} "
+            f"((doc->>'user_id'), (doc->>'created_at'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS feedback_negative_outcome_created_idx ON {_table_ref(schema, 'feedback')} "
+            f"((doc->>'negative_outcome'), (doc->>'created_at'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS advisory_telemetry_ts_epoch_idx ON {_table_ref(schema, 'advisory_telemetry')} "
+            f"((doc->>'ts_epoch'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS audit_logs_ts_idx ON {_table_ref(schema, 'audit_logs')} "
+            f"((doc->>'ts'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS audit_logs_actor_idx ON {_table_ref(schema, 'audit_logs')} "
+            f"((doc->>'actor_id'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS tickets_status_updated_idx ON {_table_ref(schema, 'tickets')} "
+            f"((doc->>'status'), (doc->>'updated_at'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS tickets_assignee_idx ON {_table_ref(schema, 'tickets')} "
+            f"((doc->>'assignee'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS tickets_created_by_idx ON {_table_ref(schema, 'tickets')} "
+            f"((doc->>'created_by'))"
+        )
+        await conn.execute(
             f"CREATE INDEX IF NOT EXISTS mandi_entries_status_idx ON {_table_ref(schema, 'mandi_entries')} "
             f"((doc->>'status'))"
         )
         await conn.execute(
             f"CREATE INDEX IF NOT EXISTS mandi_entries_arrival_date_idx ON {_table_ref(schema, 'mandi_entries')} "
             f"((doc->>'arrival_date'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS market_profiles_name_idx ON {_table_ref(schema, 'market_profiles')} "
+            f"((doc->>'name'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS faqs_order_idx ON {_table_ref(schema, 'faqs')} "
+            f"((doc->>'order'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS operations_runs_triggered_at_idx ON {_table_ref(schema, 'operations_runs')} "
+            f"((doc->>'triggered_at'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS geo_hierarchy_lookup_idx ON {_table_ref(schema, 'geo_hierarchy_nodes')} "
+            f"((doc->>'state_norm'), (doc->>'district_norm'), (doc->>'block_norm'), (doc->>'village_norm'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS geo_hierarchy_postal_code_idx ON {_table_ref(schema, 'geo_hierarchy_nodes')} "
+            f"((doc->>'postal_code'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS state_portal_snapshot_lookup_idx ON {_table_ref(schema, 'state_portal_snapshots')} "
+            f"((doc->>'state_code'), (doc->>'source_id'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS price_accuracy_updated_idx ON {_table_ref(schema, 'price_accuracy')} "
+            f"((doc->>'updated_at'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS password_resets_user_created_idx ON {_table_ref(schema, 'password_resets')} "
+            f"((doc->>'user_id'), (doc->>'created_at'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS mfa_challenges_user_created_idx ON {_table_ref(schema, 'mfa_challenges')} "
+            f"((doc->>'user_id'), (doc->>'created_at'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS client_error_events_created_idx ON {_table_ref(schema, 'client_error_events')} "
+            f"((doc->>'created_at'))"
+        )
+        await conn.execute(
+            f"CREATE INDEX IF NOT EXISTS client_error_events_source_idx ON {_table_ref(schema, 'client_error_events')} "
+            f"((doc->>'source'))"
         )

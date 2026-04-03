@@ -3,13 +3,12 @@ from __future__ import annotations
 import io
 import json
 from dataclasses import dataclass
-from pathlib import Path
 from typing import List, Tuple
 
 import numpy as np
-from PIL import Image, ImageFilter
-
+from app.core.config import settings
 from app.core.logging import get_logger
+from PIL import Image, ImageFilter
 
 logger = get_logger(__name__)
 
@@ -40,7 +39,7 @@ class DiseasePredictor:
         self._load_optional_model()
 
     def _load_label_overrides(self) -> None:
-        labels_path = Path(__file__).resolve().parent / "weights" / "labels.json"
+        labels_path = settings.disease_labels_resolved_path
         if not labels_path.exists():
             return
         try:
@@ -69,8 +68,13 @@ class DiseasePredictor:
                 ]
             )
             self._model = models.efficientnet_b0(weights=None)
-            self._model.classifier[1] = torch.nn.Linear(self._model.classifier[1].in_features, len(self._labels))
-            weight_path = Path(__file__).resolve().parent / "weights" / "plantvillage_efficientnet_b0.pt"
+            self._model.classifier[1] = torch.nn.Linear(
+                self._model.classifier[1].in_features, len(self._labels)
+            )
+            weight_path = settings.disease_model_weights_resolved_path
+            legacy_weight_path = settings.disease_model_legacy_weights_path
+            if not weight_path.exists() and legacy_weight_path.exists():
+                weight_path = legacy_weight_path
             try:
                 if not weight_path.exists() or weight_path.stat().st_size < 100_000:
                     raise FileNotFoundError
@@ -103,14 +107,24 @@ class DiseasePredictor:
         blue_ratio = float(np.mean(arr[..., 2]))
 
         if green_ratio > 0.5 and red_ratio < 0.35:
-            return DiseasePrediction(crop="Maize", disease="Healthy", confidence=self._calibrate_confidence(0.68))
+            return DiseasePrediction(
+                crop="Maize", disease="Healthy", confidence=self._calibrate_confidence(0.68)
+            )
         if green_ratio > 0.45 and red_ratio < 0.4:
-            return DiseasePrediction(crop="Rice", disease="Healthy", confidence=self._calibrate_confidence(0.62))
+            return DiseasePrediction(
+                crop="Rice", disease="Healthy", confidence=self._calibrate_confidence(0.62)
+            )
         if red_ratio > 0.5 and green_ratio < 0.4:
-            return DiseasePrediction(crop="Wheat", disease="Rust", confidence=self._calibrate_confidence(0.58))
+            return DiseasePrediction(
+                crop="Wheat", disease="Rust", confidence=self._calibrate_confidence(0.58)
+            )
         if blue_ratio > 0.45:
-            return DiseasePrediction(crop="Tomato", disease="Early Blight", confidence=self._calibrate_confidence(0.55))
-        return DiseasePrediction(crop="Rice", disease="Leaf Blight", confidence=self._calibrate_confidence(0.42))
+            return DiseasePrediction(
+                crop="Tomato", disease="Early Blight", confidence=self._calibrate_confidence(0.55)
+            )
+        return DiseasePrediction(
+            crop="Rice", disease="Leaf Blight", confidence=self._calibrate_confidence(0.42)
+        )
 
     def predict(self, image_bytes: bytes) -> DiseasePrediction:
         image = self._preprocess(image_bytes)

@@ -1,6 +1,12 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-import { formatCoordinateLabel, geocodeLocation, reverseGeocode } from "../services/locationService";
+import { mandiMarketLookup } from "../data/mandiMarketGeo";
+import {
+  formatCoordinateLabel,
+  geocodeLocation,
+  reverseGeocode,
+} from "../services/locationService";
+import { haversineKm } from "../utils/geo";
 import { getCachedWithMeta, setCached } from "../services/cache";
 
 type Coordinates = {
@@ -34,10 +40,41 @@ type LocationContextValue = {
 
 const LOCATION_CACHE_KEY = "user_location";
 const LOCATION_TTL_MS = 1000 * 60 * 60 * 24 * 14;
+const GEOLOCATION_TARGET_ACCURACY_M = 500;
+const GEOLOCATION_MAX_ATTEMPTS = 3;
+const GEOLOCATION_TIMEOUT_MS = 12000;
+const KNOWN_MANDI_LABEL_RADIUS_KM = 35;
+const LOCATION_CACHE_DECIMALS = 3;
 
 const LocationContext = createContext<LocationContextValue | undefined>(undefined);
 
+type NearbyKnownMandi = {
+  market: string;
+  distanceKm: number;
+};
+
+const getNearbyKnownMandi = (coords?: Coordinates): NearbyKnownMandi | null => {
+  if (!coords) return null;
+  const origin = { lat: coords.lat, lon: coords.lon };
+  const bestMatch =
+    Array.from(mandiMarketLookup.values())
+      .map<NearbyKnownMandi>((item) => ({
+        market: item.market,
+        distanceKm: haversineKm(origin, { lat: item.lat, lon: item.lon }),
+      }))
+      .sort((a, b) => a.distanceKm - b.distanceKm)[0] || null;
+  if (bestMatch && bestMatch.distanceKm <= KNOWN_MANDI_LABEL_RADIUS_KM) {
+    return bestMatch;
+  }
+  return null;
+};
+
 const normalizeLabel = (city?: string, state?: string, fallback?: string, coords?: Coordinates) => {
+  const nearbyMandi = getNearbyKnownMandi(coords);
+  if (nearbyMandi !== null) {
+    const parts = [nearbyMandi.market, state].filter(Boolean);
+    return parts.join(", ");
+  }
   const parts = [city, state].filter(Boolean);
   if (parts.length) return parts.join(", ");
   const normalizedFallback = fallback?.trim();
@@ -50,11 +87,22 @@ const normalizeLabel = (city?: string, state?: string, fallback?: string, coords
   return "";
 };
 
-const isFallbackLocationLabel = (value?: string) => {
-  const label = (value || "").trim();
-  if (!label) return false;
-  if (label.toLowerCase() === "location detected") return true;
-  return /^Lat\s-?\d+(\.\d+)?,\sLon\s-?\d+(\.\d+)?$/i.test(label);
+const getCurrentPositionAsync = () =>
+  new Promise<GeolocationPosition>((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(resolve, reject, {
+      enableHighAccuracy: true,
+      timeout: GEOLOCATION_TIMEOUT_MS,
+      maximumAge: 0,
+    });
+  });
+
+const sanitizeCoordsForCache = (coords?: Coordinates): Coordinates | undefined => {
+  if (!coords) return undefined;
+  return {
+    lat: Number(coords.lat.toFixed(LOCATION_CACHE_DECIMALS)),
+    lon: Number(coords.lon.toFixed(LOCATION_CACHE_DECIMALS)),
+    accuracy: typeof coords.accuracy === "number" ? Math.round(coords.accuracy) : undefined,
+  };
 };
 
 export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -68,21 +116,30 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [error, setError] = useState<string | null>(null);
 
   const storeSnapshot = useCallback((snapshot: LocationSnapshot, manual?: string) => {
-    setCached(LOCATION_CACHE_KEY, { ...snapshot, manualLocation: manual });
+    setCached(LOCATION_CACHE_KEY, {
+      ...snapshot,
+      coords: sanitizeCoordsForCache(snapshot.coords),
+      manualLocation: manual,
+    });
   }, []);
 
-  const applySnapshot = useCallback((snapshot: LocationSnapshot, manual?: string, fromCache = false) => {
-    setCoords(snapshot.coords);
-    setCity(snapshot.city);
-    setState(snapshot.state);
-    setLabel(normalizeLabel(snapshot.city, snapshot.state, snapshot.label || manual, snapshot.coords));
-    setSource(fromCache ? "cache" : snapshot.source);
-    if (manual) {
-      setManualLocation(manual);
-    }
-    setStatus("ready");
-    setError(null);
-  }, []);
+  const applySnapshot = useCallback(
+    (snapshot: LocationSnapshot, manual?: string, fromCache = false) => {
+      setCoords(snapshot.coords);
+      setCity(snapshot.city);
+      setState(snapshot.state);
+      setLabel(
+        normalizeLabel(snapshot.city, snapshot.state, snapshot.label || manual, snapshot.coords),
+      );
+      setSource(fromCache ? "cache" : snapshot.source);
+      if (manual) {
+        setManualLocation(manual);
+      }
+      setStatus("ready");
+      setError(null);
+    },
+    [],
+  );
 
   const requestLocation = useCallback(() => {
     if (typeof navigator === "undefined" || !navigator.geolocation) {
@@ -91,45 +148,73 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       return;
     }
     setStatus("locating");
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const nextCoords = {
-          lat: position.coords.latitude,
-          lon: position.coords.longitude,
-          accuracy: position.coords.accuracy
-        };
+    void (async () => {
+      let bestPosition: GeolocationPosition | null = null;
+      let lastError: GeolocationPositionError | null = null;
+
+      for (let attempt = 0; attempt < GEOLOCATION_MAX_ATTEMPTS; attempt += 1) {
         try {
-          const place = await reverseGeocode(nextCoords.lat, nextCoords.lon);
-          const nextSnapshot: LocationSnapshot = {
-            coords: nextCoords,
-            city: place.city,
-            state: place.state,
-            label: normalizeLabel(place.city, place.state, place.label),
-            source: "geolocation"
-          };
-          applySnapshot(nextSnapshot);
-          storeSnapshot(nextSnapshot, "");
-        } catch (geoError) {
-          const fallbackLabel = formatCoordinateLabel(nextCoords.lat, nextCoords.lon);
-          setCoords(nextCoords);
-          setLabel(fallbackLabel);
-          setSource("geolocation");
-          setStatus("ready");
-          setError(null);
-          storeSnapshot({ coords: nextCoords, source: "geolocation", label: fallbackLabel }, "");
+          const position = await getCurrentPositionAsync();
+          if (!bestPosition || position.coords.accuracy < bestPosition.coords.accuracy) {
+            bestPosition = position;
+          }
+          if (position.coords.accuracy <= GEOLOCATION_TARGET_ACCURACY_M) {
+            break;
+          }
+        } catch (error) {
+          lastError = error as GeolocationPositionError;
+          if (lastError?.code === 1) {
+            break;
+          }
         }
-      },
-      (err) => {
-        if (err.code === err.PERMISSION_DENIED) {
+      }
+
+      if (!bestPosition) {
+        if (lastError?.code === 1) {
           setStatus("denied");
           setError("Location permission denied. Enter your location manually.");
         } else {
           setStatus("error");
-          setError("Unable to fetch location. Enter your location manually.");
+          setError("Unable to fetch a fresh GPS location. Enter your location manually.");
         }
-      },
-      { enableHighAccuracy: false, timeout: 8000, maximumAge: 1000 * 60 * 10 }
-    );
+        return;
+      }
+
+      const nextCoords = {
+        lat: bestPosition.coords.latitude,
+        lon: bestPosition.coords.longitude,
+        accuracy: bestPosition.coords.accuracy,
+      };
+      try {
+        const place = await reverseGeocode(nextCoords.lat, nextCoords.lon);
+        const nextSnapshot: LocationSnapshot = {
+          coords: nextCoords,
+          city: place.city,
+          state: place.state,
+          label: normalizeLabel(place.city, place.state, place.label),
+          source: "geolocation",
+        };
+        applySnapshot(nextSnapshot);
+        storeSnapshot(nextSnapshot, "");
+        if (nextCoords.accuracy > GEOLOCATION_TARGET_ACCURACY_M) {
+          setError(
+            "GPS accuracy is above 500m. Move outdoors and refresh for better mandi and weather precision.",
+          );
+        }
+      } catch {
+        const fallbackLabel = formatCoordinateLabel(nextCoords.lat, nextCoords.lon);
+        setCoords(nextCoords);
+        setLabel(fallbackLabel);
+        setSource("geolocation");
+        setStatus("ready");
+        setError(
+          nextCoords.accuracy > GEOLOCATION_TARGET_ACCURACY_M
+            ? "GPS accuracy is above 500m. Move outdoors and refresh for better mandi and weather precision."
+            : null,
+        );
+        storeSnapshot({ coords: nextCoords, source: "geolocation", label: fallbackLabel }, "");
+      }
+    })();
   }, [applySnapshot, storeSnapshot]);
 
   const saveManualLocation = useCallback(
@@ -146,12 +231,13 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           city: place.city,
           state: place.state,
           label: normalizeLabel(place.city, place.state, trimmed),
-          source: "manual"
+          source: "manual",
         };
         applySnapshot(nextSnapshot, trimmed);
         storeSnapshot(nextSnapshot, trimmed);
       } catch (geoError) {
-        const message = geoError instanceof Error ? geoError.message : "Unable to resolve the location.";
+        const message =
+          geoError instanceof Error ? geoError.message : "Unable to resolve the location.";
         setStatus("error");
         setLabel(trimmed);
         setSource("manual");
@@ -159,7 +245,7 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         storeSnapshot({ label: trimmed, source: "manual" }, trimmed);
       }
     },
-    [applySnapshot, storeSnapshot]
+    [applySnapshot, storeSnapshot],
   );
 
   useEffect(() => {
@@ -179,14 +265,12 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           city: cached.value.city,
           state: cached.value.state,
           label: cached.value.label,
-          source: cached.value.source
+          source: cached.value.source,
         },
         cached.value.manualLocation,
-        true
+        true,
       );
-      if (cached.value.coords && isFallbackLocationLabel(cached.value.label)) {
-        requestLocation();
-      }
+      requestLocation();
     } else {
       requestLocation();
     }
@@ -203,9 +287,20 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       manualLocation,
       error,
       requestLocation,
-      saveManualLocation
+      saveManualLocation,
     }),
-    [status, coords, city, state, label, source, manualLocation, error, requestLocation, saveManualLocation]
+    [
+      status,
+      coords,
+      city,
+      state,
+      label,
+      source,
+      manualLocation,
+      error,
+      requestLocation,
+      saveManualLocation,
+    ],
   );
 
   return <LocationContext.Provider value={contextValue}>{children}</LocationContext.Provider>;

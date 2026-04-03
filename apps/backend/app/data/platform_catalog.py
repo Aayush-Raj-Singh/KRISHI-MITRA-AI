@@ -1,0 +1,323 @@
+from __future__ import annotations
+
+DATA_SOURCE_REGISTRY = [
+    {
+        "id": "data_gov_agmarknet",
+        "name": "data.gov.in Agmarknet dataset",
+        "provider": "Government of India",
+        "kind": "market_api",
+        "access_mode": "api",
+        "freshness": "near_real_time",
+        "geographic_granularity": "mandi",
+        "url": "https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070",
+        "tags": ["mandi", "prices", "arrivals", "official"],
+    },
+    {
+        "id": "enam",
+        "name": "eNAM",
+        "provider": "Government of India",
+        "kind": "market_platform",
+        "access_mode": "portal",
+        "freshness": "operational",
+        "geographic_granularity": "mandi",
+        "url": "https://enam.gov.in/web/",
+        "tags": ["trading", "markets", "unified-market", "official"],
+    },
+    {
+        "id": "pm_kisan",
+        "name": "PM-KISAN",
+        "provider": "Government of India",
+        "kind": "scheme_platform",
+        "access_mode": "portal",
+        "freshness": "transactional",
+        "geographic_granularity": "beneficiary",
+        "url": "https://pmkisan.gov.in/",
+        "tags": ["scheme", "dbt", "eligibility", "official"],
+    },
+    {
+        "id": "mkisan",
+        "name": "mKisan",
+        "provider": "Government of India",
+        "kind": "advisory_platform",
+        "access_mode": "portal",
+        "freshness": "campaign_based",
+        "geographic_granularity": "district",
+        "url": "https://mkisan.gov.in/",
+        "tags": ["sms", "advisory", "alerts", "official"],
+    },
+    {
+        "id": "kisan_suvidha",
+        "name": "Kisan Suvidha",
+        "provider": "Government of India",
+        "kind": "farmer_service",
+        "access_mode": "portal",
+        "freshness": "operational",
+        "geographic_granularity": "district",
+        "url": "https://www.india.gov.in/category/agriculture-rural-environment/subcategory/resources-for-agriculture/details/website-of-kisan-suvidha",
+        "tags": ["weather", "prices", "advisory", "official"],
+    },
+    {
+        "id": "imd_agromet",
+        "name": "IMD Agromet / Meghdoot",
+        "provider": "India Meteorological Department",
+        "kind": "weather_platform",
+        "access_mode": "portal",
+        "freshness": "forecast",
+        "geographic_granularity": "district",
+        "url": "https://mausam.imd.gov.in/responsive/agromet/home.php",
+        "tags": ["weather", "agromet", "forecast", "official"],
+    },
+    {
+        "id": "soil_health_card",
+        "name": "Soil Health Card",
+        "provider": "Government of India",
+        "kind": "soil_platform",
+        "access_mode": "portal",
+        "freshness": "campaign_based",
+        "geographic_granularity": "farm",
+        "url": "https://soilhealth.dac.gov.in/",
+        "tags": ["soil", "nutrient", "soil-health", "official"],
+    },
+    {
+        "id": "pmfby",
+        "name": "PMFBY",
+        "provider": "Government of India",
+        "kind": "insurance_platform",
+        "access_mode": "portal",
+        "freshness": "transactional",
+        "geographic_granularity": "district",
+        "url": "https://pmfby.gov.in/",
+        "tags": ["insurance", "risk", "claims", "official"],
+    },
+    {
+        "id": "icar",
+        "name": "ICAR",
+        "provider": "ICAR",
+        "kind": "research_network",
+        "access_mode": "portal",
+        "freshness": "reference",
+        "geographic_granularity": "national",
+        "url": "https://icar.gov.in/",
+        "tags": ["research", "crop", "best-practices", "official"],
+    },
+    {
+        "id": "bhuvan",
+        "name": "ISRO Bhuvan",
+        "provider": "NRSC / ISRO",
+        "kind": "satellite_platform",
+        "access_mode": "portal",
+        "freshness": "periodic",
+        "geographic_granularity": "village",
+        "url": "https://bhuvan.nrsc.gov.in/",
+        "tags": ["satellite", "geospatial", "remote-sensing", "official"],
+    },
+    {
+        "id": "state_agriculture_directory",
+        "name": "State agriculture department directory",
+        "provider": "India.gov.in",
+        "kind": "directory",
+        "access_mode": "portal",
+        "freshness": "reference",
+        "geographic_granularity": "state",
+        "url": "https://www.india.gov.in/category/agriculture-rural-environment/subcategory/research-marketing/details/departments-of-agriculture-of-states-and-union-territories",
+        "tags": ["state-portals", "departments", "official"],
+    },
+]
+
+
+PERSONA_REGISTRY = [
+    {
+        "id": "farmer",
+        "name": "Farmer",
+        "summary": "Operational crop, weather, market, scheme, and advisory workflows for the field edge.",
+        "capabilities": ["advisory", "mandi", "schemes", "weather", "my_farm"],
+        "default_tabs": ["dashboard", "advisor", "market", "schemes", "weather", "farm"],
+    },
+    {
+        "id": "fpo",
+        "name": "FPO",
+        "summary": "Aggregation, bulk selling, cluster advisories, and buyer/mandi coordination workflows.",
+        "capabilities": ["bulk_market", "cluster_weather", "scheme_matching", "logistics"],
+        "default_tabs": ["dashboard", "market", "schemes", "weather", "farm"],
+    },
+    {
+        "id": "agri_business",
+        "name": "Agri Business",
+        "summary": "Market intelligence, crop supply visibility, analytics APIs, and demand signals.",
+        "capabilities": ["analytics", "demand_prediction", "market_arbitrage", "api_access"],
+        "default_tabs": ["dashboard", "market", "weather", "farm"],
+    },
+    {
+        "id": "government_agency",
+        "name": "Government Agency",
+        "summary": "Program analytics, risk visibility, state and district policy intelligence, and coverage monitoring.",
+        "capabilities": [
+            "policy_dashboard",
+            "scheme_monitoring",
+            "risk_alerts",
+            "district_analytics",
+        ],
+        "default_tabs": ["dashboard", "schemes", "weather", "market"],
+    },
+]
+
+
+SUBSCRIPTION_TIERS = [
+    {
+        "id": "free",
+        "name": "Free",
+        "target_personas": ["farmer"],
+        "monthly_price_inr": 0,
+        "features": ["core advisory", "mandi lookup", "scheme view", "offline cache"],
+    },
+    {
+        "id": "pro",
+        "name": "Pro",
+        "target_personas": ["farmer", "fpo"],
+        "monthly_price_inr": 299,
+        "features": ["advanced AI", "bulk insights", "priority alerts", "extended history"],
+    },
+    {
+        "id": "enterprise",
+        "name": "Enterprise",
+        "target_personas": ["agri_business", "government_agency", "fpo"],
+        "monthly_price_inr": 0,
+        "features": ["analytics API", "policy dashboards", "custom integrations", "SLA support"],
+    },
+]
+
+
+PUBLIC_API_PRODUCTS = [
+    {
+        "id": "mandi_data_api",
+        "name": "Mandi Data API",
+        "base_path": "/api/v1/public/mandi-prices",
+        "description": "Approved mandi prices and arrivals for external consumers.",
+        "audience": ["fpo", "agri_business", "government_agency"],
+    },
+    {
+        "id": "weather_api",
+        "name": "Weather API",
+        "base_path": "/api/v1/public/weather",
+        "description": "Weather forecast proxy with cache-aware access for agriculture use cases.",
+        "audience": ["farmer", "fpo", "agri_business", "government_agency"],
+    },
+    {
+        "id": "state_intelligence_api",
+        "name": "State Intelligence API",
+        "base_path": "/api/v1/public/state-intelligence",
+        "description": "State and district intelligence aggregation for platform partners.",
+        "audience": ["fpo", "agri_business", "government_agency"],
+    },
+    {
+        "id": "ai_advisory_api",
+        "name": "AI Advisory API",
+        "base_path": "/api/ai/advisor",
+        "description": "Bedrock-backed crop advisory API for AI-assisted workflows.",
+        "audience": ["farmer", "fpo", "agri_business", "government_agency"],
+    },
+]
+
+
+MICROSERVICE_CATALOG = [
+    {
+        "id": "api_gateway",
+        "name": "API Gateway",
+        "runtime": "AWS API Gateway",
+        "responsibility": "Public and internal API entrypoint",
+    },
+    {
+        "id": "auth_service",
+        "name": "Auth Service",
+        "runtime": "FastAPI",
+        "responsibility": "JWT auth, RBAC, sessions",
+    },
+    {
+        "id": "state_engine",
+        "name": "State Engine",
+        "runtime": "FastAPI",
+        "responsibility": "State, district, locality, and persona context",
+    },
+    {
+        "id": "mandi_service",
+        "name": "Mandi Service",
+        "runtime": "FastAPI",
+        "responsibility": "Prices, arrivals, arbitrage, market APIs",
+    },
+    {
+        "id": "scheme_service",
+        "name": "Scheme Service",
+        "runtime": "FastAPI",
+        "responsibility": "Scheme matching and eligibility catalogs",
+    },
+    {
+        "id": "weather_service",
+        "name": "Weather Service",
+        "runtime": "FastAPI",
+        "responsibility": "Weather, alerts, crop risk computation",
+    },
+    {
+        "id": "ai_service",
+        "name": "AI Service",
+        "runtime": "Node.js / Bedrock",
+        "responsibility": "AI advisory and future ML inference",
+    },
+    {
+        "id": "notification_service",
+        "name": "Notification Service",
+        "runtime": "Lambda",
+        "responsibility": "Push, SMS-ready, campaign alerts",
+    },
+    {
+        "id": "etl_service",
+        "name": "ETL Service",
+        "runtime": "EventBridge + Lambda / Fargate",
+        "responsibility": "Scheduled ingestion and validation",
+    },
+    {
+        "id": "developer_api",
+        "name": "Developer API",
+        "runtime": "FastAPI",
+        "responsibility": "Public API products and documentation",
+    },
+]
+
+
+PIPELINE_JOB_CATALOG = [
+    {
+        "id": "mandi_refresh",
+        "schedule": "*/10 * * * *",
+        "mode": "incremental",
+        "purpose": "Refresh mandi prices and arrivals from official feeds and approved entries.",
+    },
+    {
+        "id": "weather_refresh",
+        "schedule": "*/30 * * * *",
+        "mode": "incremental",
+        "purpose": "Refresh district-level weather and crop risk context.",
+    },
+    {
+        "id": "scheme_sync",
+        "schedule": "0 */6 * * *",
+        "mode": "full_or_delta",
+        "purpose": "Refresh scheme catalogs, eligibility rules, and apply links.",
+    },
+    {
+        "id": "state_portal_sync",
+        "schedule": "0 3 * * *",
+        "mode": "full",
+        "purpose": "Refresh state portal, department directory, and official notice snapshots.",
+    },
+    {
+        "id": "geo_hierarchy_sync",
+        "schedule": "15 2 * * 1",
+        "mode": "full_or_delta",
+        "purpose": "Refresh district, block, village, and postal-code hierarchy datasets when configured.",
+    },
+    {
+        "id": "data_quality_validation",
+        "schedule": "*/15 * * * *",
+        "mode": "stream_and_batch",
+        "purpose": "Validate schema, duplicates, freshness, and price anomalies.",
+    },
+]

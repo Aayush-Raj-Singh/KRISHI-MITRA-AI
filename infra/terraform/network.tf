@@ -1,4 +1,5 @@
 data "aws_availability_zones" "available" {
+  count = var.enable_network ? 1 : 0
   state = "available"
 }
 
@@ -20,7 +21,7 @@ resource "aws_subnet" "public" {
   count                   = var.enable_network ? length(var.public_subnet_cidrs) : 0
   vpc_id                  = aws_vpc.main[0].id
   cidr_block              = var.public_subnet_cidrs[count.index]
-  availability_zone       = data.aws_availability_zones.available.names[count.index]
+  availability_zone       = data.aws_availability_zones.available[0].names[count.index]
   map_public_ip_on_launch = true
   tags = merge(local.tags, {
     Name = "${var.project_name}-public-${count.index + 1}"
@@ -31,7 +32,7 @@ resource "aws_subnet" "private" {
   count                   = var.enable_network ? length(var.private_subnet_cidrs) : 0
   vpc_id                  = aws_vpc.main[0].id
   cidr_block              = var.private_subnet_cidrs[count.index]
-  availability_zone       = data.aws_availability_zones.available.names[count.index]
+  availability_zone       = data.aws_availability_zones.available[0].names[count.index]
   map_public_ip_on_launch = false
   tags = merge(local.tags, {
     Name = "${var.project_name}-private-${count.index + 1}"

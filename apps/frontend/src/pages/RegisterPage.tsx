@@ -23,20 +23,20 @@ const RegisterPage: React.FC = () => {
             points={[
               {
                 icon: <WaterDropIcon color="primary" fontSize="small" />,
-                text: t("register_page.feature_irrigation")
+                text: t("register_page.feature_irrigation"),
               },
               {
                 icon: <ShowChartIcon color="secondary" fontSize="small" />,
-                text: t("register_page.feature_price")
+                text: t("register_page.feature_price"),
               },
               {
                 icon: <NatureIcon color="success" fontSize="small" />,
-                text: t("register_page.feature_sustainability")
+                text: t("register_page.feature_sustainability"),
               },
               {
                 icon: <AgricultureIcon color="primary" fontSize="small" />,
-                text: t("layout.dbt_portal")
-              }
+                text: t("layout.dbt_portal"),
+              },
             ]}
           />
         </Grid>

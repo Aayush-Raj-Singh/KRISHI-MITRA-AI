@@ -11,7 +11,13 @@ export interface ApiRequestOptions {
   responseType?: "json" | "text" | "blob";
 }
 
-export type Role = "farmer" | "extension_officer" | "admin";
+export type Role =
+  | "farmer"
+  | "extension_officer"
+  | "fpo"
+  | "agri_business"
+  | "government_agency"
+  | "admin";
 
 export type Nullable<T> = T | null;
 

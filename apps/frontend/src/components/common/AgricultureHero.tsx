@@ -19,13 +19,14 @@ const AgricultureHero: React.FC<AgricultureHeroProps> = ({
   badges = [],
   imageSrc = "/assets/agri-slider/slide-06.jpg",
   logoSrc,
-  logoAlt = "KrishiMitra-AI logo"
+  logoAlt = "KrishiMitra-AI logo",
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
 
   return (
     <Paper
+      className="render-smooth-section"
       sx={{
         position: "relative",
         overflow: "hidden",
@@ -35,7 +36,7 @@ const AgricultureHero: React.FC<AgricultureHeroProps> = ({
         background: isDark
           ? "linear-gradient(135deg, rgba(16, 40, 28, 0.98) 0%, rgba(12, 32, 22, 0.96) 55%, rgba(14, 36, 26, 0.94) 100%)"
           : "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(245,239,226,0.96) 55%, rgba(232, 244, 236, 0.94) 100%)",
-        boxShadow: isDark ? "0 18px 38px rgba(0,0,0,0.35)" : "0 18px 38px rgba(18, 44, 25, 0.12)"
+        boxShadow: isDark ? "0 12px 24px rgba(0,0,0,0.24)" : "0 12px 24px rgba(18, 44, 25, 0.08)",
       }}
     >
       <Box
@@ -49,12 +50,16 @@ const AgricultureHero: React.FC<AgricultureHeroProps> = ({
           background: isDark
             ? `radial-gradient(circle, ${alpha(theme.palette.success.light, 0.18)} 0%, ${alpha(
                 theme.palette.success.light,
-                0.04
+                0.04,
               )} 70%, rgba(31, 125, 67, 0) 100%)`
-            : "radial-gradient(circle, rgba(31, 125, 67, 0.18) 0%, rgba(31, 125, 67, 0.02) 70%, rgba(31, 125, 67, 0) 100%)"
+            : "radial-gradient(circle, rgba(31, 125, 67, 0.18) 0%, rgba(31, 125, 67, 0.02) 70%, rgba(31, 125, 67, 0) 100%)",
         }}
       />
-      <Stack direction={{ xs: "column", md: "row" }} spacing={3} alignItems={{ xs: "flex-start", md: "center" }}>
+      <Stack
+        direction={{ xs: "column", md: "row" }}
+        spacing={3}
+        alignItems={{ xs: "flex-start", md: "center" }}
+      >
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Stack direction="row" spacing={1.2} alignItems="center" sx={{ mb: 1 }}>
             {logoSrc && (
@@ -67,7 +72,7 @@ const AgricultureHero: React.FC<AgricultureHeroProps> = ({
                   width: "auto",
                   objectFit: "contain",
                   borderRadius: "50%",
-                  mr: 1.25
+                  mr: 1.25,
                 }}
               />
             )}
@@ -76,10 +81,12 @@ const AgricultureHero: React.FC<AgricultureHeroProps> = ({
                 width: 38,
                 height: 38,
                 borderRadius: "50%",
-                bgcolor: isDark ? alpha(theme.palette.success.light, 0.2) : "rgba(27, 107, 58, 0.12)",
+                bgcolor: isDark
+                  ? alpha(theme.palette.success.light, 0.2)
+                  : "rgba(27, 107, 58, 0.12)",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center"
+                justifyContent: "center",
               }}
             >
               {icon}
@@ -87,10 +94,10 @@ const AgricultureHero: React.FC<AgricultureHeroProps> = ({
             <Typography
               variant="h3"
               sx={{
-                fontFamily: 'var(--app-heading-font), var(--app-body-font), serif',
+                fontFamily: "var(--app-heading-font), var(--app-body-font), serif",
                 fontWeight: 600,
                 letterSpacing: 0.2,
-                fontSize: { xs: "1.7rem", md: "2.05rem" }
+                fontSize: { xs: "1.7rem", md: "2.05rem" },
               }}
             >
               {title}
@@ -115,7 +122,7 @@ const AgricultureHero: React.FC<AgricultureHeroProps> = ({
                     borderRadius: 999,
                     bgcolor: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.8)",
                     borderColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(27, 107, 58, 0.2)",
-                    fontWeight: 600
+                    fontWeight: 600,
                   }}
                 />
               ))}
@@ -129,19 +136,21 @@ const AgricultureHero: React.FC<AgricultureHeroProps> = ({
             borderRadius: 2.5,
             border: isDark ? "1px solid rgba(255,255,255,0.16)" : "1px solid #ddceb6",
             overflow: "hidden",
-            display: { xs: "none", sm: "block" }
+            display: { xs: "none", sm: "block" },
           }}
         >
           <Box
             component="img"
             src={imageSrc}
             alt="Agriculture"
+            loading="lazy"
+            decoding="async"
             sx={{
               width: "100%",
               height: "100%",
               objectFit: "cover",
               display: "block",
-              filter: "saturate(1.05)"
+              filter: "saturate(1.05)",
             }}
           />
         </Box>

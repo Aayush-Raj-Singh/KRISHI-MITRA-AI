@@ -16,14 +16,14 @@ registerRoute(
   new NetworkFirst({
     cacheName: "pages-cache",
     networkTimeoutSeconds: 3,
-  })
+  }),
 );
 
 registerRoute(
   ({ request }) => ["style", "script", "worker"].includes(request.destination),
   new StaleWhileRevalidate({
     cacheName: "assets-cache",
-  })
+  }),
 );
 
 registerRoute(
@@ -31,7 +31,7 @@ registerRoute(
   new CacheFirst({
     cacheName: "images-cache",
     plugins: [new ExpirationPlugin({ maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 * 30 })],
-  })
+  }),
 );
 
 registerRoute(
@@ -40,7 +40,7 @@ registerRoute(
     cacheName: "api-cache",
     networkTimeoutSeconds: 5,
     plugins: [new ExpirationPlugin({ maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 })],
-  })
+  }),
 );
 
 setCatchHandler(async ({ event }) => {

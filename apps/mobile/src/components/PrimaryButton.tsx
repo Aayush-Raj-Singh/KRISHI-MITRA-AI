@@ -1,7 +1,7 @@
 import React from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, ViewStyle } from "react-native";
 
-import { colors } from "../theme/colors";
+import { colors, radius, shadows, spacing, typography } from "../theme";
 
 interface PrimaryButtonProps {
   label: string;
@@ -18,7 +18,7 @@ export const PrimaryButton = ({
   disabled = false,
   loading = false,
   tone = "primary",
-  style
+  style,
 }: PrimaryButtonProps) => (
   <Pressable
     accessibilityRole="button"
@@ -29,10 +29,12 @@ export const PrimaryButton = ({
       tone === "secondary" ? styles.secondary : styles.primary,
       (disabled || loading) && styles.disabled,
       pressed && !(disabled || loading) ? styles.pressed : null,
-      style
+      style,
     ]}
   >
-    {loading ? <ActivityIndicator color={tone === "secondary" ? colors.primary : colors.white} /> : null}
+    {loading ? (
+      <ActivityIndicator color={tone === "secondary" ? colors.primary : colors.white} />
+    ) : null}
     <Text style={[styles.label, tone === "secondary" ? styles.secondaryLabel : null]}>{label}</Text>
   </Pressable>
 );
@@ -40,33 +42,37 @@ export const PrimaryButton = ({
 const styles = StyleSheet.create({
   base: {
     minHeight: 52,
-    borderRadius: 16,
+    borderRadius: radius.md,
     paddingHorizontal: 18,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 10
+    gap: spacing.sm,
   },
   primary: {
-    backgroundColor: colors.primary
+    backgroundColor: colors.primary,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    ...shadows.card,
   },
   secondary: {
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.border
+    borderColor: colors.border,
+    ...shadows.card,
   },
   disabled: {
-    opacity: 0.6
+    opacity: 0.6,
   },
   pressed: {
-    transform: [{ scale: 0.99 }]
+    transform: [{ scale: 0.99 }],
   },
   label: {
     color: colors.white,
-    fontSize: 15,
-    fontWeight: "700"
+    fontSize: typography.body,
+    fontWeight: "700",
   },
   secondaryLabel: {
-    color: colors.primary
-  }
+    color: colors.primary,
+  },
 });

@@ -23,6 +23,8 @@ KrishiMitra AI supports farmers, extension officers, and administrators with:
   - FastAPI
   - `asyncpg` PostgreSQL access with connection pooling
   - automatic schema/table bootstrap on startup
+  - `app/services` for application business services
+  - `microservices` for isolated service entrypoints and container build targets
 - `apps/frontend`
   - React + TypeScript + Vite
   - web and PWA experience
@@ -43,21 +45,36 @@ KrishiMitra AI supports farmers, extension officers, and administrators with:
 ```text
 apps/
   backend/
+    app/
+    microservices/
+    model-artifacts/
   frontend/
   mobile/
 docs/
 infra/
+  terraform/
+    environments/
+      dev/
+      prod/
 packages/
   shared/
 requirements.md
 design.md
 ```
 
+Folder roles:
+
+- `apps/backend/app`: main FastAPI application code, schemas, services, and utilities
+- `apps/backend/microservices`: deployable entrypoints that expose bounded backend surfaces without duplicating business logic
+- `apps/backend/model-artifacts`: ignored runtime artifact root for trained models and generated metadata
+- `packages/shared`: shared API contracts, validators, constants, and client helpers used by web and mobile
+- `infra/terraform/environments`: environment-specific Terraform wrappers for `dev` and `prod`
+
 ## Tech stack
 
 - Backend: FastAPI, Pydantic, `asyncpg`, PostgreSQL
 - Web: React 18, TypeScript, Vite, MUI, React Query, Redux Toolkit
-- Mobile: React Native, Expo, React Navigation, Zustand, AsyncStorage
+- Mobile: React Native, Expo, React Navigation, Zustand, Expo Secure Store
 - Shared: TypeScript contracts, validators, client helpers
 - Infra: Terraform and GitHub Actions
 
@@ -65,6 +82,8 @@ design.md
 
 - Python 3.11+
 - Node.js 20+
+- Terraform 1.14+
+- AWS CLI v2
 - PostgreSQL 15+
 - pgAdmin 4
 
@@ -96,6 +115,7 @@ ALLOW_INMEMORY_DB_FALLBACK=false
 CORS_ORIGINS=*
 CORS_ALLOW_METHODS=*
 CORS_ALLOW_HEADERS=*
+MODEL_ARTIFACTS_ROOT=model-artifacts
 ```
 
 Copy the example if needed and adjust credentials for your local pgAdmin/PostgreSQL instance:
@@ -109,6 +129,8 @@ Important notes:
 - The backend now prefers `DATABASE_URL`
 - `POSTGRES_DSN` is still accepted for backward compatibility
 - production-style startup does not rely on an in-memory fallback
+- model artifacts can be mounted outside source control through `MODEL_ARTIFACTS_ROOT`
+- repo-tracked ML artifacts are still supported as development fallbacks
 
 ### 3. Install backend dependencies
 
@@ -135,6 +157,28 @@ GET /health/db
 
 `/health/db` verifies the live PostgreSQL connection and reports required table availability.
 
+### 6. Set the backend runtime profile
+
+The backend runtime is Bedrock-only:
+
+```powershell
+npm run backend:profile:bedrock
+```
+
+Validate the currently selected runtime profile:
+
+```powershell
+npm run backend:validate-runtime
+```
+
+For offline-safe profile validation without live AWS calls:
+
+```powershell
+$env:RUNTIME_VALIDATION_MOCK_MODE="true"
+npm run backend:validate-runtime
+Remove-Item Env:RUNTIME_VALIDATION_MOCK_MODE
+```
+
 ## Web setup
 
 ```powershell
@@ -148,7 +192,12 @@ Typical frontend environment:
 ```text
 VITE_API_BASE_URL=http://localhost:8000/api/v1
 VITE_WS_URL=ws://localhost:8000/api/v1/ws/updates
+VITE_ERROR_REPORTING_ENDPOINT=
+VITE_APP_RELEASE=web-dev
+VITE_DEV_HOST=127.0.0.1
 ```
+
+`VITE_DEV_HOST` defaults to `127.0.0.1` to avoid exposing the Vite dev server on the network unless you explicitly opt in.
 
 ## Mobile setup
 
@@ -158,6 +207,8 @@ Create `apps/mobile/.env`:
 
 ```text
 API_BASE_URL=http://10.0.2.2:8000
+EXPO_PUBLIC_ERROR_REPORTING_ENDPOINT=
+EXPO_PUBLIC_APP_RELEASE=mobile-dev
 ```
 
 Use the correct host per runtime:
@@ -193,7 +244,7 @@ npm run run:ios
 ## Authentication and API behavior
 
 - Web and mobile reuse the same backend APIs
-- Mobile tokens are persisted with AsyncStorage
+- Mobile tokens are persisted with Expo Secure Store
 - Access tokens are attached automatically to requests
 - Refresh tokens are handled by the shared API client
 - Mobile read flows use retry-aware API calls where it is safe to do so
@@ -207,11 +258,26 @@ Production should use explicit origins and strong secrets.
 
 ## Validation
 
+### Terraform
+
+Local Terraform validation now uses the `infra/terraform/environments/dev` wrapper and its committed offline-safe var file.
+
+```powershell
+npm run infra:validate
+```
+
+That command runs:
+
+- `terraform fmt`
+- `terraform init -backend=false`
+- `terraform validate`
+- `terraform plan -refresh=false`
+
 ### Backend
 
 ```powershell
-$env:PYTHONPATH='apps/backend'
-.\.venv\Scripts\python.exe -m pytest apps/backend/tests -q
+npm run backend:test
+npm run backend:validate-runtime
 ```
 
 ### Shared package
@@ -235,8 +301,74 @@ npm run build
 ```powershell
 cd apps/mobile
 npm run typecheck
+npm run test:run
 npx expo config --type public
 ```
+
+### Security audit
+
+```powershell
+npm run security:check
+```
+
+This enforces the runtime dependency policy and fails on high/critical production npm vulnerabilities.
+
+Current status:
+
+- production/runtime npm graph: `0` vulnerabilities
+- dev-tooling audit noise remains in the Vite/Vitest/PWA toolchain
+- those remaining items are isolated to build/test tooling and require a coordinated major-version upgrade pass, not an emergency runtime fix
+
+## AWS credential setup
+
+Use AWS CLI profiles or environment variables. Do not hardcode credentials in the repo.
+
+Recommended profile flow:
+
+```powershell
+aws configure sso
+$env:AWS_PROFILE="your-profile"
+```
+
+Optional backend env values:
+
+```text
+AWS_PROFILE=your-profile
+AWS_SHARED_CREDENTIALS_FILE=
+AWS_VALIDATION_MOCK_MODE=true
+AWS_VALIDATION_S3_BUCKET=
+AWS_SECRETS_MANAGER_SECRET_ID=
+```
+
+Validate runtime wiring:
+
+```powershell
+npm run backend:validate-aws
+```
+
+If credentials are missing in local development, the validator now returns mocked/skipped statuses instead of crashing.
+
+## Operations
+
+- `/metrics` now exposes Prometheus-compatible latency, request, dependency, and client-error counters
+- browser and mobile clients send crash reports to `/api/v1/public/client-errors`
+- admins can inspect `/api/v1/diagnostics/observability` and `/api/v1/diagnostics/client-errors`
+- the production runbook is in `docs/production-readiness.md`
+
+## Troubleshooting
+
+- `terraform plan` fails locally:
+  Use `npm run infra:validate`. It already applies the repo's offline-safe validation var file.
+- `npm run backend:validate-aws` reports skipped/mocked services:
+  Set `AWS_PROFILE` or export real AWS credentials, then rerun.
+- `npm run backend:validate-runtime` fails while you only want to verify profile wiring:
+  Set `RUNTIME_VALIDATION_MOCK_MODE=true`, rerun the validator, then unset the variable.
+- Frontend is not reachable from another device:
+  Set `VITE_DEV_HOST=0.0.0.0` before `npm run frontend:dev`.
+- Mobile cannot reach the backend on a real phone:
+  Set `API_BASE_URL` in `apps/mobile/.env` to `http://<your-local-ip>:8000`.
+- PostgreSQL is unavailable locally:
+  Keep `ALLOW_INMEMORY_DB_FALLBACK=true` only for local/dev fallback scenarios, never for production.
 
 ## Notes
 

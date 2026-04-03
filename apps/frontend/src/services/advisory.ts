@@ -4,7 +4,7 @@ import {
   type ChatRequest,
   type ChatResponse,
   type TranslationRequest as AdvisoryTranslateRequest,
-  type TranslationResponse as AdvisoryTranslateResponse
+  type TranslationResponse as AdvisoryTranslateResponse,
 } from "@krishimitra/shared";
 
 import api, { unwrap } from "./api";
@@ -16,7 +16,7 @@ export type {
   AdvisoryTranslateRequest,
   AdvisoryTranslateResponse,
   ChatRequest,
-  ChatResponse
+  ChatResponse,
 };
 
 export const sendAdvisoryMessage = async (payload: ChatRequest): Promise<ChatResponse> => {
@@ -31,7 +31,7 @@ export const fetchAdvisorySlaTelemetry = async (params?: {
 };
 
 export const translateAdvisoryText = async (
-  payload: AdvisoryTranslateRequest
+  payload: AdvisoryTranslateRequest,
 ): Promise<AdvisoryTranslateResponse> => {
   return advisoryApi.translate({
     ...payload,

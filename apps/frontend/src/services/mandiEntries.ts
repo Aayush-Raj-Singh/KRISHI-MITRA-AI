@@ -48,8 +48,12 @@ export const approveMandiEntry = async (entryId: string) => {
 };
 
 export const rejectMandiEntry = async (entryId: string, reason?: string) => {
-  const response = await api.post<ApiResponse<MandiEntry>>(`/mandi/entries/${entryId}/reject`, {}, {
-    params: reason ? { reason } : undefined
-  });
+  const response = await api.post<ApiResponse<MandiEntry>>(
+    `/mandi/entries/${entryId}/reject`,
+    {},
+    {
+      params: reason ? { reason } : undefined,
+    },
+  );
   return unwrap(response.data);
 };

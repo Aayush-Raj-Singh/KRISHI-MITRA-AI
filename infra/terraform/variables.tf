@@ -10,6 +10,12 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "aws_mock_mode" {
+  type        = bool
+  description = "Enable offline-friendly provider settings for local validation and dry-run planning."
+  default     = false
+}
+
 variable "secondary_region" {
   type        = string
   description = "Secondary AWS region for multi-region deployments."

@@ -9,12 +9,26 @@ terraform {
 }
 
 provider "aws" {
-  region = var.aws_region
+  region                      = var.aws_region
+  access_key                  = var.aws_mock_mode ? "mock-access-key" : null
+  secret_key                  = var.aws_mock_mode ? "mock-secret-key" : null
+  token                       = var.aws_mock_mode ? "mock-session-token" : null
+  skip_credentials_validation = var.aws_mock_mode
+  skip_metadata_api_check     = var.aws_mock_mode
+  skip_region_validation      = var.aws_mock_mode
+  skip_requesting_account_id  = var.aws_mock_mode
 }
 
 provider "aws" {
-  alias  = "secondary"
-  region = var.secondary_region != "" ? var.secondary_region : var.aws_region
+  alias                       = "secondary"
+  region                      = var.secondary_region != "" ? var.secondary_region : var.aws_region
+  access_key                  = var.aws_mock_mode ? "mock-access-key" : null
+  secret_key                  = var.aws_mock_mode ? "mock-secret-key" : null
+  token                       = var.aws_mock_mode ? "mock-session-token" : null
+  skip_credentials_validation = var.aws_mock_mode
+  skip_metadata_api_check     = var.aws_mock_mode
+  skip_region_validation      = var.aws_mock_mode
+  skip_requesting_account_id  = var.aws_mock_mode
 }
 
 resource "aws_ecs_cluster" "krishimitra" {

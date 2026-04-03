@@ -4,8 +4,8 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
-from app.core.database import Database
 
+from app.core.database import Database
 from app.core.dependencies import get_db, require_roles
 from app.models.user import UserInDB
 from app.schemas.market_profile import (
@@ -15,6 +15,7 @@ from app.schemas.market_profile import (
 )
 from app.schemas.response import APIResponse
 from app.utils.audit import log_audit_event
+from app.utils.query_filters import build_case_insensitive_contains_filter
 from app.utils.responses import success_response
 
 router = APIRouter()
@@ -46,7 +47,7 @@ async def list_profiles(
     if district:
         query["district"] = district
     if market:
-        query["name"] = {"$regex": market, "$options": "i"}
+        query["name"] = build_case_insensitive_contains_filter(market)
     if commodity:
         query["commodities"] = commodity
 
@@ -79,7 +80,16 @@ async def create_profile(
     result = await db["market_profiles"].insert_one(record)
     created = await db["market_profiles"].find_one({"_id": result.inserted_id})
     created = _normalize(created)
-    await log_audit_event(db, user.id, user.role, "market_profile", created["_id"], "create", record, request.client.host)
+    await log_audit_event(
+        db,
+        user.id,
+        user.role,
+        "market_profile",
+        created["_id"],
+        "create",
+        record,
+        request.client.host,
+    )
     return success_response(MarketProfileDB(**created), message="Market profile created")
 
 
@@ -96,14 +106,25 @@ async def update_profile(
         profile = await db["market_profiles"].find_one({"_id": _coerce_id(profile_id)})
         if not profile:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
-        return success_response(MarketProfileDB(**_normalize(profile)), message="No changes applied")
+        return success_response(
+            MarketProfileDB(**_normalize(profile)), message="No changes applied"
+        )
     updates["updated_at"] = datetime.utcnow()
-    result = await db["market_profiles"].update_one({"_id": _coerce_id(profile_id)}, {"$set": updates})
+    result = await db["market_profiles"].update_one(
+        {"_id": _coerce_id(profile_id)}, {"$set": updates}
+    )
     if result.matched_count == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
     updated = await db["market_profiles"].find_one({"_id": _coerce_id(profile_id)})
     updated = _normalize(updated)
     await log_audit_event(
-        db, user.id, user.role, "market_profile", updated["_id"], "update", updates, request.client.host
+        db,
+        user.id,
+        user.role,
+        "market_profile",
+        updated["_id"],
+        "update",
+        updates,
+        request.client.host,
     )
     return success_response(MarketProfileDB(**updated), message="Market profile updated")

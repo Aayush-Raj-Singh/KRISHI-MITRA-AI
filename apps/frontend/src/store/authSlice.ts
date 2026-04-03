@@ -8,7 +8,7 @@ import {
   getRefreshToken,
   getStoredUser,
   setAuthTokens,
-  setStoredUser
+  setStoredUser,
 } from "../services/authStorage";
 
 interface AuthState {
@@ -20,7 +20,7 @@ interface AuthState {
 const initialState: AuthState = {
   accessToken: getAccessToken(),
   refreshToken: getRefreshToken(),
-  user: getStoredUser<UserPublic>()
+  user: getStoredUser<UserPublic>(),
 };
 
 const authSlice = createSlice({
@@ -42,8 +42,8 @@ const authSlice = createSlice({
       state.user = null;
       clearAuthTokens();
       clearStoredUser();
-    }
-  }
+    },
+  },
 });
 
 export const { setTokens, setUser, logout } = authSlice.actions;

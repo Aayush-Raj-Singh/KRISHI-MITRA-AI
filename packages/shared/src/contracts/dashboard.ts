@@ -38,6 +38,38 @@ export interface PriceArrivalDashboardResponse {
   cached?: boolean;
 }
 
+export interface MarketPriceTableFilters {
+  state?: string;
+  district?: string;
+  mandi?: string;
+  commodity?: string;
+  date_from?: string;
+  date_to?: string;
+  page?: number;
+  page_size?: number;
+}
+
+export interface MarketPriceTableRow {
+  district?: string | null;
+  market: string;
+  date: string;
+  commodity: string;
+  variety?: string | null;
+  price: number;
+  min_price: number;
+  max_price: number;
+}
+
+export interface MarketPriceTableResponse {
+  filters: MarketPriceTableFilters;
+  items: MarketPriceTableRow[];
+  total: number;
+  page: number;
+  page_size: number;
+  generated_at: string;
+  cached?: boolean;
+}
+
 export interface DashboardHeroSummary {
   latest_recommendation_id?: string | null;
   latest_recommendation_kind?: string | null;

@@ -3,11 +3,12 @@ from __future__ import annotations
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from app.core.database import Database
 
+from app.core.database import Database
 from app.core.dependencies import get_db, require_roles
 from app.schemas.mandi_directory import MandiContact, MandiDirectoryItem
 from app.schemas.response import APIResponse
+from app.utils.query_filters import build_case_insensitive_contains_filter
 from app.utils.responses import success_response
 
 router = APIRouter()
@@ -51,7 +52,7 @@ async def list_mandi_directory(
     if district:
         query["district"] = district
     if mandi:
-        query["name"] = {"$regex": mandi, "$options": "i"}
+        query["name"] = build_case_insensitive_contains_filter(mandi)
     if commodity:
         query["commodities"] = commodity
     cursor = db["market_profiles"].find(query).sort("name", 1).limit(limit)

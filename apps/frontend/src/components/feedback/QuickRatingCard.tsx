@@ -23,9 +23,9 @@ const QuickRatingCard: React.FC<QuickRatingCardProps> = ({ recommendationId, ser
       noteLabel: "Optional note",
       submit: "Submit rating",
       thanks: "Thanks for rating.",
-      submitting: "Submitting..."
+      submitting: "Submitting...",
     }),
-    []
+    [],
   );
   const translated = useTranslatedStrings(labels);
 
@@ -34,7 +34,7 @@ const QuickRatingCard: React.FC<QuickRatingCardProps> = ({ recommendationId, ser
     onSuccess: () => {
       setSubmitted(true);
       setNotes("");
-    }
+    },
   });
 
   const handleSubmit = () => {
@@ -44,7 +44,7 @@ const QuickRatingCard: React.FC<QuickRatingCardProps> = ({ recommendationId, ser
       rating,
       service,
       notes: notes.trim() || undefined,
-      source: "web"
+      source: "web",
     });
   };
 

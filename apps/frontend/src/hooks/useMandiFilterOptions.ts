@@ -23,7 +23,7 @@ export const useMandiFilterOptions = (limit = 200) => {
     queryFn: () => fetchMandiCatalog({ limit }),
     staleTime: 1000 * 60 * 30,
     refetchOnWindowFocus: false,
-    retry: 1
+    retry: 1,
   });
 
   const directoryQuery = useQuery({
@@ -31,7 +31,7 @@ export const useMandiFilterOptions = (limit = 200) => {
     queryFn: () => fetchMandiDirectory({ limit }),
     staleTime: 1000 * 60 * 30,
     refetchOnWindowFocus: false,
-    retry: 1
+    retry: 1,
   });
 
   const catalog: MandiCatalogResponse =
@@ -55,7 +55,7 @@ export const useMandiFilterOptions = (limit = 200) => {
       states: uniqueSorted(states),
       districts: uniqueSorted(districts),
       mandis: uniqueSorted(mandis),
-      commodities: uniqueSorted([...crops, ...commoditiesFromDirectory])
+      commodities: uniqueSorted([...crops, ...commoditiesFromDirectory]),
     };
   }, [catalog, directoryQuery.data]);
 
@@ -63,8 +63,10 @@ export const useMandiFilterOptions = (limit = 200) => {
     const directory = directoryQuery.data || [];
     const districtsByState: Record<string, string[]> = {};
     const mandisByStateDistrict: Record<string, string[]> = {};
+    const mandisByDistrict: Record<string, string[]> = {};
     const districtSets: Record<string, Set<string>> = {};
     const mandiSets: Record<string, Set<string>> = {};
+    const districtMandiSets: Record<string, Set<string>> = {};
 
     directory.forEach((item) => {
       const stateValue = normalize(item.state);
@@ -87,6 +89,11 @@ export const useMandiFilterOptions = (limit = 200) => {
           mandiSets[mapKey] = new Set<string>();
         }
         mandiSets[mapKey].add(mandiValue);
+
+        if (!districtMandiSets[districtKey]) {
+          districtMandiSets[districtKey] = new Set<string>();
+        }
+        districtMandiSets[districtKey].add(mandiValue);
       }
     });
 
@@ -98,7 +105,11 @@ export const useMandiFilterOptions = (limit = 200) => {
       mandisByStateDistrict[mapKey] = Array.from(set).sort((a, b) => a.localeCompare(b));
     });
 
-    return { districtsByState, mandisByStateDistrict };
+    Object.entries(districtMandiSets).forEach(([districtKey, set]) => {
+      mandisByDistrict[districtKey] = Array.from(set).sort((a, b) => a.localeCompare(b));
+    });
+
+    return { districtsByState, mandisByStateDistrict, mandisByDistrict };
   }, [directoryQuery.data]);
 
   return {
@@ -114,7 +125,11 @@ export const useMandiFilterOptions = (limit = 200) => {
       const mapKey = `${stateKey}||${districtKey}`;
       return cascadingMaps.mandisByStateDistrict[mapKey] || [];
     },
-    isLoading: catalogQuery.isLoading || directoryQuery.isLoading
+    getMandisForDistrictAcrossStates: (district: string) => {
+      const districtKey = normalizeKey(district);
+      return districtKey ? cascadingMaps.mandisByDistrict[districtKey] || [] : [];
+    },
+    isLoading: catalogQuery.isLoading || directoryQuery.isLoading,
   };
 };
 

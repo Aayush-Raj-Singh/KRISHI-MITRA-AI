@@ -14,14 +14,19 @@ phases:
       - unzip -o terraform.zip -d /usr/local/bin
       - rm -f terraform.zip
       - cd apps/frontend && npm ci && cd ../..
+      - cd packages/shared && npm install && cd ../..
+      - cd apps/mobile && npm install && cd ../..
   pre_build:
     commands:
       - echo "Running security and quality checks"
       - pip-audit -r apps/backend/requirements.txt
+      - npm run security:check
       - cd apps/backend && python -m pytest tests -q && cd ../..
       - cd apps/frontend && npm run lint && cd ../..
+      - cd packages/shared && npm run typecheck && cd ../..
       - cd apps/frontend && npm run test:run && cd ../..
-      - cd infra/terraform && terraform init -backend=false && terraform validate && cd ../..
+      - cd apps/mobile && npm run typecheck && npm run test:run && npx expo config --type public && cd ../..
+      - npm run infra:validate -- --check-fmt
   build:
     commands:
       - echo "Building frontend bundle"

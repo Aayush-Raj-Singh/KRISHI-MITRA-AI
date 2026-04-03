@@ -1,13 +1,12 @@
 const buildKey = (key: string) => `krishimitra:${key}`;
 
-export const setCached = <T,>(key: string, value: T): void => {
+export const setCached = <T>(key: string, value: T): void => {
   try {
     localStorage.setItem(buildKey(key), JSON.stringify({ value, ts: Date.now() }));
-  } catch {
-  }
+  } catch {}
 };
 
-export const getCached = <T,>(key: string): T | null => {
+export const getCached = <T>(key: string): T | null => {
   try {
     const raw = localStorage.getItem(buildKey(key));
     if (!raw) return null;
@@ -18,7 +17,7 @@ export const getCached = <T,>(key: string): T | null => {
   }
 };
 
-export const getCachedWithMeta = <T,>(key: string): { value: T; ts: number } | null => {
+export const getCachedWithMeta = <T>(key: string): { value: T; ts: number } | null => {
   try {
     const raw = localStorage.getItem(buildKey(key));
     if (!raw) return null;

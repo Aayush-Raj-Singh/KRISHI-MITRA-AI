@@ -1,13 +1,5 @@
 import React, { Suspense, useMemo } from "react";
-import {
-  Box,
-  Button,
-  Container,
-  Grid,
-  IconButton,
-  Stack,
-  Typography
-} from "@mui/material";
+import { Box, Button, Container, Grid, IconButton, Stack, Typography } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
@@ -34,60 +26,65 @@ const LandingPage: React.FC = () => {
     useMemo(
       () => ({
         featureCropTitle: "AI Crop Advisory",
-        featureCropDescription: "Personalized crop recommendations and advisory workflows tailored to farm conditions.",
+        featureCropDescription:
+          "Personalized crop recommendations and advisory workflows tailored to farm conditions.",
         featureMandiTitle: "Smart Mandi Price Intelligence",
-        featureMandiDescription: "Live mandi prices, trends, and market insights for smarter selling decisions.",
+        featureMandiDescription:
+          "Live mandi prices, trends, and market insights for smarter selling decisions.",
         featureWeatherTitle: "Weather & AQI Insights",
-        featureWeatherDescription: "Location-aware forecasts, AQI, and humidity updates for daily planning.",
+        featureWeatherDescription:
+          "Location-aware forecasts, AQI, and humidity updates for daily planning.",
         featureWaterTitle: "Water Optimization",
-        featureWaterDescription: "Irrigation schedules and water-saving recommendations driven by AI models.",
+        featureWaterDescription:
+          "Irrigation schedules and water-saving recommendations driven by AI models.",
         featureTrendTitle: "Market Trend Analytics",
         featureTrendDescription: "Price movement analytics and demand signals across key markets.",
         featureSchemeTitle: "Government Schemes",
-        featureSchemeDescription: "Discover and track schemes and benefits relevant to your region.",
+        featureSchemeDescription:
+          "Discover and track schemes and benefits relevant to your region.",
         platformFeatures: "Platform Features",
         platformFeaturesDescription:
           "A unified agriculture platform delivering intelligent advisory, market intelligence, and sustainability insights.",
         loadingFeatures: "Loading features...",
-        toggleTheme: "Toggle theme"
+        toggleTheme: "Toggle theme",
       }),
-      []
-    )
+      [],
+    ),
   );
   const features = useMemo(
     () => [
       {
         title: landingCopy.featureCropTitle,
         description: landingCopy.featureCropDescription,
-        icon: <AutoAwesomeIcon fontSize="small" />
+        icon: <AutoAwesomeIcon fontSize="small" />,
       },
       {
         title: landingCopy.featureMandiTitle,
         description: landingCopy.featureMandiDescription,
-        icon: <StorefrontIcon fontSize="small" />
+        icon: <StorefrontIcon fontSize="small" />,
       },
       {
         title: landingCopy.featureWeatherTitle,
         description: landingCopy.featureWeatherDescription,
-        icon: <AirIcon fontSize="small" />
+        icon: <AirIcon fontSize="small" />,
       },
       {
         title: landingCopy.featureWaterTitle,
         description: landingCopy.featureWaterDescription,
-        icon: <WaterDropIcon fontSize="small" />
+        icon: <WaterDropIcon fontSize="small" />,
       },
       {
         title: landingCopy.featureTrendTitle,
         description: landingCopy.featureTrendDescription,
-        icon: <ShowChartIcon fontSize="small" />
+        icon: <ShowChartIcon fontSize="small" />,
       },
       {
         title: landingCopy.featureSchemeTitle,
         description: landingCopy.featureSchemeDescription,
-        icon: <AccountBalanceIcon fontSize="small" />
-      }
+        icon: <AccountBalanceIcon fontSize="small" />,
+      },
     ],
-    [landingCopy]
+    [landingCopy],
   );
 
   return (
@@ -104,7 +101,7 @@ const LandingPage: React.FC = () => {
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          color: "#fff"
+          color: "#fff",
         }}
       >
         <Container
@@ -121,7 +118,7 @@ const LandingPage: React.FC = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            zIndex: 2
+            zIndex: 2,
           }}
         >
           <Button
@@ -131,7 +128,7 @@ const LandingPage: React.FC = () => {
               p: 0,
               minWidth: "auto",
               borderRadius: 2,
-              "&:hover": { bgcolor: "rgba(255,255,255,0.08)" }
+              "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
             }}
           >
             <Box
@@ -148,7 +145,7 @@ const LandingPage: React.FC = () => {
               color: "#fff",
               border: "1px solid rgba(255,255,255,0.35)",
               bgcolor: "rgba(0,0,0,0.25)",
-              "&:hover": { bgcolor: "rgba(0,0,0,0.4)" }
+              "&:hover": { bgcolor: "rgba(0,0,0,0.4)" },
             }}
           >
             {isDark ? <LightModeIcon /> : <DarkModeIcon />}
@@ -162,7 +159,7 @@ const LandingPage: React.FC = () => {
             maxWidth: "var(--app-shell-width-tight)",
             px: "var(--app-shell-inline-pad) !important",
             textAlign: "center",
-            zIndex: 1
+            zIndex: 1,
           }}
         >
           <Stack spacing={2.5} alignItems="center">
@@ -174,12 +171,15 @@ const LandingPage: React.FC = () => {
                 letterSpacing: 2,
                 textTransform: "uppercase",
                 maxWidth: "100%",
-                overflowWrap: "anywhere"
+                overflowWrap: "anywhere",
               }}
             >
               {t("app.title")}
             </Typography>
-            <Typography variant="h5" sx={{ fontWeight: 500, maxWidth: "100%", overflowWrap: "anywhere" }}>
+            <Typography
+              variant="h5"
+              sx={{ fontWeight: 500, maxWidth: "100%", overflowWrap: "anywhere" }}
+            >
               {t("app.subtitle")}
             </Typography>
             <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ pt: 1 }}>
@@ -201,7 +201,7 @@ const LandingPage: React.FC = () => {
                   minWidth: 160,
                   borderColor: "rgba(255,255,255,0.65)",
                   color: "#fff",
-                  "&:hover": { borderColor: "#fff", bgcolor: "rgba(255,255,255,0.12)" }
+                  "&:hover": { borderColor: "#fff", bgcolor: "rgba(255,255,255,0.12)" },
                 }}
               >
                 {t("auth.sign_up")}
@@ -217,7 +217,7 @@ const LandingPage: React.FC = () => {
           sx={{
             width: "min(100%, var(--app-shell-width))",
             maxWidth: "var(--app-shell-width)",
-            px: "var(--app-shell-inline-pad) !important"
+            px: "var(--app-shell-inline-pad) !important",
           }}
         >
           <Stack spacing={3}>
@@ -225,7 +225,11 @@ const LandingPage: React.FC = () => {
               <Typography variant="h4" sx={{ fontWeight: 700 }}>
                 {landingCopy.platformFeatures}
               </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ textAlign: "center", maxWidth: 640 }}>
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                sx={{ textAlign: "center", maxWidth: 640 }}
+              >
                 {landingCopy.platformFeaturesDescription}
               </Typography>
             </Stack>
@@ -254,10 +258,16 @@ const LandingPage: React.FC = () => {
           sx={{
             width: "min(100%, var(--app-shell-width-tight))",
             maxWidth: "var(--app-shell-width-tight)",
-            px: "var(--app-shell-inline-pad) !important"
+            px: "var(--app-shell-inline-pad) !important",
           }}
         >
-          <Stack direction="row" spacing={3} alignItems="center" justifyContent="center" flexWrap="wrap">
+          <Stack
+            direction="row"
+            spacing={3}
+            alignItems="center"
+            justifyContent="center"
+            flexWrap="wrap"
+          >
             {HEADER_BADGES.map((badge) => (
               <Box
                 key={badge.name}

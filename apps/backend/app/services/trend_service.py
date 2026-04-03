@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-from collections import defaultdict
 import hashlib
 import json
 import math
+from collections import defaultdict
 from datetime import date, datetime, timezone
 from typing import Any, List, Optional
 
-from app.core.database import Database
-
 from app.core.cache import Cache
+from app.core.database import Database
 from app.core.logging import get_logger
 from app.schemas.trends import (
     PriceSpikeAlert,
@@ -73,7 +72,9 @@ class TrendAnalyticsService:
             items = [dict(row) for row in rows]
         else:
             docs = await self._db["mandi_entries"].find({}).to_list(length=None)
-            grouped: dict[date, dict[str, float]] = defaultdict(lambda: {"price_sum": 0.0, "price_count": 0.0, "arrivals_qtl": 0.0})
+            grouped: dict[date, dict[str, float]] = defaultdict(
+                lambda: {"price_sum": 0.0, "price_count": 0.0, "arrivals_qtl": 0.0}
+            )
             for doc in docs:
                 if not match_mandi_document(doc, filters):
                     continue
@@ -87,7 +88,9 @@ class TrendAnalyticsService:
             items = [
                 {
                     "day": day,
-                    "avg_modal": values["price_sum"] / values["price_count"] if values["price_count"] else 0.0,
+                    "avg_modal": values["price_sum"] / values["price_count"]
+                    if values["price_count"]
+                    else 0.0,
                     "arrivals_qtl": values["arrivals_qtl"],
                 }
                 for day, values in sorted(grouped.items(), key=lambda item: item[0])
@@ -115,7 +118,13 @@ class TrendAnalyticsService:
     @staticmethod
     def _window_metrics(points: List[TrendPoint], window_days: int) -> TrendWindow:
         if not points:
-            return TrendWindow(window_days=window_days, points=[], change_pct=0.0, average_price=0.0, volatility=0.0)
+            return TrendWindow(
+                window_days=window_days,
+                points=[],
+                change_pct=0.0,
+                average_price=0.0,
+                volatility=0.0,
+            )
         window_points = points[-window_days:]
         prices = [point.avg_price for point in window_points]
         average_price = round(sum(prices) / len(prices), 2) if prices else 0.0
@@ -223,6 +232,8 @@ class TrendAnalyticsService:
         )
 
         if self._cache is not None:
-            await self._cache.set(cache_key, json.dumps(response.model_dump(), default=str), ttl_seconds=60 * 20)
+            await self._cache.set(
+                cache_key, json.dumps(response.model_dump(), default=str), ttl_seconds=60 * 20
+            )
         logger.info("trend_analytics_generated", points=len(points))
         return response

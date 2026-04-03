@@ -1,8 +1,8 @@
 {
-  "version": "rf-crop-v20260318193548",
-  "accuracy": 0.8882,
-  "trained_at": "2026-03-18T19:35:48.782393+00:00",
-  "samples": 805,
+  "version": "rf-crop-v20260403070815",
+  "accuracy": 0.9657,
+  "trained_at": "2026-04-03T07:08:15.409194+00:00",
+  "samples": 2333,
   "feature_columns": [
     "soil_n",
     "soil_p",

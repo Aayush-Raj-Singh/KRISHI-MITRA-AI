@@ -49,7 +49,11 @@ export interface TrendAnalyticsResponse {
   cached?: boolean;
 }
 
-export const fetchTrendAnalytics = async (filters: TrendFilters): Promise<TrendAnalyticsResponse> => {
-  const response = await api.get<ApiResponse<TrendAnalyticsResponse>>("/analytics/trends", { params: filters });
+export const fetchTrendAnalytics = async (
+  filters: TrendFilters,
+): Promise<TrendAnalyticsResponse> => {
+  const response = await api.get<ApiResponse<TrendAnalyticsResponse>>("/analytics/trends", {
+    params: filters,
+  });
   return unwrap(response.data);
 };

@@ -42,7 +42,7 @@ export class ApiError extends Error {
     status?: number,
     details?: unknown,
     config?: HttpRequestDescriptor,
-    response?: HttpErrorResponse
+    response?: HttpErrorResponse,
   ) {
     super(message);
     this.name = "ApiError";
@@ -118,7 +118,7 @@ const defaultIsAuthEndpoint = (url: string) =>
     API_ENDPOINTS.auth.login,
     API_ENDPOINTS.auth.register,
     API_ENDPOINTS.auth.refresh,
-    API_ENDPOINTS.auth.refreshAlias
+    API_ENDPOINTS.auth.refreshAlias,
   ].some((endpoint) => url.includes(endpoint));
 
 export const unwrapApiEnvelope = <T>(payload: ApiEnvelope<T>): T => {
@@ -173,9 +173,17 @@ const toHeaders = (headers?: Record<string, string>) => {
   return normalized;
 };
 
+const buildRequestId = () => {
+  const candidate =
+    typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : `req_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+  return candidate.slice(0, 64);
+};
+
 const parseResponseBody = async (
   response: Response,
-  responseType: ApiRequestOptions["responseType"] = "json"
+  responseType: ApiRequestOptions["responseType"] = "json",
 ): Promise<unknown> => {
   if (response.status === 204 || response.status === 205) {
     return undefined;
@@ -208,12 +216,17 @@ const parseResponseBody = async (
 const buildDetails = (payload: any) =>
   payload?.data?.errors || payload?.detail || payload?.data || payload;
 
-const buildError = (descriptor: HttpRequestDescriptor, status?: number, data?: unknown, headers?: Headers) => {
+const buildError = (
+  descriptor: HttpRequestDescriptor,
+  status?: number,
+  data?: unknown,
+  headers?: Headers,
+) => {
   const response = status
     ? {
         status,
         data,
-        headers
+        headers,
       }
     : undefined;
   const error = new ApiError("Request failed", status, buildDetails(data), descriptor, response);
@@ -223,7 +236,7 @@ const buildError = (descriptor: HttpRequestDescriptor, status?: number, data?: u
 
 const sendRequest = async <T>(
   descriptor: HttpRequestDescriptor,
-  accessToken?: string | null
+  accessToken?: string | null,
 ): Promise<HttpResponse<T>> => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), descriptor.timeoutMs);
@@ -237,6 +250,9 @@ const sendRequest = async <T>(
   }
 
   const headers = toHeaders(descriptor.headers);
+  if (!headers.has("X-Request-Id")) {
+    headers.set("X-Request-Id", buildRequestId());
+  }
   if (accessToken) {
     headers.set("Authorization", `Bearer ${accessToken}`);
   }
@@ -262,12 +278,15 @@ const sendRequest = async <T>(
   }
 
   try {
-    const response = await fetch(resolveRequestUrl(descriptor.baseURL, descriptor.url, descriptor.params), {
-      method: descriptor.method,
-      headers,
-      body,
-      signal: controller.signal
-    });
+    const response = await fetch(
+      resolveRequestUrl(descriptor.baseURL, descriptor.url, descriptor.params),
+      {
+        method: descriptor.method,
+        headers,
+        body,
+        signal: controller.signal,
+      },
+    );
     const data = await parseResponseBody(response, descriptor.responseType);
 
     if (!response.ok) {
@@ -277,7 +296,7 @@ const sendRequest = async <T>(
     return {
       data: data as T,
       status: response.status,
-      headers: response.headers
+      headers: response.headers,
     };
   } catch (error) {
     if (error instanceof ApiError) {
@@ -285,7 +304,9 @@ const sendRequest = async <T>(
     }
 
     const name =
-      typeof error === "object" && error && "name" in error ? String((error as { name?: string }).name) : "";
+      typeof error === "object" && error && "name" in error
+        ? String((error as { name?: string }).name)
+        : "";
     if (name === "AbortError") {
       throw new ApiError("Request timed out", undefined, undefined, descriptor);
     }
@@ -305,7 +326,7 @@ export const createKrishiMitraApi = ({
   timeoutMs = 15000,
   session,
   onError,
-  isAuthEndpoint = defaultIsAuthEndpoint
+  isAuthEndpoint = defaultIsAuthEndpoint,
 }: CreateKrishiMitraApiOptions): { api: HttpClient; unwrap: typeof unwrapApiEnvelope } => {
   let refreshPromise: Promise<string | null> | null = null;
 
@@ -324,17 +345,17 @@ export const createKrishiMitraApi = ({
     }
 
     if (!refreshPromise) {
-      refreshPromise = sendRequest<ApiEnvelope<Pick<TokenResponse, "access_token" | "refresh_token">>>(
-        {
-          baseURL,
-          url: API_ENDPOINTS.auth.refresh,
-          method: "POST",
-          timeoutMs,
-          body: {
-            refresh_token: refreshToken
-          }
-        }
-      )
+      refreshPromise = sendRequest<
+        ApiEnvelope<Pick<TokenResponse, "access_token" | "refresh_token">>
+      >({
+        baseURL,
+        url: API_ENDPOINTS.auth.refresh,
+        method: "POST",
+        timeoutMs,
+        body: {
+          refresh_token: refreshToken,
+        },
+      })
         .then((response) => {
           const data = unwrapApiEnvelope(response.data);
           if (!data.access_token || !data.refresh_token) {
@@ -361,7 +382,7 @@ export const createKrishiMitraApi = ({
     url: string,
     body?: unknown,
     config?: ApiRequestOptions,
-    retry = true
+    retry = true,
   ): Promise<HttpResponse<T>> => {
     const descriptor: HttpRequestDescriptor = {
       baseURL,
@@ -372,13 +393,16 @@ export const createKrishiMitraApi = ({
       headers: config?.headers,
       params: config?.params,
       signal: config?.signal,
-      _retry: !retry
+      _retry: !retry,
     };
 
     try {
       return await sendRequest<T>(descriptor, session?.getAccessToken());
     } catch (error) {
-      const apiError = error instanceof ApiError ? error : new ApiError(extractErrorMessage(error), undefined, undefined, descriptor);
+      const apiError =
+        error instanceof ApiError
+          ? error
+          : new ApiError(extractErrorMessage(error), undefined, undefined, descriptor);
 
       if (apiError.status === 401 && session && retry && !isAuthEndpoint(url)) {
         const token = await refreshAccessToken();
@@ -391,7 +415,7 @@ export const createKrishiMitraApi = ({
         message: extractErrorMessage(apiError),
         status: apiError.status,
         details: apiError.details,
-        error: apiError
+        error: apiError,
       });
       throw apiError;
     }
@@ -403,8 +427,8 @@ export const createKrishiMitraApi = ({
       post: (url, body, config) => request("POST", url, body, config),
       patch: (url, body, config) => request("PATCH", url, body, config),
       put: (url, body, config) => request("PUT", url, body, config),
-      delete: (url, config) => request("DELETE", url, undefined, config)
+      delete: (url, config) => request("DELETE", url, undefined, config),
     },
-    unwrap: unwrapApiEnvelope
+    unwrap: unwrapApiEnvelope,
   };
 };

@@ -4,6 +4,7 @@ import logging
 import sys
 
 import structlog
+from structlog.contextvars import bind_contextvars, clear_contextvars
 
 
 def configure_logging(level: str) -> None:
@@ -18,6 +19,7 @@ def configure_logging(level: str) -> None:
     structlog.configure(
         processors=[
             structlog.contextvars.merge_contextvars,
+            structlog.stdlib.add_logger_name,
             structlog.processors.add_log_level,
             structlog.processors.TimeStamper(fmt="iso"),
             structlog.processors.StackInfoRenderer(),
@@ -31,3 +33,11 @@ def configure_logging(level: str) -> None:
 
 def get_logger(name: str | None = None) -> structlog.stdlib.BoundLogger:
     return structlog.get_logger(name)
+
+
+def clear_log_context() -> None:
+    clear_contextvars()
+
+
+def bind_log_context(**kwargs: object) -> None:
+    bind_contextvars(**kwargs)

@@ -14,17 +14,16 @@ export type OfflineMutationRecord = {
   createdAt: string;
   attempts: number;
   lastAttemptAt?: string;
+  nextAttemptAt?: string;
+  lastError?: string;
 };
 
 const DB_NAME = "krishimitra_offline";
 const DB_VERSION = 2;
 const STORE_NAMES: OfflineStoreName[] = ["weather", "mandi", "session", "api", "images", "queue"];
-const LOCAL_PREFIX = "krishimitra:offline";
-const NO_LOCAL_FALLBACK_STORES = new Set<OfflineStoreName>(["queue"]);
 
 const isBrowser = typeof window !== "undefined";
-
-const buildLocalKey = (store: OfflineStoreName, key: string) => `${LOCAL_PREFIX}:${store}:${key}`;
+const memoryStore = new Map<string, OfflineRecord<unknown>>();
 
 const openDatabase = (): Promise<IDBDatabase> => {
   if (!isBrowser || !("indexedDB" in window)) {
@@ -48,7 +47,7 @@ const openDatabase = (): Promise<IDBDatabase> => {
 const withStore = async <T>(
   store: OfflineStoreName,
   mode: IDBTransactionMode,
-  handler: (storeRef: IDBObjectStore) => Promise<T>
+  handler: (storeRef: IDBObjectStore) => Promise<T>,
 ): Promise<T | null> => {
   try {
     const db = await openDatabase();
@@ -79,48 +78,20 @@ const withStore = async <T>(
   }
 };
 
-const canUseLocalFallback = (store: OfflineStoreName) => !NO_LOCAL_FALLBACK_STORES.has(store);
+const buildMemoryKey = (store: OfflineStoreName, key: string) => `${store}:${key}`;
 
-const getLocalRecord = <T>(store: OfflineStoreName, key: string): OfflineRecord<T> | null => {
-  if (!isBrowser || !canUseLocalFallback(store)) return null;
-  try {
-    const raw = localStorage.getItem(buildLocalKey(store, key));
-    if (!raw) return null;
-    return JSON.parse(raw) as OfflineRecord<T>;
-  } catch {
-    return null;
-  }
-};
+const getMemoryRecord = <T>(store: OfflineStoreName, key: string): OfflineRecord<T> | null =>
+  (memoryStore.get(buildMemoryKey(store, key)) as OfflineRecord<T> | undefined) || null;
 
-const getLocalRecords = <T>(store: OfflineStoreName): OfflineRecord<T>[] => {
-  if (!isBrowser || !canUseLocalFallback(store)) return [];
-  const prefix = `${LOCAL_PREFIX}:${store}:`;
-  const records: OfflineRecord<T>[] = [];
-  try {
-    for (let index = 0; index < localStorage.length; index += 1) {
-      const key = localStorage.key(index);
-      if (!key || !key.startsWith(prefix)) continue;
-      const raw = localStorage.getItem(key);
-      if (!raw) continue;
-      try {
-        records.push(JSON.parse(raw) as OfflineRecord<T>);
-      } catch {
-      }
-    }
-  } catch {
-  }
-  return records;
-};
+const getMemoryRecords = <T>(store: OfflineStoreName): OfflineRecord<T>[] =>
+  [...memoryStore.entries()]
+    .filter(([memoryKey]) => memoryKey.startsWith(`${store}:`))
+    .map(([, value]) => value as OfflineRecord<T>);
 
-const setLocalRecord = <T>(store: OfflineStoreName, key: string, value: T): OfflineRecord<T> | null => {
-  if (!isBrowser || !canUseLocalFallback(store)) return null;
-  try {
-    const record: OfflineRecord<T> = { key, value, updatedAt: new Date().toISOString() };
-    localStorage.setItem(buildLocalKey(store, key), JSON.stringify(record));
-    return record;
-  } catch {
-    return null;
-  }
+const setMemoryRecord = <T>(store: OfflineStoreName, key: string, value: T): OfflineRecord<T> => {
+  const record: OfflineRecord<T> = { key, value, updatedAt: new Date().toISOString() };
+  memoryStore.set(buildMemoryKey(store, key), record as OfflineRecord<unknown>);
+  return record;
 };
 
 export const isOnline = (): boolean => {
@@ -128,7 +99,11 @@ export const isOnline = (): boolean => {
   return navigator.onLine;
 };
 
-export const saveOfflineRecord = async <T>(store: OfflineStoreName, key: string, value: T): Promise<OfflineRecord<T> | null> => {
+export const saveOfflineRecord = async <T>(
+  store: OfflineStoreName,
+  key: string,
+  value: T,
+): Promise<OfflineRecord<T> | null> => {
   const record: OfflineRecord<T> = { key, value, updatedAt: new Date().toISOString() };
   const stored = await withStore(store, "readwrite", (storeRef) => {
     return new Promise<OfflineRecord<T>>((resolve, reject) => {
@@ -138,12 +113,15 @@ export const saveOfflineRecord = async <T>(store: OfflineStoreName, key: string,
     });
   });
   if (!stored) {
-    return setLocalRecord(store, key, value);
+    return setMemoryRecord(store, key, value);
   }
   return stored;
 };
 
-export const getOfflineRecord = async <T>(store: OfflineStoreName, key: string): Promise<OfflineRecord<T> | null> => {
+export const getOfflineRecord = async <T>(
+  store: OfflineStoreName,
+  key: string,
+): Promise<OfflineRecord<T> | null> => {
   const record = await withStore(store, "readonly", (storeRef) => {
     return new Promise<OfflineRecord<T> | null>((resolve, reject) => {
       const request = storeRef.get(key);
@@ -152,10 +130,12 @@ export const getOfflineRecord = async <T>(store: OfflineStoreName, key: string):
     });
   });
   if (record) return record;
-  return getLocalRecord<T>(store, key);
+  return getMemoryRecord<T>(store, key);
 };
 
-export const listOfflineRecords = async <T>(store: OfflineStoreName): Promise<OfflineRecord<T>[]> => {
+export const listOfflineRecords = async <T>(
+  store: OfflineStoreName,
+): Promise<OfflineRecord<T>[]> => {
   const records = await withStore(store, "readonly", (storeRef) => {
     return new Promise<OfflineRecord<T>[]>((resolve, reject) => {
       const request = storeRef.getAll();
@@ -166,7 +146,9 @@ export const listOfflineRecords = async <T>(store: OfflineStoreName): Promise<Of
   if (records) {
     return [...records].sort((left, right) => left.updatedAt.localeCompare(right.updatedAt));
   }
-  return getLocalRecords<T>(store).sort((left, right) => left.updatedAt.localeCompare(right.updatedAt));
+  return getMemoryRecords<T>(store).sort((left, right) =>
+    left.updatedAt.localeCompare(right.updatedAt),
+  );
 };
 
 export const removeOfflineRecord = async (store: OfflineStoreName, key: string): Promise<void> => {
@@ -177,31 +159,30 @@ export const removeOfflineRecord = async (store: OfflineStoreName, key: string):
       request.onerror = () => reject(request.error || new Error("Failed to delete offline record"));
     });
   });
-  if (isBrowser && canUseLocalFallback(store)) {
-    try {
-      localStorage.removeItem(buildLocalKey(store, key));
-    } catch {
-    }
-  }
+  memoryStore.delete(buildMemoryKey(store, key));
 };
 
 export const saveOfflineSessionSnapshot = (payload: { user?: unknown }) => {
   void saveOfflineRecord("session", "current", payload);
-  setLocalRecord("session", "current", payload);
+  setMemoryRecord("session", "current", payload);
 };
 
 export const getOfflineSessionSnapshot = async () => {
   return getOfflineRecord<{ user?: unknown }>("session", "current");
 };
 
-export const enqueueOfflineMutation = async (url: string, payload: unknown): Promise<OfflineMutationRecord | null> => {
+export const enqueueOfflineMutation = async (
+  url: string,
+  payload: unknown,
+): Promise<OfflineMutationRecord | null> => {
   const record: OfflineMutationRecord = {
     id: `mutation_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
     method: "POST",
     url,
     payload,
     createdAt: new Date().toISOString(),
-    attempts: 0
+    attempts: 0,
+    nextAttemptAt: new Date().toISOString(),
   };
   await saveOfflineRecord("queue", record.id, record);
   return record;
@@ -209,7 +190,9 @@ export const enqueueOfflineMutation = async (url: string, payload: unknown): Pro
 
 export const listOfflineMutations = async (): Promise<OfflineMutationRecord[]> => {
   const records = await listOfflineRecords<OfflineMutationRecord>("queue");
-  return records.map((record) => record.value).sort((left, right) => left.createdAt.localeCompare(right.createdAt));
+  return records
+    .map((record) => record.value)
+    .sort((left, right) => left.createdAt.localeCompare(right.createdAt));
 };
 
 export const updateOfflineMutation = async (record: OfflineMutationRecord): Promise<void> => {
@@ -218,4 +201,22 @@ export const updateOfflineMutation = async (record: OfflineMutationRecord): Prom
 
 export const removeOfflineMutation = async (id: string): Promise<void> => {
   await removeOfflineRecord("queue", id);
+};
+
+export const scheduleOfflineMutationRetry = (
+  record: OfflineMutationRecord,
+  error: unknown,
+): OfflineMutationRecord => {
+  const attempts = record.attempts + 1;
+  const retryDelayMs = Math.min(15 * 60 * 1000, 1000 * 2 ** Math.min(attempts, 8));
+  return {
+    ...record,
+    attempts,
+    lastAttemptAt: new Date().toISOString(),
+    nextAttemptAt: new Date(Date.now() + retryDelayMs).toISOString(),
+    lastError:
+      error instanceof Error
+        ? error.message.slice(0, 500)
+        : String(error || "Request failed").slice(0, 500),
+  };
 };

@@ -12,7 +12,6 @@ import pandas as pd
 from prophet import Prophet
 from prophet.serialize import model_from_json
 
-
 DEFAULT_PAIRS = [
     ("rice", "patna"),
     ("rice", "pune"),
@@ -150,9 +149,13 @@ def train_price_model_for_pair(
 ) -> dict:
     crop_key = crop.strip().lower()
     market_key = market.strip().lower()
-    pair_df = history_df[(history_df["crop"] == crop_key) & (history_df["market"] == market_key)][["ds", "y"]].copy()
+    pair_df = history_df[(history_df["crop"] == crop_key) & (history_df["market"] == market_key)][
+        ["ds", "y"]
+    ].copy()
     if len(pair_df) < 120:
-        raise ValueError(f"Not enough historical data for {crop_key}/{market_key}: {len(pair_df)} rows")
+        raise ValueError(
+            f"Not enough historical data for {crop_key}/{market_key}: {len(pair_df)} rows"
+        )
 
     pair_df = pair_df.sort_values("ds").reset_index(drop=True)
     holdout_days = min(60, max(30, int(len(pair_df) * 0.15)))
@@ -214,7 +217,9 @@ def train_price_model_for_pair(
     }
 
 
-def _iter_pairs(history_df: pd.DataFrame, requested_pairs: Optional[Iterable[tuple[str, str]]] = None):
+def _iter_pairs(
+    history_df: pd.DataFrame, requested_pairs: Optional[Iterable[tuple[str, str]]] = None
+):
     if requested_pairs:
         for crop, market in requested_pairs:
             yield crop.strip().lower(), market.strip().lower()
@@ -286,8 +291,12 @@ def predict_future(model, periods: int) -> pd.DataFrame:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Retrain Prophet price models")
-    parser.add_argument("--crop", type=str, default=None, help="Optional crop for single pair retrain")
-    parser.add_argument("--market", type=str, default=None, help="Optional market for single pair retrain")
+    parser.add_argument(
+        "--crop", type=str, default=None, help="Optional crop for single pair retrain"
+    )
+    parser.add_argument(
+        "--market", type=str, default=None, help="Optional market for single pair retrain"
+    )
     args = parser.parse_args()
 
     if args.crop and args.market:

@@ -23,22 +23,22 @@ def _cleanup_phone(phone: str) -> None:
         conn = await asyncpg.connect(dsn)
         try:
             row = await conn.fetchrow(
-                f"SELECT id FROM \"{schema}\".\"users\" WHERE doc->> 'phone' = $1",
+                f'SELECT id FROM "{schema}"."users" WHERE doc->> \'phone\' = $1',
                 phone,
             )
             if not row:
                 return
             user_id = row["id"]
             await conn.execute(
-                f"DELETE FROM \"{schema}\".\"disease_history\" WHERE doc->> 'user_id' = $1",
+                f'DELETE FROM "{schema}"."disease_history" WHERE doc->> \'user_id\' = $1',
                 user_id,
             )
             await conn.execute(
-                f"DELETE FROM \"{schema}\".\"refresh_tokens\" WHERE doc->> 'user_id' = $1",
+                f'DELETE FROM "{schema}"."refresh_tokens" WHERE doc->> \'user_id\' = $1',
                 user_id,
             )
             await conn.execute(
-                f"DELETE FROM \"{schema}\".\"users\" WHERE id = $1",
+                f'DELETE FROM "{schema}"."users" WHERE id = $1',
                 user_id,
             )
         finally:

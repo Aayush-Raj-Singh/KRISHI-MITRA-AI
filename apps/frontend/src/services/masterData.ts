@@ -5,7 +5,12 @@ export const fetchCommodities = async () => {
   return unwrap(response.data);
 };
 
-export const createCommodity = async (payload: { name: string; code: string; categories: string[]; active: boolean }) => {
+export const createCommodity = async (payload: {
+  name: string;
+  code: string;
+  categories: string[];
+  active: boolean;
+}) => {
   const response = await api.post<ApiResponse<unknown>>("/master/commodities", payload);
   return unwrap(response.data);
 };
@@ -20,7 +25,12 @@ export const fetchVarieties = async (params?: { commodity_id?: string }) => {
   return unwrap(response.data);
 };
 
-export const createVariety = async (payload: { commodity_id: string; name: string; code: string; active: boolean }) => {
+export const createVariety = async (payload: {
+  commodity_id: string;
+  name: string;
+  code: string;
+  active: boolean;
+}) => {
   const response = await api.post<ApiResponse<unknown>>("/master/varieties", payload);
   return unwrap(response.data);
 };
@@ -35,7 +45,12 @@ export const fetchGrades = async (params?: { commodity_id?: string }) => {
   return unwrap(response.data);
 };
 
-export const createGrade = async (payload: { commodity_id: string; name: string; code: string; active: boolean }) => {
+export const createGrade = async (payload: {
+  commodity_id: string;
+  name: string;
+  code: string;
+  active: boolean;
+}) => {
   const response = await api.post<ApiResponse<unknown>>("/master/grades", payload);
   return unwrap(response.data);
 };
@@ -65,7 +80,12 @@ export const fetchSeasons = async () => {
   return unwrap(response.data);
 };
 
-export const createSeason = async (payload: { name: string; start_month: number; end_month: number; active: boolean }) => {
+export const createSeason = async (payload: {
+  name: string;
+  start_month: number;
+  end_month: number;
+  active: boolean;
+}) => {
   const response = await api.post<ApiResponse<unknown>>("/master/seasons", payload);
   return unwrap(response.data);
 };

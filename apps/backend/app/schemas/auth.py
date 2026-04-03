@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from datetime import datetime
 import re
+from datetime import datetime
 from typing import List, Optional
 
 from pydantic import Field, field_validator
@@ -35,6 +35,22 @@ def _validate_email_address(value: Optional[str]) -> Optional[str]:
     if not local_part or not domain_part or ".." in cleaned:
         raise ValueError("Invalid email address")
     return cleaned.lower()
+
+
+def _validate_profile_image_url(value: Optional[str]) -> Optional[str]:
+    if value is None:
+        return None
+    cleaned = value.strip()
+    if not cleaned:
+        return None
+    allowed_prefixes = ("http://", "https://", "/")
+    if cleaned.startswith("data:"):
+        if not cleaned.lower().startswith("data:image/"):
+            raise ValueError("Profile image must be an image URL")
+        return cleaned
+    if not cleaned.startswith(allowed_prefixes):
+        raise ValueError("Profile image must use http, https, root-relative, or data:image URL")
+    return cleaned
 
 
 def _validate_password_strength(value: str) -> str:
@@ -178,6 +194,11 @@ class UserProfileUpdate(StrictSchema):
     @classmethod
     def validate_profile_email(cls, value: Optional[str]) -> Optional[str]:
         return _validate_email_address(value)
+
+    @field_validator("profile_image_url")
+    @classmethod
+    def validate_profile_image(cls, value: Optional[str]) -> Optional[str]:
+        return _validate_profile_image_url(value)
 
     @field_validator("primary_crops")
     @classmethod

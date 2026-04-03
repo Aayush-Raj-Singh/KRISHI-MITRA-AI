@@ -33,6 +33,14 @@ build/
 coverage/
 *.tsbuildinfo
 .terraform/
+*.tfplan
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
 apps/frontend/android/.gradle/
 apps/frontend/android/build/
 apps/frontend/android/app/build/
@@ -44,17 +52,40 @@ Aayush_accessKeys.csv
 # Environment/config secrets
 .env
 .env.*
+!.env.example
+!**/.env.example
+!.env*.example
+!**/.env*.example
 *.pem
 *.key
 
 # IDE/OS
 .DS_Store
 Thumbs.db
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 .idea/
+desktop.ini
+.run/
 
 # Temporary folders
 _tmp/
 tmp/
 .tmp/
 *.tmp
+apps/backend/backups/
+infra/terraform/.terraform/
+infra/terraform/local.override.tfvars
+apps/backend/ml/crop_model/*.bak
+apps/backend/ml/crop_model/*.old
+apps/backend/ml/crop_model/*.tmp
+apps/backend/ml/crop_model/*.joblib.tmp
+*.pkl
+*.pt
+*.h5
+apps/backend/model-artifacts/*
+!apps/backend/model-artifacts/.gitkeep
+!apps/backend/model-artifacts/README.md
+node_modules.stale/
+.cleanup/
+.tmp-*.log

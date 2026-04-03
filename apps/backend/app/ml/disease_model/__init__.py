@@ -1,3 +1,3 @@
-from .predictor import DiseasePredictor, DiseasePrediction
+from .predictor import DiseasePrediction, DiseasePredictor
 
 __all__ = ["DiseasePredictor", "DiseasePrediction"]

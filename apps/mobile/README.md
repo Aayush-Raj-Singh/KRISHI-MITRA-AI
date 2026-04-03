@@ -8,6 +8,8 @@ Create `apps/mobile/.env` with an API host that your device can reach:
 
 ```text
 API_BASE_URL=http://10.0.2.2:8000
+EXPO_PUBLIC_ERROR_REPORTING_ENDPOINT=
+EXPO_PUBLIC_APP_RELEASE=mobile-dev
 ```
 
 Connection targets:
@@ -42,7 +44,7 @@ npm run run:ios
 
 ## Auth and storage
 
-- Auth tokens are stored with AsyncStorage
+- Auth tokens are stored with Expo Secure Store
 - Access tokens are attached automatically to API requests
 - Refresh tokens are rotated through the shared API client
-- Offline feedback is queued locally and synced when connectivity returns
+- Offline feedback is queued locally, retried with backoff, and synced when connectivity returns

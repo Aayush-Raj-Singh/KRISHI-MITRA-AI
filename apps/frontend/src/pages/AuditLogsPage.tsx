@@ -13,14 +13,21 @@ const fetchAuditLogs = async () => {
 
 const AuditLogsPage: React.FC = () => {
   const { t } = useTranslation();
-  const { data, isLoading, error } = useQuery({ queryKey: ["audit-logs"], queryFn: fetchAuditLogs });
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["audit-logs"],
+    queryFn: fetchAuditLogs,
+  });
 
   return (
     <AppLayout>
       <Stack spacing={3}>
-        <Typography variant="h4">{t("audit_logs_page.title", { defaultValue: "Audit Logs" })}</Typography>
+        <Typography variant="h4">
+          {t("audit_logs_page.title", { defaultValue: "Audit Logs" })}
+        </Typography>
         {isLoading && (
-          <Typography>{t("audit_logs_page.loading", { defaultValue: "Loading audit logs..." })}</Typography>
+          <Typography>
+            {t("audit_logs_page.loading", { defaultValue: "Loading audit logs..." })}
+          </Typography>
         )}
         {error && <Typography color="error">{t("common.request_failed")}</Typography>}
         <Stack spacing={2}>
@@ -31,8 +38,8 @@ const AuditLogsPage: React.FC = () => {
                   {log.action} - {log.entity}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {t("audit_logs_page.actor_label", { defaultValue: "Actor" })}: {log.actor_id} ({log.actor_role}) -{" "}
-                  {new Date(log.ts).toLocaleString()}
+                  {t("audit_logs_page.actor_label", { defaultValue: "Actor" })}: {log.actor_id} (
+                  {log.actor_role}) - {new Date(log.ts).toLocaleString()}
                 </Typography>
               </CardContent>
             </Card>

@@ -12,13 +12,13 @@ jobs:
     strategy:
       matrix:
         service:
-          - services.identity_service.main:app
-          - services.advisory_service.main:app
-          - services.recommendation_service.main:app
-          - services.market_service.main:app
-          - services.analytics_service.main:app
-          - services.operations_service.main:app
-          - services.support_service.main:app
+          - microservices.identity_service.main:app
+          - microservices.advisory_service.main:app
+          - microservices.recommendation_service.main:app
+          - microservices.market_service.main:app
+          - microservices.analytics_service.main:app
+          - microservices.operations_service.main:app
+          - microservices.support_service.main:app
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,6 +27,6 @@ jobs:
         run: |
           docker build \
             --build-arg SERVICE_MODULE=${{ matrix.service }} \
-            -f apps/backend/services/Dockerfile \
+            -f apps/backend/microservices/Dockerfile \
             -t krishimitra-${{ matrix.service }} \
             .

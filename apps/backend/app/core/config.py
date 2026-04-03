@@ -11,6 +11,24 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from app.core.secrets import load_secrets_into_env
 
 BACKEND_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_MODEL_ARTIFACTS_ROOT = BACKEND_ROOT / "model-artifacts"
+LEGACY_ML_ROOT = BACKEND_ROOT / "ml"
+DEFAULT_EXTERNAL_LINK_ALLOWLIST = [
+    "agmarknet.gov.in",
+    "amritmahotsav.nic.in",
+    "data.gov.in",
+    "digitalindia.gov.in",
+    "enam.gov.in",
+    "farmer.gov.in",
+    "g20.org",
+    "india.gov.in",
+    "mkisan.gov.in",
+    "mygov.in",
+    "pgportal.gov.in",
+    "pmfby.gov.in",
+    "pmkisan.gov.in",
+    "soilhealth.dac.gov.in",
+]
 load_dotenv(BACKEND_ROOT / ".env")
 load_dotenv()
 load_secrets_into_env()
@@ -21,6 +39,8 @@ class Settings(BaseSettings):
         env_file=str(BACKEND_ROOT / ".env"),
         env_file_encoding="utf-8",
         case_sensitive=False,
+        extra="ignore",
+        protected_namespaces=("settings_",),
     )
 
     project_name: str = "KrishiMitra-AI"
@@ -49,18 +69,46 @@ class Settings(BaseSettings):
     redis_url: Optional[str] = Field(None, alias="REDIS_URL")
 
     aws_region: str = Field("us-east-1", alias="AWS_REGION")
-    aws_secrets_manager_secret_id: Optional[str] = Field(None, alias="AWS_SECRETS_MANAGER_SECRET_ID")
-    bedrock_model_id: str = Field("anthropic.claude-3-sonnet-20240229-v1:0", alias="BEDROCK_MODEL_ID")
-    bedrock_fallback_model_id: str = Field("anthropic.claude-3-haiku-20240307-v1:0", alias="BEDROCK_FALLBACK_MODEL_ID")
-    bedrock_max_tokens: int = Field(800, alias="BEDROCK_MAX_TOKENS")
-    bedrock_temperature: float = Field(0.7, alias="BEDROCK_TEMPERATURE")
+    aws_profile: Optional[str] = Field(None, alias="AWS_PROFILE")
+    aws_shared_credentials_file: Optional[str] = Field(None, alias="AWS_SHARED_CREDENTIALS_FILE")
+    aws_validation_mock_mode: bool = Field(True, alias="AWS_VALIDATION_MOCK_MODE")
+    runtime_validation_mock_mode: bool = Field(False, alias="RUNTIME_VALIDATION_MOCK_MODE")
+    aws_validation_s3_bucket: Optional[str] = Field(None, alias="AWS_VALIDATION_S3_BUCKET")
+    aws_secrets_manager_secret_id: Optional[str] = Field(
+        None, alias="AWS_SECRETS_MANAGER_SECRET_ID"
+    )
+    llm_provider: str = Field("bedrock", alias="LLM_PROVIDER")
+    bedrock_model_id: str = Field("openai.gpt-oss-20b-1:0", alias="BEDROCK_MODEL_ID")
+    bedrock_fallback_model_id: str = Field(
+        "openai.gpt-oss-120b-1:0", alias="BEDROCK_FALLBACK_MODEL_ID"
+    )
+    llm_max_tokens: int = Field(
+        800,
+        alias="LLM_MAX_TOKENS",
+        validation_alias=AliasChoices("LLM_MAX_TOKENS", "BEDROCK_MAX_TOKENS"),
+    )
+    llm_temperature: float = Field(
+        0.7,
+        alias="LLM_TEMPERATURE",
+        validation_alias=AliasChoices("LLM_TEMPERATURE", "BEDROCK_TEMPERATURE"),
+    )
+    translation_provider: str = Field("aws", alias="TRANSLATION_PROVIDER")
     aws_translate_enabled: bool = Field(True, alias="AWS_TRANSLATE_ENABLED")
     advisory_timeout_seconds: float = Field(4.8, alias="ADVISORY_TIMEOUT_SECONDS")
     advisory_sla_ms: int = Field(5000, alias="ADVISORY_SLA_MS")
-    public_translate_fallback_enabled: bool = Field(True, alias="PUBLIC_TRANSLATE_FALLBACK_ENABLED")
+    public_translate_fallback_enabled: bool = Field(
+        False, alias="PUBLIC_TRANSLATE_FALLBACK_ENABLED"
+    )
     sagemaker_runtime_enabled: bool = Field(False, alias="SAGEMAKER_RUNTIME_ENABLED")
     sagemaker_crop_endpoint: Optional[str] = Field(None, alias="SAGEMAKER_CROP_ENDPOINT")
     sagemaker_price_endpoint: Optional[str] = Field(None, alias="SAGEMAKER_PRICE_ENDPOINT")
+    model_artifacts_root: Path = Field(DEFAULT_MODEL_ARTIFACTS_ROOT, alias="MODEL_ARTIFACTS_ROOT")
+    crop_model_artifact_path: Optional[Path] = Field(None, alias="CROP_MODEL_ARTIFACT_PATH")
+    price_history_path: Optional[Path] = Field(None, alias="PRICE_HISTORY_PATH")
+    price_artifact_dir: Optional[Path] = Field(None, alias="PRICE_ARTIFACT_DIR")
+    price_metadata_path: Optional[Path] = Field(None, alias="PRICE_METADATA_PATH")
+    disease_labels_path: Optional[Path] = Field(None, alias="DISEASE_LABELS_PATH")
+    disease_model_weights_path: Optional[Path] = Field(None, alias="DISEASE_MODEL_WEIGHTS_PATH")
 
     password_reset_expire_minutes: int = Field(15, alias="PASSWORD_RESET_EXPIRE_MINUTES")
     mfa_enabled: bool = Field(False, alias="MFA_ENABLED")
@@ -103,9 +151,27 @@ class Settings(BaseSettings):
     weather_api_key: Optional[str] = Field(None, alias="WEATHER_API_KEY")
     mandi_api_url: Optional[str] = Field(None, alias="MANDI_API_URL")
     mandi_api_key: Optional[str] = Field(None, alias="MANDI_API_KEY")
+    mandi_demo_api_key: Optional[str] = Field(None, alias="MANDI_DEMO_API_KEY")
     external_http_timeout_seconds: float = Field(5.0, alias="EXTERNAL_HTTP_TIMEOUT_SECONDS")
+    state_portal_directory_url: str = Field(
+        "https://farmerconnect.apeda.gov.in/Home/UsefulLinks",
+        alias="STATE_PORTAL_DIRECTORY_URL",
+    )
+    state_portal_snapshot_stale_hours: int = Field(24, alias="STATE_PORTAL_SNAPSHOT_STALE_HOURS")
+    state_portal_max_sources_per_state: int = Field(4, alias="STATE_PORTAL_MAX_SOURCES_PER_STATE")
+    state_portal_snapshot_link_limit: int = Field(6, alias="STATE_PORTAL_SNAPSHOT_LINK_LIMIT")
+    geo_hierarchy_district_csv_url: Optional[str] = Field(
+        None, alias="GEO_HIERARCHY_DISTRICT_CSV_URL"
+    )
+    geo_hierarchy_block_csv_url: Optional[str] = Field(None, alias="GEO_HIERARCHY_BLOCK_CSV_URL")
+    geo_hierarchy_village_csv_url: Optional[str] = Field(
+        None, alias="GEO_HIERARCHY_VILLAGE_CSV_URL"
+    )
 
     log_level: str = Field("INFO", alias="LOG_LEVEL")
+    metrics_enabled: bool = Field(True, alias="METRICS_ENABLED")
+    metrics_api_key: Optional[str] = Field(None, alias="METRICS_API_KEY")
+    client_error_ingest_enabled: bool = Field(True, alias="CLIENT_ERROR_INGEST_ENABLED")
 
     cors_origins: str = Field("*", alias="CORS_ORIGINS")
     cors_allow_methods: str = Field("*", alias="CORS_ALLOW_METHODS")
@@ -119,7 +185,9 @@ class Settings(BaseSettings):
     rate_limit_export_per_minute: int = Field(10, alias="RATE_LIMIT_EXPORT_PER_MINUTE")
     rate_limit_ws_per_minute: int = Field(30, alias="RATE_LIMIT_WS_PER_MINUTE")
     rate_limit_public_per_minute: int = Field(60, alias="RATE_LIMIT_PUBLIC_PER_MINUTE")
-    rate_limit_storage_prefix: str = Field("krishimitra:ratelimit", alias="RATE_LIMIT_STORAGE_PREFIX")
+    rate_limit_storage_prefix: str = Field(
+        "krishimitra:ratelimit", alias="RATE_LIMIT_STORAGE_PREFIX"
+    )
     public_api_keys: str = Field("", alias="PUBLIC_API_KEYS")
     external_link_allowlist: str = Field("", alias="EXTERNAL_LINK_ALLOWLIST")
 
@@ -130,6 +198,69 @@ class Settings(BaseSettings):
     @property
     def allow_runtime_fallbacks(self) -> bool:
         return not self.is_production
+
+    @property
+    def should_mock_runtime_validation(self) -> bool:
+        return bool(self.runtime_validation_mock_mode and not self.is_production)
+
+    @property
+    def crop_model_artifact_resolved_path(self) -> Path:
+        return (
+            self.crop_model_artifact_path
+            or self.model_artifacts_root / "crop_model" / "crop_model.joblib"
+        )
+
+    @property
+    def crop_model_legacy_artifact_path(self) -> Path:
+        return LEGACY_ML_ROOT / "crop_model" / "crop_model.joblib"
+
+    @property
+    def price_history_resolved_path(self) -> Path:
+        return self.price_history_path or LEGACY_ML_ROOT / "price_model" / "price_history.csv"
+
+    @property
+    def price_artifact_dir_resolved_path(self) -> Path:
+        return self.price_artifact_dir or self.model_artifacts_root / "price_model" / "artifacts"
+
+    @property
+    def price_artifact_legacy_dir(self) -> Path:
+        return LEGACY_ML_ROOT / "price_model" / "artifacts"
+
+    @property
+    def price_metadata_resolved_path(self) -> Path:
+        return (
+            self.price_metadata_path
+            or self.model_artifacts_root / "price_model" / "models_metadata.json"
+        )
+
+    @property
+    def price_metadata_legacy_path(self) -> Path:
+        return LEGACY_ML_ROOT / "price_model" / "models_metadata.json"
+
+    @property
+    def disease_labels_resolved_path(self) -> Path:
+        return (
+            self.disease_labels_path
+            or BACKEND_ROOT / "app" / "ml" / "disease_model" / "weights" / "labels.json"
+        )
+
+    @property
+    def disease_model_weights_resolved_path(self) -> Path:
+        return (
+            self.disease_model_weights_path
+            or self.model_artifacts_root / "disease_model" / "plantvillage_efficientnet_b0.pt"
+        )
+
+    @property
+    def disease_model_legacy_weights_path(self) -> Path:
+        return (
+            BACKEND_ROOT
+            / "app"
+            / "ml"
+            / "disease_model"
+            / "weights"
+            / "plantvillage_efficientnet_b0.pt"
+        )
 
     def _parse_list(self, raw_value: str) -> List[str]:
         value = (raw_value or "").strip()
@@ -173,7 +304,25 @@ class Settings(BaseSettings):
 
     @property
     def external_link_allowlist_domains(self) -> List[str]:
-        return self._parse_list(self.external_link_allowlist)
+        configured = self._parse_list(self.external_link_allowlist)
+        return configured or list(DEFAULT_EXTERNAL_LINK_ALLOWLIST)
+
+    @field_validator(
+        "model_artifacts_root",
+        "crop_model_artifact_path",
+        "price_history_path",
+        "price_artifact_dir",
+        "price_metadata_path",
+        "disease_labels_path",
+        "disease_model_weights_path",
+        mode="before",
+    )
+    @classmethod
+    def resolve_backend_relative_paths(cls, value):
+        if value in (None, ""):
+            return None
+        path = Path(value)
+        return path if path.is_absolute() else BACKEND_ROOT / path
 
     @field_validator(
         "rate_limit_global_per_minute",
@@ -192,6 +341,7 @@ class Settings(BaseSettings):
         "postgres_max_pool_size",
         "smtp_port",
         "advisory_sla_ms",
+        "llm_max_tokens",
         "db_connect_max_attempts",
     )
     @classmethod
@@ -200,11 +350,22 @@ class Settings(BaseSettings):
             raise ValueError("Value must be greater than zero")
         return value
 
-    @field_validator("external_http_timeout_seconds", "advisory_timeout_seconds", "db_connect_retry_delay_seconds")
+    @field_validator(
+        "external_http_timeout_seconds",
+        "advisory_timeout_seconds",
+        "db_connect_retry_delay_seconds",
+    )
     @classmethod
     def validate_positive_seconds(cls, value: float) -> float:
         if value <= 0:
             raise ValueError("Value must be greater than zero")
+        return value
+
+    @field_validator("llm_temperature")
+    @classmethod
+    def validate_temperature(cls, value: float) -> float:
+        if value < 0:
+            raise ValueError("LLM_TEMPERATURE must be zero or greater")
         return value
 
     @field_validator("scheduler_daily_hour", "scheduler_weekly_hour", "scheduler_quarterly_hour")
@@ -214,10 +375,42 @@ class Settings(BaseSettings):
             raise ValueError("Hour must be between 0 and 23")
         return value
 
-    @field_validator("otp_provider", "background_task_backend", "rag_backend")
+    @field_validator(
+        "otp_provider",
+        "background_task_backend",
+        "rag_backend",
+        "llm_provider",
+        "translation_provider",
+    )
     @classmethod
     def validate_enums(cls, value: str) -> str:
         return (value or "").strip().lower()
+
+    @field_validator("llm_provider", mode="before")
+    @classmethod
+    def migrate_legacy_llm_provider(cls, value: str) -> str:
+        return "bedrock"
+
+    @field_validator("translation_provider", mode="before")
+    @classmethod
+    def migrate_legacy_translation_provider(cls, value: str) -> str:
+        return "aws"
+
+    @field_validator("public_translate_fallback_enabled", mode="before")
+    @classmethod
+    def disable_public_translation_fallback(cls, value: bool) -> bool:
+        return False
+
+    @field_validator("aws_translate_enabled", mode="before")
+    @classmethod
+    def enable_aws_translate_runtime(cls, value: bool) -> bool:
+        return True
+
+    @model_validator(mode="after")
+    def validate_provider_settings(self):
+        if not self.aws_translate_enabled:
+            raise ValueError("AWS_TRANSLATE_ENABLED must be true when TRANSLATION_PROVIDER=aws")
+        return self
 
     @model_validator(mode="after")
     def validate_security_settings(self):
@@ -229,9 +422,13 @@ class Settings(BaseSettings):
 
         insecure_values = {"change-me", "change-me-refresh"}
         if self.jwt_secret_key in insecure_values or len(self.jwt_secret_key) < 32:
-            raise ValueError("JWT_SECRET_KEY must be set to a strong value (>=32 chars) for secure mode")
+            raise ValueError(
+                "JWT_SECRET_KEY must be set to a strong value (>=32 chars) for secure mode"
+            )
         if self.jwt_refresh_secret_key in insecure_values or len(self.jwt_refresh_secret_key) < 32:
-            raise ValueError("JWT_REFRESH_SECRET_KEY must be set to a strong value (>=32 chars) for secure mode")
+            raise ValueError(
+                "JWT_REFRESH_SECRET_KEY must be set to a strong value (>=32 chars) for secure mode"
+            )
         if self.jwt_secret_key == self.jwt_refresh_secret_key:
             raise ValueError("JWT access and refresh secrets must be different")
         if "*" in self.cors_origin_list:
@@ -246,7 +443,9 @@ class Settings(BaseSettings):
             raise ValueError("TWILIO_MOCK_MODE must be false in secure mode")
         if "stub" in self.rag_backend:
             raise ValueError("RAG_BACKEND must not use stub backends in secure mode")
-        if self.sagemaker_runtime_enabled and (not self.sagemaker_crop_endpoint or not self.sagemaker_price_endpoint):
+        if self.sagemaker_runtime_enabled and (
+            not self.sagemaker_crop_endpoint or not self.sagemaker_price_endpoint
+        ):
             raise ValueError("SageMaker runtime mode requires both crop and price endpoint names")
         return self
 

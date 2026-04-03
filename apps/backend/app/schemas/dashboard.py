@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 from app.schemas.analytics import AnalyticsOverview, FarmerAttentionItem, FeedbackReliabilityStats
 
+
 class PriceArrivalFilters(BaseModel):
     state: Optional[str] = None
     district: Optional[str] = None
@@ -43,6 +44,38 @@ class PriceArrivalDashboardResponse(BaseModel):
     filters: PriceArrivalFilters
     summary: PriceArrivalSummary
     series: List[PriceArrivalPoint]
+    generated_at: datetime
+    cached: bool = False
+
+
+class MarketPriceTableFilters(BaseModel):
+    state: Optional[str] = None
+    district: Optional[str] = None
+    mandi: Optional[str] = None
+    commodity: Optional[str] = None
+    date_from: Optional[date] = None
+    date_to: Optional[date] = None
+    page: int = 1
+    page_size: int = 10
+
+
+class MarketPriceTableRow(BaseModel):
+    district: Optional[str] = None
+    market: str
+    date: date
+    commodity: str
+    variety: Optional[str] = None
+    price: float
+    min_price: float
+    max_price: float
+
+
+class MarketPriceTableResponse(BaseModel):
+    filters: MarketPriceTableFilters
+    items: List[MarketPriceTableRow]
+    total: int
+    page: int
+    page_size: int
     generated_at: datetime
     cached: bool = False
 

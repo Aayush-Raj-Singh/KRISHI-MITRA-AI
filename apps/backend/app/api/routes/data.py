@@ -7,7 +7,12 @@ from app.core.dependencies import (
     get_public_external_data_service,
     require_roles,
 )
-from app.schemas.integrations import LocationLookupResponse, LocationSearchResponse, MandiPriceResponse, WeatherResponse
+from app.schemas.integrations import (
+    LocationLookupResponse,
+    LocationSearchResponse,
+    MandiPriceResponse,
+    WeatherResponse,
+)
 from app.schemas.response import APIResponse
 from app.services.external_data_service import ExternalDataService
 from app.utils.responses import success_response
@@ -49,7 +54,7 @@ async def search_location(
 async def market_prices(
     crop: str = Query(min_length=2),
     market: str = Query(min_length=2),
-    days: int = Query(default=7, ge=1, le=30),
+    days: int = Query(default=30, ge=1, le=30),
     __: str = Depends(require_roles(["farmer", "extension_officer", "admin"])),
     service: ExternalDataService = Depends(get_external_data_service),
 ) -> APIResponse[MandiPriceResponse]:

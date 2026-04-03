@@ -10,11 +10,10 @@ from typing import Any, Iterable, List, Tuple
 from uuid import uuid4
 
 import asyncpg
-from bson import ObjectId
-from pymongo import MongoClient
-
 from app.core.config import settings
 from app.core.database import COLLECTIONS
+from bson import ObjectId
+from pymongo import MongoClient
 
 
 def _quote_ident(name: str) -> str:
@@ -45,7 +44,9 @@ def _normalize(value: Any) -> Any:
     return value
 
 
-def _iter_batches(cursor: Iterable[dict], batch_size: int, limit: int | None) -> Iterable[List[dict]]:
+def _iter_batches(
+    cursor: Iterable[dict], batch_size: int, limit: int | None
+) -> Iterable[List[dict]]:
     batch: List[dict] = []
     count = 0
     for doc in cursor:
@@ -148,7 +149,9 @@ async def run(args: argparse.Namespace) -> None:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Migrate MongoDB collections to PostgreSQL JSONB tables.")
+    parser = argparse.ArgumentParser(
+        description="Migrate MongoDB collections to PostgreSQL JSONB tables."
+    )
     parser.add_argument(
         "--mongo-uri",
         default=os.getenv("MONGO_URI") or os.getenv("MONGODB_URI", ""),
@@ -159,10 +162,16 @@ def parse_args() -> argparse.Namespace:
         default=os.getenv("MONGO_DB") or os.getenv("MONGODB_DB", ""),
         help="MongoDB database name.",
     )
-    parser.add_argument("--collections", default="", help="Comma-separated collection list (optional).")
+    parser.add_argument(
+        "--collections", default="", help="Comma-separated collection list (optional)."
+    )
     parser.add_argument("--batch-size", type=int, default=500, help="Batch size for inserts.")
-    parser.add_argument("--truncate", action="store_true", help="Truncate target tables before inserting.")
-    parser.add_argument("--limit", type=int, default=None, help="Limit documents per collection (debugging).")
+    parser.add_argument(
+        "--truncate", action="store_true", help="Truncate target tables before inserting."
+    )
+    parser.add_argument(
+        "--limit", type=int, default=None, help="Limit documents per collection (debugging)."
+    )
     parser.add_argument("--dry-run", action="store_true", help="Scan documents without inserting.")
     args = parser.parse_args()
     if args.collections:

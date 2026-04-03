@@ -2,7 +2,7 @@
 
 ## System Overview
 
-KrishiMitra AI is a cloud-native, AI-powered rural decision intelligence platform built on AWS infrastructure. The system employs a microservices architecture with distinct layers for presentation, business logic, AI/ML processing, and data persistence. The platform integrates machine learning models for predictive analytics (crop recommendation, price forecasting) with Amazon Bedrock for generative AI capabilities, delivering personalized agricultural advisory services to rural farmers across India.
+KrishiMitra AI is a cloud-native, AI-powered rural decision intelligence platform built on AWS infrastructure. The system employs a microservices architecture with distinct layers for presentation, business logic, AI/ML processing, and data persistence. The platform integrates machine learning models for predictive analytics (crop recommendation, price forecasting) with a switchable AI runtime for generative capabilities, delivering personalized agricultural advisory services to rural farmers across India.
 
 The architecture prioritizes scalability, multilingual support, offline capabilities, and cost efficiency while maintaining high availability during critical agricultural periods. The system processes structured agricultural data (soil parameters, weather, prices) and unstructured user queries through specialized AI pipelines, transforming raw data into actionable intelligence.
 
@@ -46,8 +46,8 @@ The architecture prioritizes scalability, multilingual support, offline capabili
 │  │  └──────────────┘  └──────────────┘  └──────────────┘    │   │
 │  │                                                          │   │
 │  │  ┌──────────────────────────────────────────────────┐    │   │
-│  │  │         Amazon Bedrock (Claude/Titan)            │    │   │
-│  │  │         Multilingual AI Advisory                 │    │   │
+│  │  │      AWS AI Runtime Layer                       │    │   │
+│  │  │      (Bedrock Production Profile)              │    │   │
 │  │  └──────────────────────────────────────────────────┘    │   │
 │  └──────────────────────────────────────────────────────────┘   │
 │                            │                                    │
@@ -97,6 +97,7 @@ The architecture prioritizes scalability, multilingual support, offline capabili
 #### 1.1 Web Frontend (React)
 
 **Technology Stack**:
+
 - React 18 with TypeScript
 - Material-UI (MUI) for component library
 - Redux Toolkit for state management
@@ -106,6 +107,7 @@ The architecture prioritizes scalability, multilingual support, offline capabili
 - PWA capabilities with service workers
 
 **Key Features**:
+
 - Responsive design optimized for mobile and desktop
 - Multilingual interface with dynamic language switching
 - Offline mode with service worker caching
@@ -114,6 +116,7 @@ The architecture prioritizes scalability, multilingual support, offline capabili
 - Accessibility compliance (ARIA labels, keyboard navigation)
 
 **Module Structure**:
+
 ```
 src/
 ├── components/
@@ -131,10 +134,10 @@ src/
 └── utils/              # Helper functions
 ```
 
-
 #### 1.2 Mobile Frontend (React Native)
 
 **Technology Stack**:
+
 - React Native 0.72+
 - React Navigation for routing
 - Redux Toolkit for state management
@@ -144,6 +147,7 @@ src/
 - Push notifications using Firebase Cloud Messaging
 
 **Key Features**:
+
 - Native performance on Android and iOS
 - Offline-first architecture with local SQLite database
 - Background sync when connectivity is restored
@@ -152,6 +156,7 @@ src/
 - Low-bandwidth mode for rural connectivity
 
 **Module Structure**:
+
 ```
 src/
 ├── screens/
@@ -177,6 +182,7 @@ src/
 **Technology**: AWS API Gateway + Application Load Balancer
 
 **Features**:
+
 - RESTful API endpoints with versioning (v1, v2)
 - Request validation and transformation
 - Rate limiting (100 requests/minute per user)
@@ -185,6 +191,7 @@ src/
 - Request/response logging to CloudWatch
 
 **Endpoint Structure**:
+
 ```
 /api/v1/
 ├── /auth
@@ -217,6 +224,7 @@ src/
 #### 2.2 Backend Services (FastAPI)
 
 **Technology Stack**:
+
 - FastAPI (Python 3.11+)
 - Pydantic for data validation
 - SQLAlchemy for ORM (if needed)
@@ -228,6 +236,7 @@ src/
 **Service Architecture**:
 
 **Auth Service**:
+
 - User registration and authentication
 - JWT token generation and validation
 - Role-based access control (Farmer, Extension Officer, Admin)
@@ -235,36 +244,41 @@ src/
 - Multi-factor authentication (SMS OTP)
 
 **User Service**:
+
 - User profile management
 - Farm profile data (soil type, crops, location)
 - Preference management (language, notification settings)
 - User activity tracking
 
 **Recommendation Service**:
+
 - Orchestrates ML model inference
 - Caches recent predictions
 - Formats and enriches model outputs
 - Handles batch recommendation requests
 
 **Advisory Service**:
+
 - Manages conversation context
-- Integrates with Amazon Bedrock
+- Integrates with the active AI runtime
 - Implements conversation history
 - Handles multilingual translation
 
 **Data Integration Service**:
+
 - Fetches weather data from external APIs
 - Fetches mandi price data
 - Validates and normalizes external data
 - Schedules periodic data updates
 
 **Feedback Service**:
+
 - Collects user ratings and feedback
 - Stores actual farming outcomes
 - Triggers model retraining pipelines
 
-
 **Deployment**:
+
 - Containerized using Docker
 - Deployed on AWS ECS (Elastic Container Service) with Fargate
 - Auto-scaling based on CPU/memory utilization
@@ -278,11 +292,13 @@ src/
 #### 3.1 Crop Recommendation Engine
 
 **Model Architecture**:
+
 - Primary Model: XGBoost Classifier
 - Backup Model: Random Forest Classifier
 - Ensemble approach for improved accuracy
 
 **Input Features** (15 features):
+
 - Soil parameters: N, P, K levels, pH, organic carbon
 - Climate data: Temperature (min, max, avg), humidity, rainfall
 - Location: Latitude, longitude, agro-climatic zone
@@ -290,10 +306,12 @@ src/
 - Historical: Previous crop yield (if available)
 
 **Output**:
+
 - Top 3 crop recommendations with confidence scores
 - Explanation of key factors influencing recommendation
 
 **Training Pipeline**:
+
 1. Data collection from agricultural datasets (Kaggle, government sources)
 2. Feature engineering and normalization
 3. Train-test split (80-20) with stratification
@@ -303,6 +321,7 @@ src/
 7. Deployment to SageMaker endpoint
 
 **Inference Pipeline**:
+
 1. Receive user input via API
 2. Validate and preprocess features
 3. Call SageMaker endpoint
@@ -311,6 +330,7 @@ src/
 6. Return formatted response
 
 **Model Monitoring**:
+
 - Track prediction distribution drift
 - Monitor inference latency
 - Compare predictions against actual outcomes
@@ -319,11 +339,13 @@ src/
 #### 3.2 Price Forecasting Engine
 
 **Model Architecture**:
+
 - Primary Model: LSTM (Long Short-Term Memory) Neural Network
 - Backup Model: Prophet (Facebook's time-series forecasting)
 - Separate models for each major crop and market combination
 
 **Input Features**:
+
 - Historical daily prices (past 365 days)
 - Seasonal indicators (month, week, festival periods)
 - Weather forecasts (rainfall, temperature)
@@ -331,11 +353,13 @@ src/
 - External factors (fuel prices, policy changes)
 
 **Output**:
+
 - Daily price predictions for 30, 60, 90 days
 - Confidence intervals (80%, 95%)
 - Trend indicators (bullish, bearish, stable)
 
 **Training Pipeline**:
+
 1. Collect historical mandi price data (5+ years)
 2. Handle missing values and outliers
 3. Feature engineering (moving averages, lag features)
@@ -346,6 +370,7 @@ src/
 8. Deploy to SageMaker endpoint
 
 **Inference Pipeline**:
+
 1. Receive crop and market selection
 2. Fetch latest price data and weather forecasts
 3. Prepare input sequences
@@ -355,16 +380,17 @@ src/
 7. Cache forecasts for 7 days
 
 **Model Monitoring**:
+
 - Compare predictions against actual prices weekly
 - Calculate rolling MAPE
 - Retrain models quarterly or when MAPE exceeds 15%
-
 
 #### 3.3 Water Optimization Engine
 
 **Approach**: Rule-based system enhanced with weather forecasting
 
 **Input Parameters**:
+
 - Crop type and growth stage
 - Soil type and moisture level
 - Weather forecast (rainfall, temperature, humidity)
@@ -372,6 +398,7 @@ src/
 - Farm size and irrigation method
 
 **Logic**:
+
 1. Lookup crop water requirements from agricultural database
 2. Adjust for growth stage (seedling, vegetative, flowering, maturity)
 3. Calculate evapotranspiration (ET) using Penman-Monteith equation
@@ -380,12 +407,14 @@ src/
 6. Generate irrigation schedule (frequency, duration, volume)
 
 **Output**:
+
 - Recommended irrigation schedule (next 7 days)
 - Estimated water volume required
 - Potential water savings vs. traditional methods
 - Alerts for predicted rainfall
 
 **Implementation**:
+
 - Deployed as AWS Lambda function (Python)
 - Triggered via API Gateway
 - Uses cached weather forecasts
@@ -396,46 +425,53 @@ src/
 **Scoring Algorithm**:
 
 **Water Efficiency Score** (0-100):
+
 - Actual water usage vs. optimal usage
 - Irrigation method efficiency
 - Rainfall utilization
 
 **Fertilizer Efficiency Score** (0-100):
+
 - NPK application vs. soil test recommendations
 - Organic vs. chemical fertilizer ratio
 - Timing of application
 
 **Yield Optimization Score** (0-100):
+
 - Actual yield vs. regional average
 - Actual yield vs. potential yield for soil/climate
 - Crop selection appropriateness
 
 **Overall Sustainability Score**:
+
 - Weighted average: Water (40%), Fertilizer (30%), Yield (30%)
 - Benchmarked against regional best practices
 - Tracked over multiple farming cycles
 
 **Implementation**:
+
 - Calculated post-harvest when user reports outcomes
 - Stored in PostgreSQL for trend analysis
 - Visualized in dashboard with improvement suggestions
 
 ---
 
-### 4. Amazon Bedrock Integration
+### 4. Switchable AI Runtime Integration
 
 #### 4.1 Multilingual AI Advisory
 
 **Model Selection**:
+
 - Primary: Anthropic Claude 3 (Sonnet or Haiku for cost optimization)
 - Backup: Amazon Titan Text
 
 **Prompt Engineering**:
 
 **System Prompt Template**:
+
 ```
-You are KrishiMitra, an expert agricultural advisor for Indian farmers. 
-You provide practical, actionable advice based on scientific principles 
+You are KrishiMitra, an expert agricultural advisor for Indian farmers.
+You provide practical, actionable advice based on scientific principles
 and local farming practices.
 
 User Context:
@@ -456,36 +492,40 @@ Guidelines:
 ```
 
 **User Query Processing**:
+
 1. Detect user language (if not specified)
 2. Translate query to English (if needed) using AWS Translate
 3. Retrieve user context from database
 4. Retrieve relevant agricultural knowledge (RAG approach)
 5. Construct prompt with context
-6. Call Bedrock API with temperature=0.7
+6. Call the configured AI runtime with the active provider settings
 7. Translate response back to user language
 8. Store conversation in history
 
 **Knowledge Augmentation (RAG)**:
+
 - Maintain vector database of agricultural knowledge
 - Use Amazon OpenSearch for semantic search
 - Embed user query and retrieve top 5 relevant documents
-- Include retrieved context in Bedrock prompt
+- Include retrieved context in the AI runtime prompt
 - Sources: Government guidelines, research papers, best practices
 
-
 **Conversation Management**:
+
 - Store conversation history in PostgreSQL
 - Maintain context window of last 5 exchanges
 - Implement conversation summarization for long threads
 - Allow users to start new conversation threads
 
 **Cost Optimization**:
+
 - Use Claude Haiku for simple queries (classification, factual Q&A)
 - Use Claude Sonnet for complex advisory (multi-step reasoning)
 - Implement caching for frequently asked questions
 - Set token limits (max 1000 tokens per response)
 
 **Safety and Compliance**:
+
 - Content filtering to prevent harmful advice
 - Disclaimer that AI advice is supplementary, not replacement for expert consultation
 - Logging all interactions for quality assurance
@@ -498,6 +538,7 @@ Guidelines:
 #### 5.1 PostgreSQL (JSONB) Schema
 
 **Users Collection**:
+
 ```json
 {
   "_id": "ObjectId",
@@ -531,6 +572,7 @@ Guidelines:
 ```
 
 **Recommendations Collection**:
+
 ```json
 {
   "_id": "ObjectId",
@@ -559,6 +601,7 @@ Guidelines:
 ```
 
 **Conversations Collection**:
+
 ```json
 {
   "_id": "ObjectId",
@@ -578,6 +621,7 @@ Guidelines:
 ```
 
 **Outcomes Collection**:
+
 ```json
 {
   "_id": "ObjectId",
@@ -596,6 +640,7 @@ Guidelines:
 ```
 
 **Market Prices Collection** (Time-series):
+
 ```json
 {
   "_id": "ObjectId",
@@ -609,6 +654,7 @@ Guidelines:
 ```
 
 **Weather Data Collection** (Time-series):
+
 ```json
 {
   "_id": "ObjectId",
@@ -637,7 +683,6 @@ Guidelines:
 - Separate collections for historical vs. real-time data
 - Archive old data (>2 years) to S3 for cost optimization
 
-
 ---
 
 ## Data Flow Description
@@ -645,102 +690,102 @@ Guidelines:
 ### 1. User Registration Flow
 
 ```
-User (Mobile/Web) 
-  → API Gateway 
-  → Auth Service 
-  → Validate input 
-  → Hash password 
-  → Store in PostgreSQL 
-  → Generate JWT token 
+User (Mobile/Web)
+  → API Gateway
+  → Auth Service
+  → Validate input
+  → Hash password
+  → Store in PostgreSQL
+  → Generate JWT token
   → Return token to client
 ```
 
 ### 2. Crop Recommendation Flow
 
 ```
-User submits soil/climate data 
-  → API Gateway 
-  → Recommendation Service 
-  → Check Redis cache (key: hash of input) 
+User submits soil/climate data
+  → API Gateway
+  → Recommendation Service
+  → Check Redis cache (key: hash of input)
   → If cache miss:
-      → Validate and preprocess input 
-      → Call SageMaker endpoint 
-      → Receive predictions 
-      → Enrich with explanations 
-      → Store in PostgreSQL 
-      → Cache in Redis (TTL: 24h) 
+      → Validate and preprocess input
+      → Call SageMaker endpoint
+      → Receive predictions
+      → Enrich with explanations
+      → Store in PostgreSQL
+      → Cache in Redis (TTL: 24h)
   → Return recommendations to client
 ```
 
 ### 3. Price Forecast Flow
 
 ```
-User selects crop and market 
-  → API Gateway 
-  → Recommendation Service 
-  → Check Redis cache 
+User selects crop and market
+  → API Gateway
+  → Recommendation Service
+  → Check Redis cache
   → If cache miss:
-      → Fetch latest price data from PostgreSQL 
-      → Fetch weather forecast from cache/API 
-      → Prepare input sequence 
-      → Call SageMaker endpoint 
-      → Generate confidence intervals 
-      → Store forecast in PostgreSQL 
-      → Cache in Redis (TTL: 7 days) 
+      → Fetch latest price data from PostgreSQL
+      → Fetch weather forecast from cache/API
+      → Prepare input sequence
+      → Call SageMaker endpoint
+      → Generate confidence intervals
+      → Store forecast in PostgreSQL
+      → Cache in Redis (TTL: 7 days)
   → Return forecast with visualization data
 ```
 
 ### 4. AI Advisory Flow
 
 ```
-User asks question in regional language 
-  → API Gateway 
-  → Advisory Service 
-  → Detect language 
-  → Retrieve user context from PostgreSQL 
-  → Retrieve conversation history 
-  → If non-English: Translate query using AWS Translate 
-  → Perform semantic search in knowledge base (OpenSearch) 
-  → Construct prompt with context + knowledge 
-  → Call Amazon Bedrock API 
-  → Receive response 
-  → If non-English: Translate response back 
-  → Store conversation in PostgreSQL 
+User asks question in regional language
+  → API Gateway
+  → Advisory Service
+  → Detect language
+  → Retrieve user context from PostgreSQL
+  → Retrieve conversation history
+  → If non-English: Translate query using AWS Translate
+  → Perform semantic search in knowledge base (OpenSearch)
+  → Construct prompt with context + knowledge
+  → Call the configured AI runtime
+  → Receive response
+  → If non-English: Translate response back
+  → Store conversation in PostgreSQL
   → Return response to client
 ```
 
 ### 5. Feedback and Learning Flow
 
 ```
-User provides feedback/outcome 
-  → API Gateway 
-  → Feedback Service 
-  → Store in PostgreSQL 
-  → Trigger async job (Celery) 
-  → Aggregate feedback data 
+User provides feedback/outcome
+  → API Gateway
+  → Feedback Service
+  → Store in PostgreSQL
+  → Trigger async job (Celery)
+  → Aggregate feedback data
   → If threshold met (e.g., 1000 new outcomes):
-      → Trigger model retraining pipeline 
-      → Fetch training data from PostgreSQL + S3 
-      → Train updated model 
-      → Evaluate performance 
-      → If improved: Deploy to SageMaker 
-      → Update model version 
+      → Trigger model retraining pipeline
+      → Fetch training data from PostgreSQL + S3
+      → Train updated model
+      → Evaluate performance
+      → If improved: Deploy to SageMaker
+      → Update model version
   → Send notification to admin
 ```
 
 ### 6. Data Synchronization Flow (Mobile Offline)
 
 ```
-Mobile app loses connectivity 
-  → Store user actions in local SQLite 
-  → Queue API requests 
-  → Continue showing cached data 
-  
-Connectivity restored 
-  → Background sync service activates 
-  → Upload queued requests to API 
-  → Fetch latest data 
-  → Update local cache 
+Mobile app loses connectivity
+  → Store user actions in local SQLite
+  → Queue API requests
+  → Continue showing cached data
+
+Connectivity restored
+  → Background sync service activates
+  → Upload queued requests to API
+  → Fetch latest data
+  → Update local cache
   → Notify user of sync completion
 ```
 
@@ -795,7 +840,6 @@ Connectivity restored
    - Tag with version, metrics, training date
    - Approve for deployment
 
-
 #### Phase 3: Model Deployment
 
 1. **Deployment Strategy**:
@@ -817,25 +861,27 @@ Connectivity restored
 ### Inference Pipeline
 
 ```
-API Request 
-  → Input Validation 
-  → Feature Preprocessing 
-  → Model Inference (SageMaker) 
-  → Post-processing 
-  → Response Formatting 
-  → Caching 
+API Request
+  → Input Validation
+  → Feature Preprocessing
+  → Model Inference (SageMaker)
+  → Post-processing
+  → Response Formatting
+  → Caching
   → Return to Client
 ```
 
 **Optimization Techniques**:
+
 - Batch inference for bulk requests
 - Model quantization for faster inference
 - Caching frequent predictions
 - Async inference for non-urgent requests
 
-### Context Passing to Bedrock
+### Context Passing to the AI Runtime
 
 **Context Assembly**:
+
 1. Retrieve user profile (location, crops, soil type)
 2. Retrieve recent recommendations
 3. Retrieve conversation history (last 5 exchanges)
@@ -843,6 +889,7 @@ API Request
 5. Construct structured prompt
 
 **Prompt Template**:
+
 ```python
 prompt = f"""
 System: {system_prompt}
@@ -868,6 +915,7 @@ User Query: {user_query}
 Response:
 """
 
+# Example Bedrock-profile invocation
 response = bedrock.invoke_model(
     modelId="anthropic.claude-3-sonnet-20240229-v1:0",
     body={
@@ -882,6 +930,7 @@ response = bedrock.invoke_model(
 ```
 
 **Context Optimization**:
+
 - Limit context to 4000 tokens to control costs
 - Prioritize recent and relevant information
 - Summarize long conversation histories
@@ -898,6 +947,7 @@ response = bedrock.invoke_model(
 **Purpose**: Host backend API services
 
 **Configuration**:
+
 - ECS Cluster with Fargate launch type (serverless containers)
 - Task Definition: 2 vCPU, 4 GB RAM per task
 - Auto-scaling: Target CPU utilization 70%
@@ -905,6 +955,7 @@ response = bedrock.invoke_model(
 - Load balancer: Application Load Balancer (ALB)
 
 **Cost Optimization**:
+
 - Use Fargate Spot for non-critical workloads
 - Right-size containers based on monitoring
 - Schedule scaling for predictable traffic patterns
@@ -914,6 +965,7 @@ response = bedrock.invoke_model(
 **Purpose**: Object storage for ML models, datasets, and static assets
 
 **Bucket Structure**:
+
 ```
 krishimitra-data/
 ├── models/
@@ -932,6 +984,7 @@ krishimitra-data/
 ```
 
 **Configuration**:
+
 - Versioning enabled for models
 - Lifecycle policies: Move to Glacier after 90 days
 - Server-side encryption (SSE-S3)
@@ -942,27 +995,30 @@ krishimitra-data/
 **Purpose**: ML model training and inference
 
 **Components**:
+
 - **Training Jobs**: On-demand training with spot instances
 - **Endpoints**: Real-time inference for crop and price models
 - **Model Registry**: Version control for models
 - **Experiments**: Track training runs
 
 **Endpoint Configuration**:
+
 - Crop Recommender: ml.t3.medium, auto-scaling 1-5 instances
 - Price Forecaster: ml.t3.medium, auto-scaling 1-5 instances
 - Multi-model endpoint for cost efficiency
 
-#### 4. Amazon Bedrock
+#### 4. AWS AI Runtime
 
-**Purpose**: Generative AI for multilingual advisory
+**Purpose**: Generative AI for multilingual advisory with Bedrock-native runtime controls
 
 **Configuration**:
-- Model: Anthropic Claude 3 Sonnet
-- Fallback: Amazon Titan Text
-- On-demand pricing (pay per token)
+
+- Bedrock-backed runtime with managed provider access
+- AWS-native translation and provider controls
 - Guardrails configured for content filtering
 
 **Usage Patterns**:
+
 - Average 500 tokens per request
 - Estimated 10,000 requests/day
 - Cost: ~$0.015 per request = $150/day
@@ -972,6 +1028,7 @@ krishimitra-data/
 **Purpose**: API management and routing
 
 **Configuration**:
+
 - REST API with regional endpoint
 - Request validation using JSON schemas
 - Rate limiting: 100 requests/minute per user
@@ -983,12 +1040,14 @@ krishimitra-data/
 **Purpose**: Caching and session management
 
 **Configuration**:
+
 - Redis 7.0
 - Node type: cache.t3.medium
 - Cluster mode enabled (3 shards, 1 replica each)
 - Automatic failover enabled
 
 **Cache Strategy**:
+
 - Crop recommendations: TTL 24 hours
 - Price forecasts: TTL 7 days
 - Weather data: TTL 6 hours
@@ -999,20 +1058,23 @@ krishimitra-data/
 **Purpose**: Monitoring, logging, and alerting
 
 **Metrics Tracked**:
+
 - API latency (p50, p95, p99)
 - Error rates (4xx, 5xx)
 - ML inference latency
 - Database query performance
 - Cache hit rates
-- Bedrock token usage
+- LLM token usage
 
 **Alarms**:
+
 - API error rate > 5%
 - Inference latency > 5 seconds
 - Database connection pool exhaustion
 - Disk usage > 80%
 
 **Dashboards**:
+
 - Real-time system health
 - User activity metrics
 - ML model performance
@@ -1023,6 +1085,7 @@ krishimitra-data/
 **Purpose**: Serverless functions for event-driven tasks
 
 **Use Cases**:
+
 - Water optimization calculations
 - Data validation and transformation
 - Scheduled data fetching (weather, prices)
@@ -1030,17 +1093,18 @@ krishimitra-data/
 - Notification delivery
 
 **Configuration**:
+
 - Runtime: Python 3.11
 - Memory: 512 MB - 1 GB
 - Timeout: 30 seconds
 - Concurrency limit: 100
-
 
 #### 9. Amazon EventBridge
 
 **Purpose**: Event-driven architecture
 
 **Event Rules**:
+
 - Daily weather data fetch (6 AM IST)
 - Daily mandi price update (8 AM IST)
 - Weekly model performance evaluation
@@ -1051,16 +1115,18 @@ krishimitra-data/
 **Purpose**: Secure credential storage
 
 **Secrets Stored**:
+
 - Database connection strings
 - API keys (weather, mandi, translation)
 - JWT signing keys
-- Bedrock access credentials
+- AI provider credentials
 
 #### 11. Amazon CloudFront
 
 **Purpose**: CDN for static assets and API acceleration
 
 **Configuration**:
+
 - Origin: S3 bucket for static assets
 - Edge locations: Global distribution
 - HTTPS only
@@ -1071,7 +1137,8 @@ krishimitra-data/
 **Purpose**: SSL/TLS certificates
 
 **Configuration**:
-- Wildcard certificate for *.krishimitra.ai
+
+- Wildcard certificate for \*.krishimitra.ai
 - Automatic renewal
 - Integration with CloudFront and ALB
 
@@ -1080,6 +1147,7 @@ krishimitra-data/
 **Purpose**: DNS management
 
 **Configuration**:
+
 - Hosted zone for krishimitra.ai
 - Health checks for failover
 - Latency-based routing for multi-region
@@ -1089,6 +1157,7 @@ krishimitra-data/
 **Purpose**: Identity and access management
 
 **Policies**:
+
 - Least privilege access for services
 - Role-based access for ECS tasks
 - MFA required for admin access
@@ -1305,6 +1374,7 @@ krishimitra-data/
 ### Deployment Process
 
 **Backend Deployment**:
+
 ```bash
 # Build and push Docker image
 docker build -t krishimitra-api:v1.2.0 .
@@ -1320,6 +1390,7 @@ aws ecs update-service --cluster krishimitra --service api-service \
 ```
 
 **ML Model Deployment**:
+
 ```python
 # Register model in SageMaker
 model = Model(
@@ -1342,6 +1413,7 @@ predictor = model.deploy(
 **Tool**: Alembic (for schema changes)
 
 **Process**:
+
 1. Create migration script
 2. Test in development
 3. Apply to staging
@@ -1356,6 +1428,7 @@ predictor = model.deploy(
 ### Application Monitoring
 
 **Metrics**:
+
 - Request rate (requests/second)
 - Response time (p50, p95, p99)
 - Error rate (4xx, 5xx)
@@ -1363,6 +1436,7 @@ predictor = model.deploy(
 - API endpoint usage
 
 **Tools**:
+
 - CloudWatch for AWS metrics
 - Custom metrics via CloudWatch API
 - Real-time dashboards
@@ -1370,6 +1444,7 @@ predictor = model.deploy(
 ### ML Model Monitoring
 
 **Metrics**:
+
 - Inference latency
 - Prediction distribution
 - Model accuracy (vs. actual outcomes)
@@ -1377,6 +1452,7 @@ predictor = model.deploy(
 - Feature importance changes
 
 **Alerts**:
+
 - Accuracy drop > 10%
 - Inference latency > 5 seconds
 - Prediction distribution shift
@@ -1384,6 +1460,7 @@ predictor = model.deploy(
 ### Infrastructure Monitoring
 
 **Metrics**:
+
 - CPU utilization
 - Memory usage
 - Disk I/O
@@ -1391,6 +1468,7 @@ predictor = model.deploy(
 - Database connections
 
 **Alerts**:
+
 - CPU > 80% for 5 minutes
 - Memory > 85%
 - Disk usage > 80%
@@ -1399,17 +1477,20 @@ predictor = model.deploy(
 ### Logging Strategy
 
 **Log Levels**:
+
 - ERROR: Application errors, exceptions
 - WARN: Degraded performance, retries
 - INFO: Important events (user actions, API calls)
 - DEBUG: Detailed debugging information
 
 **Log Aggregation**:
+
 - All logs sent to CloudWatch Logs
 - Log groups per service
 - Retention: 30 days (production), 7 days (dev)
 
 **Log Analysis**:
+
 - CloudWatch Insights for querying
 - Alerts on error patterns
 - Export to S3 for long-term storage
@@ -1417,12 +1498,14 @@ predictor = model.deploy(
 ### Alerting
 
 **Alert Channels**:
+
 - Email for non-urgent alerts
 - SMS for critical alerts
 - Slack integration for team notifications
 - PagerDuty for on-call rotation
 
 **Alert Rules**:
+
 - Critical: API down, database unreachable
 - High: Error rate > 5%, latency > 10s
 - Medium: Disk usage > 80%, cache miss rate > 50%
@@ -1470,6 +1553,7 @@ predictor = model.deploy(
 **Year 3**: 10 million users, pan-India
 
 **Technical Evolution**:
+
 - Migrate to microservices architecture
 - Implement event sourcing for audit trails
 - Add GraphQL API for flexible queries
@@ -1503,6 +1587,7 @@ predictor = model.deploy(
 This design document provides a comprehensive technical blueprint for KrishiMitra AI, a scalable, secure, and intelligent platform for rural agricultural decision-making. The architecture leverages AWS cloud services, machine learning, and generative AI to deliver personalized, multilingual advisory services to Indian farmers.
 
 Key design principles include:
+
 - **Scalability**: Horizontal scaling to support millions of users
 - **Performance**: Sub-3-second response times with caching and optimization
 - **Security**: End-to-end encryption, RBAC, and compliance with data protection regulations
@@ -1511,4 +1596,3 @@ Key design principles include:
 - **Extensibility**: Modular design for future enhancements
 
 The platform is designed for rapid prototyping during the hackathon phase while maintaining production-ready architecture for long-term deployment and scaling.
-

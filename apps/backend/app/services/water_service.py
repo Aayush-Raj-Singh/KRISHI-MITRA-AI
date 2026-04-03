@@ -25,7 +25,9 @@ def compute_crop_water_need_mm(et0_mm: float, crop_coefficient: float, soil_fact
     return max(0.0, et0_mm * crop_coefficient * soil_factor)
 
 
-def compute_irrigation_mm(crop_water_need_mm: float, effective_rain_mm: float, source_efficiency: float) -> float:
+def compute_irrigation_mm(
+    crop_water_need_mm: float, effective_rain_mm: float, source_efficiency: float
+) -> float:
     required_mm = max(0.0, crop_water_need_mm - effective_rain_mm)
     return required_mm / max(source_efficiency, 0.5)
 
@@ -66,14 +68,18 @@ class WaterOptimizer:
     def _kc(self, crop: str, stage: str) -> float:
         stage_key = stage.lower().strip()
         if stage_key not in SUPPORTED_STAGES:
-            raise ValueError(f"Unsupported growth stage '{stage}'. Supported stages: {', '.join(sorted(SUPPORTED_STAGES))}")
+            raise ValueError(
+                f"Unsupported growth stage '{stage}'. Supported stages: {', '.join(sorted(SUPPORTED_STAGES))}"
+            )
         crop_data = self.model.crop_coefficients.get(crop.lower().strip())
         if not crop_data:
             return 1.0
         return crop_data.get(stage_key, 1.0)
 
     @staticmethod
-    def _evapotranspiration_mm(temperature_c: float, humidity_pct: float = 60.0, wind_ms: float = 1.2) -> float:
+    def _evapotranspiration_mm(
+        temperature_c: float, humidity_pct: float = 60.0, wind_ms: float = 1.2
+    ) -> float:
         t = max(0.0, temperature_c)
         humidity_factor = max(0.2, 1.0 - (humidity_pct / 100.0) * 0.45)
         wind_factor = 1.0 + min(max(wind_ms, 0.0), 6.0) * 0.08
@@ -104,11 +110,15 @@ class WaterOptimizer:
             baseline_mm_total += crop_water_need_mm
 
             effective_rain_mm = effective_rainfall_mm(day.rainfall_mm)
-            irrigation_mm = compute_irrigation_mm(crop_water_need_mm, effective_rain_mm, source_efficiency=1.0)
+            irrigation_mm = compute_irrigation_mm(
+                crop_water_need_mm, effective_rain_mm, source_efficiency=1.0
+            )
 
             if day.rainfall_mm >= max(5.0, crop_water_need_mm * 0.8):
                 running_delay = max(running_delay, 1)
-                notes.append(f"Rain expected on {day.date}: delay irrigation by 1 day where feasible.")
+                notes.append(
+                    f"Rain expected on {day.date}: delay irrigation by 1 day where feasible."
+                )
 
             if running_delay > 0:
                 irrigation_mm *= 0.35
@@ -134,11 +144,15 @@ class WaterOptimizer:
 
         savings_percent = 0.0
         if baseline_mm_total > 0:
-            savings_percent = max(0.0, (baseline_mm_total - recommended_mm_total) / baseline_mm_total * 100)
+            savings_percent = max(
+                0.0, (baseline_mm_total - recommended_mm_total) / baseline_mm_total * 100
+            )
 
         total_volume_liters = recommended_mm_total * LITERS_PER_MM_ACRE * request.field_area_acres
         if request.water_source.lower() in {"borewell", "groundwater"}:
-            notes.append("Borewell source detected: use drip/sprinkler timing to avoid over-extraction.")
+            notes.append(
+                "Borewell source detected: use drip/sprinkler timing to avoid over-extraction."
+            )
 
         response = WaterOptimizationResponse(
             crop=request.crop,
@@ -149,5 +163,7 @@ class WaterOptimizer:
             model_version=self.model.version,
             created_at=datetime.now(timezone.utc),
         )
-        logger.info("water_optimization_generated", model_version=self.model.version, crop=request.crop)
+        logger.info(
+            "water_optimization_generated", model_version=self.model.version, crop=request.crop
+        )
         return response

@@ -2,13 +2,12 @@ from __future__ import annotations
 
 import json
 from collections import Counter
-from typing import Any, Dict
 from datetime import datetime, timedelta, timezone
+from typing import Any, Dict
 
 from app.core.database import Database
-
-from app.models.recommendation import default_recommendation_record
 from app.core.logging import get_logger
+from app.models.recommendation import default_recommendation_record
 
 logger = get_logger(__name__)
 
@@ -19,7 +18,13 @@ class RecommendationService:
         self._collection = db["recommendations"]
         self._feedback_collection = db["feedback"]
 
-    async def store(self, user_id: str, kind: str, request_payload: Dict[str, Any], response_payload: Dict[str, Any]) -> str:
+    async def store(
+        self,
+        user_id: str,
+        kind: str,
+        request_payload: Dict[str, Any],
+        response_payload: Dict[str, Any],
+    ) -> str:
         safe_request = json.loads(json.dumps(request_payload, default=str))
         safe_response = json.loads(json.dumps(response_payload, default=str))
         record = default_recommendation_record(user_id, kind, safe_request, safe_response)
@@ -27,14 +32,21 @@ class RecommendationService:
         logger.info("recommendation_stored", recommendation_id=str(result.inserted_id), kind=kind)
         return str(result.inserted_id)
 
-    async def get_crop_personalization_context(self, user_id: str, season: str | None = None) -> Dict[str, Any]:
+    async def get_crop_personalization_context(
+        self, user_id: str, season: str | None = None
+    ) -> Dict[str, Any]:
         """
         Build lightweight personalization signals from historical outcomes.
         """
         from_date = datetime.now(timezone.utc) - timedelta(days=540)
-        feedback_docs = await self._feedback_collection.find(
-            {"user_id": user_id, "created_at": {"$gte": from_date}}
-        ).sort("created_at", -1).limit(60).to_list(length=60)
+        feedback_docs = (
+            await self._feedback_collection.find(
+                {"user_id": user_id, "created_at": {"$gte": from_date}}
+            )
+            .sort("created_at", -1)
+            .limit(60)
+            .to_list(length=60)
+        )
 
         if not feedback_docs:
             return {
@@ -64,7 +76,9 @@ class RecommendationService:
         preferred_counter: Counter[str] = Counter()
         seasonal_counter: Counter[str] = Counter()
         if recommendation_ids:
-            rec_docs = await self._collection.find({"_id": {"$in": recommendation_ids}, "kind": "crop"}).to_list(length=None)
+            rec_docs = await self._collection.find(
+                {"_id": {"$in": recommendation_ids}, "kind": "crop"}
+            ).to_list(length=None)
             season_key = (season or "").strip().lower()
             for recommendation in rec_docs:
                 response_payload = recommendation.get("response_payload", {})

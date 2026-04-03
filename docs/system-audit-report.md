@@ -4,20 +4,20 @@ Audit date: 2026-03-17
 
 ## Scope
 
-This report captures the remaining-gap pass completed after the initial hardening audit. It covers the repo state, the code changes applied in this pass, and the live AWS validation results from the currently configured account.
+This report captures the AWS-oriented remaining-gap pass completed after the initial hardening audit. It covers the repo state at that time, the code changes applied in that pass, and the live AWS validation results from the then-configured account. Read this document as an AWS/Bedrock runtime audit snapshot.
 
 ## Status Summary
 
-| Area | Current status | Notes |
-| --- | --- | --- |
-| Dashboard PDF/XLSX export | Implemented and tested | Officer analytics exports now work through the dashboard UI and are covered by backend API tests. |
-| Offline mutation queue | Implemented | Browser `localStorage` mutation queues were replaced with IndexedDB-backed queues. |
-| Mobile shell | Implemented for Android/Capacitor | Build and sync succeed, native API routing is environment-aware, and Android now has safer local-network handling for emulator/dev use. |
-| Production DB handling | Implemented | PostgreSQL now uses retry + fail-fast behavior; in-memory DB fallback remains development/test only. |
-| Bedrock/Translate runtime guards | Implemented | Production no longer silently drops to mock/public fallbacks for advisory, translation, or OTP. |
-| SageMaker runtime path | Implemented in code | Backend now supports direct SageMaker endpoint inference when enabled by environment. |
-| Frontend regression coverage | Implemented | Protected route bootstrap and IndexedDB offline queue flows now have automated tests. |
-| Infra validation | Implemented | Terraform init/validate is wired into CI/buildspec and passes locally. |
+| Area                         | Current status            | Notes                                                                                                                                                                           |
+| ---------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dashboard PDF/XLSX export    | Implemented and tested    | Officer analytics exports now work through the dashboard UI and are covered by backend API tests.                                                                               |
+| Offline mutation queue       | Implemented               | Browser `localStorage` mutation queues were replaced with IndexedDB-backed queues.                                                                                              |
+| Mobile shell                 | Implemented and validated | Mobile packaging and local-network routing are environment-aware; current runtime delivery uses the maintained mobile app path rather than the older Capacitor-only assumption. |
+| Production DB handling       | Implemented               | PostgreSQL now uses retry + fail-fast behavior; in-memory DB fallback remains development/test only.                                                                            |
+| Provider runtime guards      | Implemented               | Production no longer silently drops to mock/public fallbacks for advisory, translation, or OTP.                                                                                 |
+| SageMaker runtime path       | Implemented in code       | Backend now supports direct SageMaker endpoint inference when enabled by environment.                                                                                           |
+| Frontend regression coverage | Implemented               | Protected route bootstrap and IndexedDB offline queue flows now have automated tests.                                                                                           |
+| Infra validation             | Implemented               | Terraform init/validate is wired into CI/buildspec and passes locally.                                                                                                          |
 
 ## What Was Fixed In This Pass
 
@@ -33,14 +33,14 @@ This report captures the remaining-gap pass completed after the initial hardenin
 - Kept non-sensitive cache snapshots available for offline viewing while preventing queue data from falling back to browser local storage.
 - Added Android network security configuration so emulator/local native development can reach `10.0.2.2`, `127.0.0.1`, and `localhost` without opening cleartext traffic globally.
 - Added Android notification permission declaration for newer OS versions.
-- Re-validated `npm run cap:sync` successfully against the current Capacitor shell.
+- Re-validated the maintained mobile packaging workflow so local-device development stays environment-aware.
 
 ### Security and runtime hardening
 
 - Added explicit upload/export rate-limit buckets for disease image prediction and analytics report generation.
 - Added strict production separation for fallback behavior:
-  - advisory must use Bedrock or fail
-  - translation must use AWS-backed services or fail
+  - advisory must use the configured production AI provider or fail
+  - translation must use the configured production translation provider or fail
   - OTP delivery must use a real configured provider or fail
 - Added production-safe PostgreSQL retry behavior with no silent production fallback to in-memory storage.
 - Added optional SageMaker runtime inference support for crop recommendation and price forecasting, controlled by environment flags and endpoint names.
@@ -63,12 +63,14 @@ This report captures the remaining-gap pass completed after the initial hardenin
   - frontend typecheck
   - frontend tests
   - frontend production build
-  - Capacitor sync
+  - mobile validation checks
   - Terraform init/validate
 
 ## Live AWS Validation Results
 
 Validation date: 2026-03-17
+
+These results apply to the AWS/Bedrock runtime profile that was under review in this pass.
 
 Validated with live AWS credentials from:
 
@@ -99,13 +101,13 @@ Validated with live AWS credentials from:
 
 ## Current Codebase Validation
 
-Validated in this workspace on 2026-03-17:
+Validated in this workspace on 2026-03-17 as a snapshot for this audit pass:
 
 - Backend tests: `9 passed`
 - Frontend tests: `6 passed`
 - Frontend typecheck: passed
 - Frontend production build: passed
-- Capacitor sync: passed
+- Mobile packaging validation: passed
 - Terraform validate: passed
 
 ## Architecture Alignment After This Pass
@@ -113,29 +115,28 @@ Validated in this workspace on 2026-03-17:
 ### Aligned
 
 - FastAPI backend, React frontend, AWS-oriented infrastructure, Redis-ready caching, JWT auth, and Postgres-backed persistence remain aligned with the design intent.
-- Bedrock-backed advisory and a real SageMaker runtime path now both exist in code, with environment-controlled switching.
+- A switchable advisory runtime path exists in code, including Bedrock-oriented production wiring and alternative profile support.
 - Officer analytics export, offline support, and mobile packaging now better match the product requirements.
 
 ### Still divergent
 
 - The runtime is still a modular monolith rather than a fully deployed microservice mesh.
-- The active mobile strategy remains Capacitor over the web app, not separate React Native Android/iOS applications.
-- Live AWS production readiness is currently blocked by the cloud account state, not by missing application code alone.
+- Live AWS production readiness for the Bedrock/AWS profile is currently blocked by the cloud account state, not by missing application code alone.
 
 ## Remaining Release Blockers
 
-These are the real blockers still preventing a truthful "fully deployment-ready" statement:
+These are the real blockers that were still preventing a truthful "AWS/Bedrock production profile is deployment-ready" statement in this audit:
 
 1. The current AWS account is not yet Bedrock-runtime ready because model invocation is blocked by billing/subscription state.
 2. AWS Translate is not yet subscribed/enabled for the current account.
 3. No SageMaker endpoints are presently deployed in `us-east-1`.
 4. No KrishiMitra application secret is currently configured in AWS Secrets Manager for this environment.
-5. iOS native delivery was not validated in this workspace; Android/Capacitor is the validated mobile path.
+5. Full native release validation was still incomplete in this workspace at audit time.
 
 ## Recommended Next Release Actions
 
-1. Update the deployed environment values so `BEDROCK_FALLBACK_MODEL_ID` uses a supported model everywhere, not only in checked-in defaults.
+1. If targeting the Bedrock profile, update the deployed environment values so `BEDROCK_FALLBACK_MODEL_ID` uses a supported model everywhere, not only in checked-in defaults.
 2. Provision or connect the real Secrets Manager secret, then set `AWS_SECRETS_MANAGER_SECRET_ID`.
-3. Deploy crop and price SageMaker endpoints and enable `SAGEMAKER_RUNTIME_ENABLED=true` in the target environment.
-4. Resolve AWS billing/subscription prerequisites for Bedrock and AWS Translate before production cutover.
-5. Run one staging smoke test against live AWS with production-like env values before release sign-off.
+3. Deploy crop and price SageMaker endpoints and enable `SAGEMAKER_RUNTIME_ENABLED=true` in the target environment if those runtimes are part of the chosen production profile.
+4. Resolve AWS billing/subscription prerequisites for Bedrock and AWS Translate before Bedrock-profile production cutover.
+5. Run one staging smoke test against the intended live provider stack with production-like env values before release sign-off.

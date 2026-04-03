@@ -6,7 +6,11 @@ interface UseDashboardCarouselOptions {
   autoplayMs: number;
 }
 
-const useDashboardCarousel = ({ slideCount, visibleSlideCount, autoplayMs }: UseDashboardCarouselOptions) => {
+const useDashboardCarousel = ({
+  slideCount,
+  visibleSlideCount,
+  autoplayMs,
+}: UseDashboardCarouselOptions) => {
   const carouselRef = useRef<HTMLDivElement | null>(null);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const maxSlideIndex = Math.max(slideCount - visibleSlideCount, 0);
@@ -21,7 +25,7 @@ const useDashboardCarousel = ({ slideCount, visibleSlideCount, autoplayMs }: Use
     const cardWidth = carousel.clientWidth / visibleSlideCount;
     carousel.scrollTo({
       left: clampedIndex * cardWidth,
-      behavior: "smooth"
+      behavior: "smooth",
     });
     setActiveSlideIndex(clampedIndex);
   };
@@ -79,7 +83,7 @@ const useDashboardCarousel = ({ slideCount, visibleSlideCount, autoplayMs }: Use
     carouselRef,
     handleCarouselScroll,
     showPrevSlide,
-    showNextSlide
+    showNextSlide,
   };
 };
 

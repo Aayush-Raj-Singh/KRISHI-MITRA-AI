@@ -5,7 +5,6 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
 from app.core.database import Database
-
 from app.schemas.quality import DataQualityIssue, DataQualityReport, DataQualitySummary
 
 
@@ -36,7 +35,9 @@ class DataQualityService:
             .limit(30)
             .to_list(length=30)
         )
-        prices = [float(doc.get("modal_price", 0.0) or 0.0) for doc in docs if doc.get("modal_price")]
+        prices = [
+            float(doc.get("modal_price", 0.0) or 0.0) for doc in docs if doc.get("modal_price")
+        ]
         if not prices:
             return 0.0, 0.0
         mean = sum(prices) / len(prices)
@@ -66,7 +67,11 @@ class DataQualityService:
                         severity="high",
                         message="Price fields are missing or zero",
                         entry_id=entry_id,
-                        fields={"min_price": min_price, "max_price": max_price, "modal_price": modal_price},
+                        fields={
+                            "min_price": min_price,
+                            "max_price": max_price,
+                            "modal_price": modal_price,
+                        },
                         detected_at=now,
                     )
                 )
@@ -88,7 +93,11 @@ class DataQualityService:
                         severity="medium",
                         message="Modal price is outside min/max range",
                         entry_id=entry_id,
-                        fields={"min_price": min_price, "max_price": max_price, "modal_price": modal_price},
+                        fields={
+                            "min_price": min_price,
+                            "max_price": max_price,
+                            "modal_price": modal_price,
+                        },
                         detected_at=now,
                     )
                 )
@@ -115,7 +124,9 @@ class DataQualityService:
                     )
                 )
             if modal_price > 0:
-                mean, stddev = await self._rolling_stats(str(doc.get("commodity", "")), str(doc.get("market", "")))
+                mean, stddev = await self._rolling_stats(
+                    str(doc.get("commodity", "")), str(doc.get("market", ""))
+                )
                 if stddev > 0 and abs(modal_price - mean) > stddev * 3:
                     issues.append(
                         DataQualityIssue(
@@ -123,7 +134,11 @@ class DataQualityService:
                             severity="high",
                             message="Modal price deviates significantly from recent trend",
                             entry_id=entry_id,
-                            fields={"modal_price": modal_price, "mean": round(mean, 2), "stddev": round(stddev, 2)},
+                            fields={
+                                "modal_price": modal_price,
+                                "mean": round(mean, 2),
+                                "stddev": round(stddev, 2),
+                            },
                             detected_at=now,
                         )
                     )

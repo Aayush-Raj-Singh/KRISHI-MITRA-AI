@@ -8,24 +8,24 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class TicketMessage(BaseModel):
     sender: str
-    body: str = Field(..., min_length=1)
+    body: str = Field(..., min_length=1, max_length=2000)
     ts: datetime = Field(default_factory=datetime.utcnow)
 
 
 class TicketCreate(BaseModel):
-    subject: str = Field(..., min_length=3)
-    body: str = Field(..., min_length=1)
-    category: Optional[str] = None
+    subject: str = Field(..., min_length=3, max_length=200)
+    body: str = Field(..., min_length=1, max_length=4000)
+    category: Optional[str] = Field(default=None, max_length=100)
     attachment_ids: Optional[List[str]] = None
 
 
 class TicketReply(BaseModel):
-    body: str = Field(..., min_length=1)
+    body: str = Field(..., min_length=1, max_length=2000)
 
 
 class TicketStatusUpdate(BaseModel):
     status: str = Field(..., pattern="^(open|pending|in_progress|resolved|closed)$")
-    assignee: Optional[str] = None
+    assignee: Optional[str] = Field(default=None, max_length=128)
 
 
 class TicketDB(BaseModel):
@@ -41,10 +41,7 @@ class TicketDB(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    model_config = ConfigDict(
-        validate_by_name=True,
-        json_encoders={datetime: lambda v: v.isoformat()}
-    )
+    model_config = ConfigDict(validate_by_name=True)
 
 
 class TicketListResponse(BaseModel):

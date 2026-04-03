@@ -14,7 +14,7 @@ export default defineConfig({
         "offline.html",
         "pwa-192x192.png",
         "pwa-512x512.png",
-        "assets/logo/krishimitra-ai-logo.png"
+        "assets/logo/krishimitra-ai-logo.png",
       ],
       strategies: "injectManifest",
       srcDir: "src",
@@ -23,8 +23,8 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
         additionalManifestEntries: [
           { url: "/offline.html", revision: null },
-          { url: "/manifest.json", revision: null }
-        ]
+          { url: "/manifest.json", revision: null },
+        ],
       },
       manifest: {
         name: "KrishiMitra-AI",
@@ -37,20 +37,20 @@ export default defineConfig({
           {
             src: "/pwa-192x192.png",
             sizes: "192x192",
-            type: "image/png"
+            type: "image/png",
           },
           {
             src: "/pwa-512x512.png",
             sizes: "512x512",
-            type: "image/png"
-          }
-        ]
-      }
-    })
+            type: "image/png",
+          },
+        ],
+      },
+    }),
   ],
   server: {
     port: 5173,
-    host: true
+    host: process.env.VITE_DEV_HOST || "127.0.0.1",
   },
   build: {
     chunkSizeWarningLimit: 900,
@@ -63,13 +63,21 @@ export default defineConfig({
           if (id.includes("@mui/icons-material")) {
             return "mui-icons";
           }
-          if (id.includes("@mui/material") || id.includes("@emotion/react") || id.includes("@emotion/styled")) {
+          if (
+            id.includes("@mui/material") ||
+            id.includes("@emotion/react") ||
+            id.includes("@emotion/styled")
+          ) {
             return "mui-core";
           }
           if (id.includes("chart.js") || id.includes("react-chartjs-2")) {
             return "charts";
           }
-          if (id.includes("@reduxjs/toolkit") || id.includes("react-redux") || id.includes("@tanstack/react-query")) {
+          if (
+            id.includes("@reduxjs/toolkit") ||
+            id.includes("react-redux") ||
+            id.includes("@tanstack/react-query")
+          ) {
             return "state";
           }
           if (id.includes("i18next") || id.includes("react-i18next")) {
@@ -87,8 +95,8 @@ export default defineConfig({
             return "network";
           }
           return undefined;
-        }
-      }
-    }
-  }
+        },
+      },
+    },
+  },
 });

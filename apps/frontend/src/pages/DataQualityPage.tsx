@@ -18,24 +18,26 @@ const DataQualityPage: React.FC = () => {
     mandi: "",
     commodity: "",
     date_from: "",
-    date_to: ""
+    date_to: "",
   });
   const selectedState = draftFilters.state.trim();
   const selectedDistrict = draftFilters.district.trim();
   const districtsForState = selectedState ? mandiOptions.getDistrictsForState(selectedState) : [];
   const mandisForDistrict =
-    selectedState && selectedDistrict ? mandiOptions.getMandisForDistrict(selectedState, selectedDistrict) : [];
+    selectedState && selectedDistrict
+      ? mandiOptions.getMandisForDistrict(selectedState, selectedDistrict)
+      : [];
   const commoditySuggestions = useLocalSuggestions("quality.commodity", mandiOptions.commodities);
   const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>({});
 
   const reportQuery = useQuery({
     queryKey: ["quality-report", appliedFilters],
-    queryFn: () => fetchDataQualityReport(appliedFilters)
+    queryFn: () => fetchDataQualityReport(appliedFilters),
   });
 
   const issuesQuery = useQuery({
     queryKey: ["quality-issues"],
-    queryFn: fetchQualityIssues
+    queryFn: fetchQualityIssues,
   });
 
   const handleApply = () => {
@@ -69,7 +71,9 @@ const DataQualityPage: React.FC = () => {
   return (
     <AppLayout>
       <Stack spacing={3}>
-        <Typography variant="h4">{t("quality.title", { defaultValue: "Data Quality Monitor" })}</Typography>
+        <Typography variant="h4">
+          {t("quality.title", { defaultValue: "Data Quality Monitor" })}
+        </Typography>
 
         <Card sx={{ border: "1px solid #e7ddcc" }}>
           <CardContent>
@@ -81,25 +85,25 @@ const DataQualityPage: React.FC = () => {
                 {
                   key: "state",
                   label: t("filters.state", { defaultValue: "State" }),
-                  options: mandiOptions.states
+                  options: mandiOptions.states,
                 },
                 {
                   key: "district",
                   label: t("filters.district", { defaultValue: "District" }),
                   options: districtsForState,
-                  disabled: !selectedState
+                  disabled: !selectedState,
                 },
                 {
                   key: "mandi",
                   label: t("filters.mandi", { defaultValue: "Mandi" }),
                   options: mandisForDistrict,
-                  disabled: !selectedState || !selectedDistrict
+                  disabled: !selectedState || !selectedDistrict,
                 },
                 {
                   key: "commodity",
                   label: t("quality.commodity", { defaultValue: "Commodity" }),
-                  options: commoditySuggestions.suggestions
-                }
+                  options: commoditySuggestions.suggestions,
+                },
               ].map((field) => (
                 <Grid item xs={12} sm={6} md={3} key={field.key}>
                   <FilterAutocomplete
@@ -118,7 +122,9 @@ const DataQualityPage: React.FC = () => {
                   type="date"
                   InputLabelProps={{ shrink: true }}
                   value={draftFilters.date_from}
-                  onChange={(event) => setDraftFilters((prev) => ({ ...prev, date_from: event.target.value }))}
+                  onChange={(event) =>
+                    setDraftFilters((prev) => ({ ...prev, date_from: event.target.value }))
+                  }
                 />
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
@@ -128,7 +134,9 @@ const DataQualityPage: React.FC = () => {
                   type="date"
                   InputLabelProps={{ shrink: true }}
                   value={draftFilters.date_to}
-                  onChange={(event) => setDraftFilters((prev) => ({ ...prev, date_to: event.target.value }))}
+                  onChange={(event) =>
+                    setDraftFilters((prev) => ({ ...prev, date_to: event.target.value }))
+                  }
                 />
               </Grid>
               <Grid item xs={12} md={3} display="flex" alignItems="center">
@@ -140,10 +148,10 @@ const DataQualityPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        {reportQuery.isLoading && <Typography>{t("quality.loading", { defaultValue: "Running checks..." })}</Typography>}
-        {reportQuery.error && (
-          <Typography color="error">{String(reportQuery.error)}</Typography>
+        {reportQuery.isLoading && (
+          <Typography>{t("quality.loading", { defaultValue: "Running checks..." })}</Typography>
         )}
+        {reportQuery.error && <Typography color="error">{String(reportQuery.error)}</Typography>}
 
         {summary && (
           <Grid container spacing={2}>
@@ -176,12 +184,21 @@ const DataQualityPage: React.FC = () => {
 
         {reportQuery.data?.issues && reportQuery.data.issues.length > 0 && (
           <Stack spacing={2}>
-            <Typography variant="h6">{t("quality.latest_findings", { defaultValue: "Latest findings" })}</Typography>
+            <Typography variant="h6">
+              {t("quality.latest_findings", { defaultValue: "Latest findings" })}
+            </Typography>
             {reportQuery.data.issues.slice(0, 12).map((issue) => (
-              <Card key={`${issue.issue_type}-${issue.entry_id}-${issue.detected_at}`} sx={{ border: "1px solid #ece0cf" }}>
+              <Card
+                key={`${issue.issue_type}-${issue.entry_id}-${issue.detected_at}`}
+                sx={{ border: "1px solid #ece0cf" }}
+              >
                 <CardContent>
                   <Stack direction="row" spacing={1} alignItems="center">
-                    <Chip label={issue.severity} size="small" color={issue.severity === "high" ? "error" : "warning"} />
+                    <Chip
+                      label={issue.severity}
+                      size="small"
+                      color={issue.severity === "high" ? "error" : "warning"}
+                    />
                     <Typography variant="subtitle2">{issue.issue_type}</Typography>
                   </Stack>
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
@@ -194,7 +211,9 @@ const DataQualityPage: React.FC = () => {
         )}
 
         <Stack spacing={2}>
-          <Typography variant="h6">{t("quality.recent_issues", { defaultValue: "Recent issues" })}</Typography>
+          <Typography variant="h6">
+            {t("quality.recent_issues", { defaultValue: "Recent issues" })}
+          </Typography>
           <Grid container spacing={2}>
             {(issuesQuery.data || []).slice(0, 6).map((issue: any) => (
               <Grid item xs={12} md={6} key={issue._id}>

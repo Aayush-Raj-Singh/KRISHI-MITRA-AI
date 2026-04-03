@@ -11,6 +11,8 @@ from app.models.user import UserInDB
 from app.schemas.analytics import AnalyticsOverview
 from app.schemas.dashboard import (
     DashboardHeroSummary,
+    MarketPriceTableFilters,
+    MarketPriceTableResponse,
     PriceArrivalDashboardResponse,
     PriceArrivalFilters,
     RegionalInsightsResponse,
@@ -58,6 +60,33 @@ async def price_arrival_dashboard(
     )
     result = await service.price_arrival_dashboard(filters)
     return success_response(result, message="price arrival dashboard")
+
+
+@router.get("/market-prices", response_model=APIResponse[MarketPriceTableResponse])
+async def market_price_table(
+    state: Optional[str] = None,
+    district: Optional[str] = None,
+    mandi: Optional[str] = None,
+    commodity: Optional[str] = None,
+    date_from: Optional[date] = Query(default=None),
+    date_to: Optional[date] = Query(default=None),
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=10, ge=1, le=100),
+    __: str = Depends(require_roles(["farmer", "extension_officer", "admin"])),
+    service: DashboardService = Depends(get_dashboard_service),
+) -> APIResponse[MarketPriceTableResponse]:
+    filters = MarketPriceTableFilters(
+        state=state,
+        district=district,
+        mandi=mandi,
+        commodity=commodity,
+        date_from=date_from,
+        date_to=date_to,
+        page=page,
+        page_size=page_size,
+    )
+    result = await service.market_price_table(filters)
+    return success_response(result, message="market price table")
 
 
 @router.get("/metrics", response_model=APIResponse[AnalyticsOverview])

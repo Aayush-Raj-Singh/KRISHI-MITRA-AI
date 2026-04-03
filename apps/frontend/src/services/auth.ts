@@ -7,7 +7,7 @@ import {
   type RegisterRequest as RegisterPayload,
   type TokenResponse,
   type UserProfileUpdate as UserProfileUpdatePayload,
-  type UserPublic
+  type UserPublic,
 } from "@krishimitra/shared";
 
 import api, { unwrap } from "./api";
@@ -22,7 +22,7 @@ export type {
   RegisterPayload,
   TokenResponse,
   UserProfileUpdatePayload,
-  UserPublic
+  UserPublic,
 };
 
 export const registerUser = async (payload: RegisterPayload): Promise<AuthResponse> => {
@@ -33,12 +33,14 @@ export const loginUser = async (payload: LoginPayload): Promise<TokenResponse> =
   return authApi.login(payload);
 };
 
-export const requestPasswordReset = async (payload: PasswordResetRequestPayload): Promise<{ sent: boolean }> => {
+export const requestPasswordReset = async (
+  payload: PasswordResetRequestPayload,
+): Promise<{ sent: boolean }> => {
   return authApi.requestPasswordReset(payload);
 };
 
 export const confirmPasswordReset = async (
-  payload: PasswordResetConfirmPayload
+  payload: PasswordResetConfirmPayload,
 ): Promise<{ reset: boolean }> => {
   return authApi.confirmPasswordReset(payload);
 };

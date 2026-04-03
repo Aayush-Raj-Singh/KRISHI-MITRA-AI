@@ -8,8 +8,8 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import pandas as pd
+from app.core.database import Database, close_postgres, connect_to_postgres
 
-from app.core.database import connect_to_postgres, close_postgres, Database
 from ml.training.retrain_price_model import DEFAULT_PAIRS, retrain_price_models
 from ml.training.train_crop_model import FEATURE_COLUMNS, train_crop_model
 
@@ -24,12 +24,14 @@ async def _pull_recent_outcomes(db: Database, days: int = 180) -> List[Dict[str,
     return feedback
 
 
-async def _augment_crop_dataset_from_feedback() -> int:
+async def _augment_crop_dataset_from_feedback(db: Database | None = None) -> int:
     csv_path = _root() / "ml" / "crop_model" / "crop_training_data.csv"
     base_df = pd.read_csv(csv_path) if csv_path.exists() else pd.DataFrame()
 
     appended_rows: List[dict] = []
-    db = await connect_to_postgres()
+    owns_db = db is None
+    if db is None:
+        db = await connect_to_postgres()
     try:
         feedback = await _pull_recent_outcomes(db)
         if not feedback:
@@ -65,11 +67,20 @@ async def _augment_crop_dataset_from_feedback() -> int:
             }
             if all(
                 row.get(col) is not None
-                for col in ["soil_n", "soil_p", "soil_k", "soil_ph", "temperature_c", "humidity_pct", "rainfall_mm"]
+                for col in [
+                    "soil_n",
+                    "soil_p",
+                    "soil_k",
+                    "soil_ph",
+                    "temperature_c",
+                    "humidity_pct",
+                    "rainfall_mm",
+                ]
             ):
                 appended_rows.append(row)
     finally:
-        await close_postgres()
+        if owns_db:
+            await close_postgres()
 
     if not appended_rows:
         return 0
@@ -81,14 +92,14 @@ async def _augment_crop_dataset_from_feedback() -> int:
     return int(len(app_df))
 
 
-async def run_pipeline() -> dict:
+async def run_pipeline(db: Database | None = None) -> dict:
     output: Dict[str, Any] = {
         "started_at": datetime.now(timezone.utc).isoformat(),
     }
 
     augmented_rows = 0
     try:
-        augmented_rows = await _augment_crop_dataset_from_feedback()
+        augmented_rows = await _augment_crop_dataset_from_feedback(db=db)
     except Exception as exc:
         output["crop_data_augmentation_error"] = str(exc)
 

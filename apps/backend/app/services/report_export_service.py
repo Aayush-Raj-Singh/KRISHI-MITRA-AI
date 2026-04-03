@@ -153,7 +153,10 @@ class ReportExportService:
     def _reliability_rows(report: RegionalInsightsResponse) -> list[list[str]]:
         reliability = report.feedback_reliability
         distribution = " | ".join(
-            f"{star}*={count}" for star, count in sorted(reliability.rating_distribution.items(), key=lambda item: item[0])
+            f"{star}*={count}"
+            for star, count in sorted(
+                reliability.rating_distribution.items(), key=lambda item: item[0]
+            )
         )
         return [
             ["Metric", "Value"],
@@ -203,7 +206,9 @@ class ReportExportService:
         workbook.save(buffer)
         return buffer.getvalue()
 
-    def _populate_sheet(self, sheet, *, title: str, subtitle: str, rows: Iterable[Iterable[str]]) -> None:
+    def _populate_sheet(
+        self, sheet, *, title: str, subtitle: str, rows: Iterable[Iterable[str]]
+    ) -> None:
         header_fill = PatternFill(fill_type="solid", fgColor="1B6B3A")
         title_font = Font(size=14, bold=True)
         header_font = Font(bold=True, color="FFFFFF")
@@ -291,7 +296,12 @@ class ReportExportService:
                     ("FONTSIZE", (0, 0), (-1, -1), 9),
                     ("VALIGN", (0, 0), (-1, -1), "TOP"),
                     ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#D4D9D6")),
-                    ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#F5F7F6")]),
+                    (
+                        "ROWBACKGROUNDS",
+                        (0, 1),
+                        (-1, -1),
+                        [colors.white, colors.HexColor("#F5F7F6")],
+                    ),
                     ("LEFTPADDING", (0, 0), (-1, -1), 6),
                     ("RIGHTPADDING", (0, 0), (-1, -1), 6),
                     ("TOPPADDING", (0, 0), (-1, -1), 5),

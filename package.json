@@ -3,22 +3,88 @@
   "private": true,
   "workspaces": [
     "apps/frontend",
+    "apps/ai-advisor-service",
     "apps/mobile",
     "packages/shared"
   ],
   "scripts": {
     "backend:dev": ".\\.venv\\Scripts\\python.exe -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 --app-dir apps/backend",
+    "backend:auth-service:dev": ".\\.venv\\Scripts\\python.exe -m uvicorn app.microservices:auth_service_app --reload --host 0.0.0.0 --port 8001 --app-dir apps/backend",
+    "backend:state-engine:dev": ".\\.venv\\Scripts\\python.exe -m uvicorn app.microservices:state_engine_app --reload --host 0.0.0.0 --port 8002 --app-dir apps/backend",
+    "backend:mandi-service:dev": ".\\.venv\\Scripts\\python.exe -m uvicorn app.microservices:mandi_service_app --reload --host 0.0.0.0 --port 8003 --app-dir apps/backend",
+    "backend:developer-api:dev": ".\\.venv\\Scripts\\python.exe -m uvicorn app.microservices:developer_api_app --reload --host 0.0.0.0 --port 8004 --app-dir apps/backend",
+    "backend:test": ".\\.venv\\Scripts\\python.exe -m pytest apps/backend/tests -q",
+    "backend:validate-runtime": ".\\.venv\\Scripts\\python.exe apps/backend/scripts/validate_runtime_profile.py",
+    "backend:validate-aws": ".\\.venv\\Scripts\\python.exe apps/backend/scripts/validate_aws_runtime.py",
+    "backend:profile:bedrock": "node scripts/switch-backend-runtime-profile.mjs bedrock",
+    "ai-advisor:dev": "npm --prefix apps/ai-advisor-service run dev",
+    "ai-advisor:start": "npm --prefix apps/ai-advisor-service run start",
+    "ai-advisor:test": "npm --prefix apps/ai-advisor-service run test",
     "frontend:dev": "npm --prefix apps/frontend run dev",
     "frontend:build": "npm --prefix apps/frontend run build",
     "frontend:preview": "npm --prefix apps/frontend run preview",
+    "frontend:test": "npm --prefix apps/frontend run test:run",
     "mobile:start": "npm --prefix apps/mobile run start",
     "mobile:android": "npm --prefix apps/mobile run android",
     "mobile:ios": "npm --prefix apps/mobile run ios",
     "mobile:run:android": "npm --prefix apps/mobile run run:android",
     "mobile:run:ios": "npm --prefix apps/mobile run run:ios",
-    "shared:typecheck": "npm --prefix packages/shared run typecheck"
+    "mobile:typecheck": "npm --prefix apps/mobile run typecheck",
+    "mobile:test": "npm --prefix apps/mobile run test:run",
+    "shared:typecheck": "npm --prefix packages/shared run typecheck",
+    "format": "npm run format:web && npm run format:python && npm run format:infra",
+    "format:check": "npm run format:web:check && npm run format:python:check && npm run format:infra:check",
+    "format:web": "prettier --write .",
+    "format:web:check": "prettier --check .",
+    "format:python": ".\\.venv\\Scripts\\python.exe -m ruff check apps/backend --select I --fix && .\\.venv\\Scripts\\python.exe -m ruff format apps/backend",
+    "format:python:check": ".\\.venv\\Scripts\\python.exe -m ruff check apps/backend --select I && .\\.venv\\Scripts\\python.exe -m ruff format --check apps/backend",
+    "format:infra": "terraform fmt -recursive infra/terraform",
+    "format:infra:check": "terraform fmt -check -recursive infra/terraform",
+    "infra:validate": "node scripts/infra-validate.mjs",
+    "security:check": "node scripts/security-check.mjs",
+    "ci:check": "npm run security:check && npm run shared:typecheck && npm run frontend:test && npm run mobile:test && npm run mobile:typecheck && npm run backend:test"
   },
   "devDependencies": {
+    "brace-expansion": "5.0.5",
+    "jsdom": "^25.0.1",
+    "prettier": "^3.8.1",
     "vite": "^5.4.2"
+  },
+  "overrides": {
+    "@xmldom/xmldom": "0.8.12",
+    "node-forge": "1.4.0",
+    "anymatch": {
+      "picomatch": "2.3.2"
+    },
+    "micromatch": {
+      "picomatch": "2.3.2"
+    },
+    "@rollup/pluginutils": {
+      "picomatch": "2.3.2"
+    },
+    "jest-util": {
+      "picomatch": "2.3.2"
+    },
+    "fdir": {
+      "picomatch": "4.0.4"
+    },
+    "tinyglobby": {
+      "picomatch": "4.0.4"
+    },
+    "@expo/cli": {
+      "picomatch": "4.0.4"
+    },
+    "@expo/metro-config": {
+      "picomatch": "4.0.4"
+    },
+    "postcss-load-config": {
+      "yaml": "2.8.3"
+    },
+    "metro-config": {
+      "yaml": "2.8.3"
+    },
+    "cosmiconfig": {
+      "yaml": "1.10.3"
+    }
   }
 }

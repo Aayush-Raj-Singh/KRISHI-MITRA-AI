@@ -4,12 +4,18 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
-from app.core.database import Database
 
+from app.core.database import Database
 from app.core.dependencies import get_db, require_roles
 from app.models.user import UserInDB
 from app.schemas.response import APIResponse
-from app.schemas.ticket import TicketCreate, TicketDB, TicketListResponse, TicketReply, TicketStatusUpdate
+from app.schemas.ticket import (
+    TicketCreate,
+    TicketDB,
+    TicketListResponse,
+    TicketReply,
+    TicketStatusUpdate,
+)
 from app.utils.audit import log_audit_event
 from app.utils.responses import success_response
 
@@ -52,7 +58,9 @@ async def create_ticket(
     result = await db["tickets"].insert_one(record)
     created = await db["tickets"].find_one({"_id": result.inserted_id})
     created = _normalize(created)
-    await log_audit_event(db, user.id, user.role, "ticket", created["_id"], "create", record, request.client.host)
+    await log_audit_event(
+        db, user.id, user.role, "ticket", created["_id"], "create", record, request.client.host
+    )
     return success_response(TicketDB(**created), message="Ticket created")
 
 
@@ -94,7 +102,11 @@ async def reply_ticket(
 
     if user.role == "farmer" and ticket.get("created_by") != user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not allowed")
-    if user.role == "extension_officer" and ticket.get("assignee") not in {None, user.id} and ticket.get("created_by") != user.id:
+    if (
+        user.role == "extension_officer"
+        and ticket.get("assignee") not in {None, user.id}
+        and ticket.get("created_by") != user.id
+    ):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not allowed")
 
     now = datetime.utcnow()
@@ -105,7 +117,9 @@ async def reply_ticket(
     )
     updated = await db["tickets"].find_one({"_id": _coerce_id(ticket_id)})
     updated = _normalize(updated)
-    await log_audit_event(db, user.id, user.role, "ticket", updated["_id"], "reply", message, request.client.host)
+    await log_audit_event(
+        db, user.id, user.role, "ticket", updated["_id"], "reply", message, request.client.host
+    )
     return success_response(TicketDB(**updated), message="Reply added")
 
 
@@ -125,9 +139,25 @@ async def update_ticket_status(
 
     updates = {"status": payload.status, "updated_at": datetime.utcnow()}
     if payload.assignee is not None:
+        assignee = await db["users"].find_one({"_id": payload.assignee})
+        if not assignee:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Assignee not found"
+            )
+        if assignee.get("role") not in {"extension_officer", "admin"}:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Assignee must be a staff user"
+            )
+        if user.role != "admin" and payload.assignee != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Extension officers can only assign tickets to themselves",
+            )
         updates["assignee"] = payload.assignee
     await db["tickets"].update_one({"_id": _coerce_id(ticket_id)}, {"$set": updates})
     updated = await db["tickets"].find_one({"_id": _coerce_id(ticket_id)})
     updated = _normalize(updated)
-    await log_audit_event(db, user.id, user.role, "ticket", updated["_id"], "status", updates, request.client.host)
+    await log_audit_event(
+        db, user.id, user.role, "ticket", updated["_id"], "status", updates, request.client.host
+    )
     return success_response(TicketDB(**updated), message="Ticket updated")

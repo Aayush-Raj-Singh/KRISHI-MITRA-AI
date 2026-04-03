@@ -1,7 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Mukta:wght@300;400;500;600;700&family=Prata&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Noto+Sans+Gurmukhi:wght@400;500;600;700&family=Noto+Sans+Gujarati:wght@400;500;600;700&family=Noto+Sans+Kannada:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@400;500;600;700&family=Noto+Sans+Oriya:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&family=Noto+Sans+Telugu:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --app-body-font: "Mukta", "Noto Sans Devanagari", "Noto Sans Bengali", "Noto Sans Gurmukhi",
+  --app-body-font:
+    "Mukta", "Noto Sans Devanagari", "Noto Sans Bengali", "Noto Sans Gurmukhi",
     "Noto Sans Gujarati", "Noto Sans Kannada", "Noto Sans Malayalam", "Noto Sans Oriya",
     "Noto Sans Tamil", "Noto Sans Telugu", "Noto Naskh Arabic", sans-serif;
   --app-heading-font: "Prata";
@@ -37,10 +41,18 @@ body {
   background-image:
     radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 60%),
     radial-gradient(circle at 82% 8%, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 55%),
-    linear-gradient(180deg, rgba(242, 237, 226, 0.9) 0%, rgba(233, 244, 234, 0.92) 50%, rgba(243, 239, 230, 0.92) 100%);
-  background-size: 100% 100%, 100% 100%, 100% 100%;
-  background-attachment: fixed;
-  text-rendering: optimizeLegibility;
+    linear-gradient(
+      180deg,
+      rgba(242, 237, 226, 0.9) 0%,
+      rgba(233, 244, 234, 0.92) 50%,
+      rgba(243, 239, 230, 0.92) 100%
+    );
+  background-size:
+    100% 100%,
+    100% 100%,
+    100% 100%;
+  background-attachment: scroll;
+  text-rendering: auto;
   overflow-x: hidden;
 }
 
@@ -52,8 +64,13 @@ html[data-theme="dark"] body {
   background-image:
     radial-gradient(circle at 18% 22%, rgba(28, 44, 35, 0.7), rgba(28, 44, 35, 0) 60%),
     radial-gradient(circle at 82% 8%, rgba(22, 36, 28, 0.7), rgba(22, 36, 28, 0) 55%),
-    linear-gradient(180deg, rgba(14, 24, 18, 0.92) 0%, rgba(14, 26, 19, 0.94) 50%, rgba(12, 22, 16, 0.94) 100%);
-  background-attachment: fixed;
+    linear-gradient(
+      180deg,
+      rgba(14, 24, 18, 0.92) 0%,
+      rgba(14, 26, 19, 0.94) 50%,
+      rgba(12, 22, 16, 0.94) 100%
+    );
+  background-attachment: scroll;
   --surface-strong: rgba(20, 63, 43, 0.96);
   --surface-soft: rgba(12, 32, 22, 0.8);
   --surface-muted: rgba(12, 32, 22, 0.7);
@@ -68,7 +85,11 @@ html[data-theme="dark"] .MuiPaper-root:not(.MuiPopover-paper):not(.MuiMenu-paper
 html[data-theme="dark"] .MuiCard-root,
 html[data-theme="dark"] .MuiAccordion-root,
 html[data-theme="dark"] .MuiDrawer-paper {
-  background: linear-gradient(140deg, rgba(20, 63, 43, 0.98) 0%, rgba(17, 52, 36, 0.98) 100%) !important;
+  background: linear-gradient(
+    140deg,
+    rgba(20, 63, 43, 0.98) 0%,
+    rgba(17, 52, 36, 0.98) 100%
+  ) !important;
   border-color: rgba(255, 255, 255, 0.12) !important;
   color: #ffffff;
 }
@@ -199,6 +220,21 @@ html[data-language="ur"] {
   letter-spacing: 0.2px;
 }
 
+@keyframes appFadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.app-shell-enter {
+  animation: appFadeSlideIn 320ms ease-out both;
+}
+
 @media (max-width: 900px) {
   #app-loading img {
     height: 36px;
@@ -213,6 +249,64 @@ html[data-language="ur"] {
 
 img {
   max-width: 100%;
+  display: block;
+}
+
+.render-smooth-section {
+  content-visibility: auto;
+  contain: layout style paint;
+  contain-intrinsic-size: 640px;
+}
+
+@keyframes externalLinksMarquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-50% - (var(--external-gap, 24px) / 2)));
+  }
+}
+
+@keyframes noticeScrollMarquee {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-50% - (var(--notice-gap, 12px) / 2)));
+  }
+}
+
+@keyframes noticeGalleryMarquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-50% - (var(--gallery-gap, 16px) / 2)));
+  }
+}
+
+.external-links-marquee:hover .external-links-track,
+.external-links-marquee:focus-within .external-links-track,
+.notice-board-window:hover .notice-scroll-track,
+.notice-board-window:focus-within .notice-scroll-track,
+.notice-gallery-window:hover .notice-gallery-track,
+.notice-gallery-window:focus-within .notice-gallery-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .external-links-track,
+  .notice-scroll-track,
+  .notice-gallery-track {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .render-smooth-section {
+    contain-intrinsic-size: 960px;
+  }
 }
 
 :focus-visible {
@@ -318,7 +412,8 @@ html[data-contrast="high"] :focus-visible {
   }
 
   .external-link-card[data-duplicate="true"],
-  .notice-item[data-duplicate="true"] {
+  .notice-item[data-duplicate="true"],
+  .notice-gallery-track [data-duplicate="true"] {
     display: none !important;
   }
 

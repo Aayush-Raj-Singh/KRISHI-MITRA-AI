@@ -45,7 +45,9 @@ def _next_quarterly(now: datetime, hour: int) -> datetime:
     quarters = [1, 4, 7, 10]
     year = now.year
     for month in quarters:
-        candidate = now.replace(year=year, month=month, day=1, hour=hour, minute=0, second=0, microsecond=0)
+        candidate = now.replace(
+            year=year, month=month, day=1, hour=hour, minute=0, second=0, microsecond=0
+        )
         if candidate > now:
             return candidate
     return now.replace(year=year + 1, month=1, day=1, hour=hour, minute=0, second=0, microsecond=0)
@@ -105,18 +107,36 @@ class SchedulerRunner:
         next_weekly = _next_weekly(datetime.now(tz), weekday, settings.scheduler_weekly_hour)
         next_quarterly = _next_quarterly(datetime.now(tz), settings.scheduler_quarterly_hour)
         next_seasonal_check = datetime.now(tz)
+        next_state_portal_sync = _next_daily(datetime.now(tz), settings.scheduler_daily_hour)
+        next_geo_hierarchy_sync = _next_weekly(
+            datetime.now(tz), weekday, settings.scheduler_weekly_hour
+        )
 
         while not self._stop_event.is_set():
             now = datetime.now(tz)
             if now >= next_daily:
                 await self._trigger(app, "daily_external_data_refresh")
                 next_daily = _next_daily(now + timedelta(seconds=1), settings.scheduler_daily_hour)
+            if now >= next_state_portal_sync:
+                await self._trigger(app, "state_portal_sync")
+                next_state_portal_sync = _next_daily(
+                    now + timedelta(seconds=1), settings.scheduler_daily_hour
+                )
             if now >= next_weekly:
                 await self._trigger(app, "weekly_price_refresh")
-                next_weekly = _next_weekly(now + timedelta(seconds=1), weekday, settings.scheduler_weekly_hour)
+                next_weekly = _next_weekly(
+                    now + timedelta(seconds=1), weekday, settings.scheduler_weekly_hour
+                )
+            if now >= next_geo_hierarchy_sync:
+                await self._trigger(app, "geo_hierarchy_sync")
+                next_geo_hierarchy_sync = _next_weekly(
+                    now + timedelta(seconds=1), weekday, settings.scheduler_weekly_hour
+                )
             if now >= next_quarterly:
                 await self._trigger(app, "quarterly_full_retrain")
-                next_quarterly = _next_quarterly(now + timedelta(seconds=1), settings.scheduler_quarterly_hour)
+                next_quarterly = _next_quarterly(
+                    now + timedelta(seconds=1), settings.scheduler_quarterly_hour
+                )
             if now >= next_seasonal_check:
                 await self._trigger(app, "seasonal_crop_refresh")
                 next_seasonal_check = now + timedelta(days=1)
@@ -130,15 +150,36 @@ class SchedulerRunner:
 
         service = OperationsService(db)
         if operation == "daily_external_data_refresh":
-            result = await service.trigger_daily_data_refresh(triggered_by="scheduler", async_mode=True)
+            result = await service.trigger_daily_data_refresh(
+                triggered_by="scheduler", async_mode=True
+            )
+        elif operation == "state_portal_sync":
+            result = await service.trigger_state_portal_sync(
+                triggered_by="scheduler", async_mode=True
+            )
+        elif operation == "geo_hierarchy_sync":
+            result = await service.trigger_geo_hierarchy_sync(
+                triggered_by="scheduler", async_mode=True
+            )
         elif operation == "weekly_price_refresh":
-            result = await service.trigger_weekly_price_refresh(triggered_by="scheduler", async_mode=True)
+            result = await service.trigger_weekly_price_refresh(
+                triggered_by="scheduler", async_mode=True
+            )
         elif operation == "seasonal_crop_refresh":
-            result = await service.trigger_seasonal_crop_refresh(triggered_by="scheduler", async_mode=True)
+            result = await service.trigger_seasonal_crop_refresh(
+                triggered_by="scheduler", async_mode=True
+            )
         else:
-            result = await service.trigger_quarterly_retrain(triggered_by="scheduler", async_mode=True)
+            result = await service.trigger_quarterly_retrain(
+                triggered_by="scheduler", async_mode=True
+            )
 
-        logger.info("scheduler_triggered", operation=result.operation, run_id=result.run_id, status=result.status)
+        logger.info(
+            "scheduler_triggered",
+            operation=result.operation,
+            run_id=result.run_id,
+            status=result.status,
+        )
 
         manager = getattr(app.state, "realtime_manager", None)
         if manager is not None:

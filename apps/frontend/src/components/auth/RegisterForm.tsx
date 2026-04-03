@@ -10,7 +10,7 @@ import {
   MenuItem,
   Stack,
   TextField,
-  Typography
+  Typography,
 } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
@@ -40,10 +40,15 @@ const capitalizeWords = (value: string) =>
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const buildPasswordError = (value: string, t: (key: string, options?: Record<string, unknown>) => string) => {
+const buildPasswordError = (
+  value: string,
+  t: (key: string, options?: Record<string, unknown>) => string,
+) => {
   const issues: string[] = [];
-  if (value.length < 8) issues.push(t("auth.validation.password_issue_min", { defaultValue: "minimum 8 characters" }));
-  if (value.length > 72) issues.push(t("auth.validation.password_issue_max", { defaultValue: "maximum 72 characters" }));
+  if (value.length < 8)
+    issues.push(t("auth.validation.password_issue_min", { defaultValue: "minimum 8 characters" }));
+  if (value.length > 72)
+    issues.push(t("auth.validation.password_issue_max", { defaultValue: "maximum 72 characters" }));
   if (!/[A-Z]/.test(value)) {
     issues.push(t("auth.validation.password_issue_upper", { defaultValue: "an uppercase letter" }));
   }
@@ -54,12 +59,14 @@ const buildPasswordError = (value: string, t: (key: string, options?: Record<str
     issues.push(t("auth.validation.password_issue_number", { defaultValue: "a number" }));
   }
   if (!/[^A-Za-z0-9]/.test(value)) {
-    issues.push(t("auth.validation.password_issue_special", { defaultValue: "a special character" }));
+    issues.push(
+      t("auth.validation.password_issue_special", { defaultValue: "a special character" }),
+    );
   }
   return issues.length
     ? t("auth.validation.password_requirements", {
         defaultValue: "Password must include {{issues}}.",
-        issues: issues.join(", ")
+        issues: issues.join(", "),
       })
     : "";
 };
@@ -74,16 +81,16 @@ const RegisterForm: React.FC = () => {
         retry: "Retry",
         offline: "You are offline.",
         connected: "Connected to internet.",
-        reviewFields: "Please review the highlighted fields."
+        reviewFields: "Please review the highlighted fields.",
       }),
-      []
-    )
+      [],
+    ),
   );
   const alignedFieldSx = {
     "& .MuiFormHelperText-root": {
       minHeight: 22,
-      mt: 0.5
-    }
+      mt: 0.5,
+    },
   } as const;
 
   const [form, setForm] = useState({
@@ -98,14 +105,14 @@ const RegisterForm: React.FC = () => {
     primary_crops: "",
     role: "farmer",
     language: "en",
-    assigned_regions: ""
+    assigned_regions: "",
   });
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [apiStatus, setApiStatus] = useState<"checking" | "online" | "offline">("checking");
   const [networkStatus, setNetworkStatus] = useState<"online" | "offline">(
-    typeof navigator !== "undefined" && navigator.onLine ? "online" : "offline"
+    typeof navigator !== "undefined" && navigator.onLine ? "online" : "offline",
   );
   const [showConnectedBanner, setShowConnectedBanner] = useState(false);
   const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
@@ -144,8 +151,16 @@ const RegisterForm: React.FC = () => {
     { code: "or", label: t("languages.or") },
     { code: "ur", label: t("languages.ur") },
     { code: "ne", label: t("languages.ne") },
-    { code: "sa", label: t("languages.sa") }
+    { code: "sa", label: t("languages.sa") },
   ];
+  const roleOptions = [
+    { value: "farmer", label: t("auth.role_farmer") },
+    { value: "fpo", label: t("auth.role_fpo", { defaultValue: "FPO" }) },
+    {
+      value: "agri_business",
+      label: t("auth.role_agri_business", { defaultValue: "Agri Business" }),
+    },
+  ] as const;
 
   const updateField = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -166,21 +181,21 @@ const RegisterForm: React.FC = () => {
     if (!name || name.length < 2) {
       errors.name = t("auth.validation.name_min", {
         defaultValue: "Name must be at least 2 characters.",
-        count: 2
+        count: 2,
       });
     }
 
     const phone = phoneDigits(form.phone);
     if (!phone || phone.length !== 10) {
       errors.phone = t("auth.validation.phone_digits", {
-        defaultValue: "Phone number must be 10 digits."
+        defaultValue: "Phone number must be 10 digits.",
       });
     }
 
     const email = form.email.trim();
     if (email && !emailRegex.test(email)) {
       errors.email = t("auth.validation.email_invalid", {
-        defaultValue: "Enter a valid email address."
+        defaultValue: "Enter a valid email address.",
       });
     }
 
@@ -191,26 +206,26 @@ const RegisterForm: React.FC = () => {
 
     if (!form.location.trim()) {
       errors.location = t("auth.validation.location_required", {
-        defaultValue: "Location is required."
+        defaultValue: "Location is required.",
       });
     }
 
     const farmSizeNumber = Number(form.farm_size);
     if (!form.farm_size || Number.isNaN(farmSizeNumber) || farmSizeNumber <= 0) {
       errors.farm_size = t("auth.validation.farm_size_positive", {
-        defaultValue: "Farm size must be greater than 0."
+        defaultValue: "Farm size must be greater than 0.",
       });
     }
 
     if (!form.soil_type.trim()) {
       errors.soil_type = t("auth.validation.soil_type_required", {
-        defaultValue: "Soil type is required."
+        defaultValue: "Soil type is required.",
       });
     }
 
     if (!form.water_source.trim()) {
       errors.water_source = t("auth.validation.water_source_required", {
-        defaultValue: "Water source is required."
+        defaultValue: "Water source is required.",
       });
     }
 
@@ -220,14 +235,17 @@ const RegisterForm: React.FC = () => {
       .filter(Boolean);
     if (crops.length === 0) {
       errors.primary_crops = t("auth.validation.primary_crops_required", {
-        defaultValue: "Add at least one primary crop."
+        defaultValue: "Add at least one primary crop.",
       });
     }
 
     return errors;
   }, [form, t]);
 
-  const combinedErrors = useMemo(() => ({ ...validationErrors, ...serverErrors }), [validationErrors, serverErrors]);
+  const combinedErrors = useMemo(
+    () => ({ ...validationErrors, ...serverErrors }),
+    [validationErrors, serverErrors],
+  );
   const isFormValid = Object.values(combinedErrors).every((value) => !value);
 
   const fieldError = (field: string) =>
@@ -250,7 +268,7 @@ const RegisterForm: React.FC = () => {
             const field = String(loc[loc.length - 1] || "");
             if (field) {
               nextErrors[field] = String(
-                item?.msg || t("common.invalid_value", { defaultValue: "Invalid value" })
+                item?.msg || t("common.invalid_value", { defaultValue: "Invalid value" }),
               );
             }
           });
@@ -269,7 +287,7 @@ const RegisterForm: React.FC = () => {
           setSubmitAttempted(true);
         }
       }
-    }
+    },
   });
 
   useEffect(() => {
@@ -332,7 +350,7 @@ const RegisterForm: React.FC = () => {
       assigned_regions: form.assigned_regions
         .split(",")
         .map((region) => region.trim())
-        .filter(Boolean)
+        .filter(Boolean),
     };
 
     mutation.mutate(payload, {
@@ -343,11 +361,11 @@ const RegisterForm: React.FC = () => {
         }
         setSuccessMessage(
           t("register_page.success_redirect", {
-            defaultValue: "Registration successful. Redirecting to dashboard..."
-          })
+            defaultValue: "Registration successful. Redirecting to dashboard...",
+          }),
         );
         window.setTimeout(() => navigate("/dashboard"), 600);
-      }
+      },
     });
   };
 
@@ -372,7 +390,9 @@ const RegisterForm: React.FC = () => {
               </Alert>
             )}
             {showConnectedBanner && (
-              <Alert severity="success">{t("ui.connected_to_internet", { defaultValue: registerUiCopy.connected })}</Alert>
+              <Alert severity="success">
+                {t("ui.connected_to_internet", { defaultValue: registerUiCopy.connected })}
+              </Alert>
             )}
             {mutation.isError && (
               <Alert severity="error">
@@ -405,7 +425,7 @@ const RegisterForm: React.FC = () => {
                     <InputAdornment position="start">
                       <PersonIcon fontSize="small" />
                     </InputAdornment>
-                  )
+                  ),
                 }}
               />
               <Grid container spacing={2} alignItems="flex-start">
@@ -421,7 +441,7 @@ const RegisterForm: React.FC = () => {
                     error={fieldError("phone")}
                     helperText={fieldHelper(
                       "phone",
-                      t("auth.validation.phone_digits_helper", { defaultValue: "10 digits" })
+                      t("auth.validation.phone_digits_helper", { defaultValue: "10 digits" }),
                     )}
                     inputProps={{ inputMode: "numeric", pattern: "[0-9]*", maxLength: 10 }}
                     InputProps={{
@@ -429,7 +449,7 @@ const RegisterForm: React.FC = () => {
                         <InputAdornment position="start">
                           <PhoneIphoneIcon fontSize="small" />
                         </InputAdornment>
-                      )
+                      ),
                     }}
                   />
                 </Grid>
@@ -448,7 +468,7 @@ const RegisterForm: React.FC = () => {
                         <InputAdornment position="start">
                           <AlternateEmailIcon fontSize="small" />
                         </InputAdornment>
-                      )
+                      ),
                     }}
                   />
                 </Grid>
@@ -469,7 +489,7 @@ const RegisterForm: React.FC = () => {
                       fieldError("password")
                         ? validationErrors.password
                         : t("auth.validation.password_strength_helper", {
-                            defaultValue: "Min 8 chars, upper, lower, number, special"
+                            defaultValue: "Min 8 chars, upper, lower, number, special",
                           })
                     }
                     InputProps={{
@@ -477,7 +497,7 @@ const RegisterForm: React.FC = () => {
                         <InputAdornment position="start">
                           <LockIcon fontSize="small" />
                         </InputAdornment>
-                      )
+                      ),
                     }}
                   />
                 </Grid>
@@ -497,7 +517,7 @@ const RegisterForm: React.FC = () => {
                     <InputAdornment position="start">
                       <PlaceIcon fontSize="small" />
                     </InputAdornment>
-                  )
+                  ),
                 }}
               />
               <Grid container spacing={2} alignItems="flex-start">
@@ -519,7 +539,7 @@ const RegisterForm: React.FC = () => {
                         <InputAdornment position="start">
                           <LandscapeIcon fontSize="small" />
                         </InputAdornment>
-                      )
+                      ),
                     }}
                   />
                 </Grid>
@@ -554,7 +574,7 @@ const RegisterForm: React.FC = () => {
                         <InputAdornment position="start">
                           <WaterDropIcon fontSize="small" />
                         </InputAdornment>
-                      )
+                      ),
                     }}
                   />
                 </Grid>
@@ -578,7 +598,7 @@ const RegisterForm: React.FC = () => {
                         <InputAdornment position="start">
                           <AgricultureIcon fontSize="small" />
                         </InputAdornment>
-                      )
+                      ),
                     }}
                   />
                 </Grid>
@@ -593,10 +613,15 @@ const RegisterForm: React.FC = () => {
                     onChange={(event) => updateField("role", event.target.value)}
                     fullWidth
                     sx={alignedFieldSx}
-                    helperText=" "
+                    helperText={t("auth.role_registration_helper", {
+                      defaultValue: "Privileged roles are provisioned by administrators.",
+                    })}
                   >
-                    <MenuItem value="farmer">{t("auth.role_farmer")}</MenuItem>
-                    <MenuItem value="extension_officer">{t("auth.role_extension_officer")}</MenuItem>
+                    {roleOptions.map((role) => (
+                      <MenuItem key={role.value} value={role.value}>
+                        {role.label}
+                      </MenuItem>
+                    ))}
                   </TextField>
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -617,19 +642,12 @@ const RegisterForm: React.FC = () => {
                     ))}
                   </TextField>
                 </Grid>
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    name="assigned_regions"
-                    label={t("auth.assigned_regions", { defaultValue: "Assigned regions (officer/admin)" })}
-                    fullWidth
-                    value={form.assigned_regions}
-                    onChange={(event) => updateField("assigned_regions", event.target.value)}
-                    sx={alignedFieldSx}
-                    helperText={t("auth.assigned_regions_helper", { defaultValue: "Comma-separated districts/states" })}
-                  />
-                </Grid>
               </Grid>
-              <Button type="submit" variant="contained" disabled={mutation.isPending || !isFormValid}>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={mutation.isPending || !isFormValid}
+              >
                 {mutation.isPending ? t("auth.creating") : t("auth.sign_up")}
               </Button>
             </Stack>

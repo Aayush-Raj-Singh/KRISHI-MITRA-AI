@@ -8,11 +8,12 @@ from botocore.exceptions import BotoCoreError, ClientError
 
 from app.core.config import settings
 from app.core.logging import get_logger
+from app.services.llm_provider import BaseLLMService, build_llm_prompt
 
 logger = get_logger(__name__)
 
 
-class BedrockService:
+class BedrockService(BaseLLMService):
     _LANG_TO_TRANSLATE_CODE = {
         "en": "en",
         "hi": "hi",
@@ -37,8 +38,19 @@ class BedrockService:
         self.translate_client = boto3.client("translate", region_name=settings.aws_region)
         self.model_id = settings.bedrock_model_id
         self.fallback_model_id = settings.bedrock_fallback_model_id
-        self.max_tokens = settings.bedrock_max_tokens
-        self.temperature = settings.bedrock_temperature
+        self.max_tokens = settings.llm_max_tokens
+        self.temperature = settings.llm_temperature
+
+    def describe_runtime(self) -> Dict[str, Any]:
+        return {
+            "provider": "bedrock",
+            "implementation": type(self).__name__,
+            "model_id": self.model_id,
+            "fallback_model_id": self.fallback_model_id,
+            "supports_fallback": True,
+            "max_tokens": self.max_tokens,
+            "temperature": self.temperature,
+        }
 
     def _build_prompt(
         self,
@@ -49,29 +61,14 @@ class BedrockService:
         language: str,
         retrieved_context: List[Dict[str, str]] | None = None,
     ) -> str:
-        history = "\n".join([f"{item['role']}: {item['content']}" for item in conversation])
-        context_lines = "\n".join([f"- {key}: {value}" for key, value in user_context.items()])
-        rag_lines = ""
-        if retrieved_context:
-            rag_lines = "\n\nRetrieved Context:\n" + "\n".join(
-                [
-                    f"[{item.get('source', 'unknown')} | {item.get('reference', 'n/a')}]\n{item.get('content', '')}"
-                    for item in retrieved_context
-                ]
-            )
-        prompt = (
-            f"System: {system_prompt}\n\n"
-            f"Language: {language}\n"
-            f"User Context:\n{context_lines}\n\n"
-            f"Conversation History:\n{history}\n\n"
-            f"{rag_lines}\n\n"
-            f"User Query: {user_message}\n\n"
-            "Response:\n"
-            "- Cite retrieved references when factual claims are made.\n"
-            "- If the context is insufficient, explicitly mention uncertainty.\n"
-            "- Include a final line in this format when references are used: Sources: <comma separated source names>"
+        return build_llm_prompt(
+            system_prompt=system_prompt,
+            user_context=user_context,
+            conversation=conversation,
+            user_message=user_message,
+            language=language,
+            retrieved_context=retrieved_context,
         )
-        return prompt
 
     def _translate_text(self, text: str, source_language: str, target_language: str) -> str:
         src = self._LANG_TO_TRANSLATE_CODE.get(source_language.lower(), source_language.lower())
@@ -86,37 +83,36 @@ class BedrockService:
         translated = response.get("TranslatedText")
         return translated if isinstance(translated, str) and translated.strip() else text
 
-    def translate_text(self, text: str, source_language: str = "auto", target_language: str = "en") -> str:
+    def translate_text(
+        self, text: str, source_language: str = "auto", target_language: str = "en"
+    ) -> str:
         content = text.strip()
         if not content:
             return text
-        return self._translate_text(content, source_language=source_language, target_language=target_language)
+        return self._translate_text(
+            content, source_language=source_language, target_language=target_language
+        )
 
-    def _invoke_claude(self, prompt: str, model_id: str) -> str:
-        body = {
-            "anthropic_version": "bedrock-2023-05-31",
-            "max_tokens": self.max_tokens,
-            "temperature": self.temperature,
-            "messages": [
+    def _invoke_converse(self, prompt: str, model_id: str) -> str:
+        response = self.client.converse(
+            modelId=model_id,
+            messages=[
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": prompt},
+                        {"text": prompt},
                     ],
                 }
             ],
-        }
-        response = self.client.invoke_model(
-            modelId=model_id,
-            body=json.dumps(body),
-            contentType="application/json",
-            accept="application/json",
+            inferenceConfig={
+                "maxTokens": self.max_tokens,
+                "temperature": self.temperature,
+            },
         )
-        payload = json.loads(response["body"].read())
-        content = payload.get("content", [])
+        content = response.get("output", {}).get("message", {}).get("content", [])
         if isinstance(content, list):
-            return "".join(item.get("text", "") for item in content)
-        return payload.get("completion", "")
+            return "".join(item.get("text", "") for item in content if isinstance(item, dict))
+        return ""
 
     def _invoke_titan(self, prompt: str, model_id: str) -> str:
         body = {
@@ -140,8 +136,10 @@ class BedrockService:
 
     def _invoke_model(self, prompt: str, model_id: str) -> str:
         normalized = (model_id or "").strip().lower()
-        if normalized.startswith("anthropic."):
-            return self._invoke_claude(prompt, model_id)
+        if normalized.startswith("amazon.titan"):
+            return self._invoke_titan(prompt, model_id)
+        if normalized:
+            return self._invoke_converse(prompt, model_id)
         return self._invoke_titan(prompt, model_id)
 
     def generate_reply(
@@ -158,7 +156,9 @@ class BedrockService:
         translated_query = False
         if language.lower() != "en":
             try:
-                prompt_message = self._translate_text(user_message, source_language=language, target_language="en")
+                prompt_message = self._translate_text(
+                    user_message, source_language=language, target_language="en"
+                )
                 prompt_context = []
                 for item in retrieved_context or []:
                     translated_item = dict(item)
@@ -181,7 +181,7 @@ class BedrockService:
             retrieved_context=prompt_context,
         )
         try:
-            reply = self._invoke_claude(prompt, self.model_id)
+            reply = self._invoke_model(prompt, self.model_id)
             model_used = self.model_id
             fallback_used = False
         except (BotoCoreError, ClientError, KeyError, ValueError) as exc:
@@ -197,19 +197,34 @@ class BedrockService:
         final_reply = reply.strip()
         if translated_query and language.lower() != "en":
             try:
-                final_reply = self._translate_text(final_reply, source_language="en", target_language=language)
+                final_reply = self._translate_text(
+                    final_reply, source_language="en", target_language=language
+                )
             except Exception as exc:
                 logger.warning("translate_reply_failed", language=language, error=str(exc))
         return final_reply, model_used, fallback_used
 
     def health_check(self, test_fallback: bool = False) -> Dict[str, Any]:
-        prompt = "Return the word: OK"
         result: Dict[str, Any] = {
             "available": True,
             "primary_model": {"model_id": self.model_id, "ok": False},
         }
+        if settings.should_mock_runtime_validation:
+            result["mocked"] = True
+            result["primary_model"]["ok"] = True
+            result["primary_model"]["sample"] = "OK"
+            if test_fallback:
+                result["fallback_model"] = {
+                    "model_id": self.fallback_model_id,
+                    "ok": True,
+                    "sample": "OK",
+                    "mocked": True,
+                }
+            return result
+
+        prompt = "Return the word: OK"
         try:
-            reply = self._invoke_claude(prompt, self.model_id)
+            reply = self._invoke_model(prompt, self.model_id)
             result["primary_model"]["ok"] = bool(reply.strip())
             result["primary_model"]["sample"] = reply.strip()[:120]
         except Exception as exc:

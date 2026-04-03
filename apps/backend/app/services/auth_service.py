@@ -1,15 +1,14 @@
 from __future__ import annotations
 
+import hashlib
+import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-import hashlib
-import secrets
-
 from jose import JWTError
-from app.core.database import Database
 
 from app.core.config import settings
+from app.core.database import Database
 from app.core.security import (
     create_access_token,
     create_refresh_token,
@@ -55,7 +54,9 @@ class AuthService:
         attempts = int(getattr(user, "failed_login_attempts", 0)) + 1
         payload: dict = {"failed_login_attempts": attempts, "last_failed_login_at": self._now()}
         if attempts >= settings.auth_lockout_threshold:
-            payload["lockout_until"] = self._now() + timedelta(minutes=settings.auth_lockout_minutes)
+            payload["lockout_until"] = self._now() + timedelta(
+                minutes=settings.auth_lockout_minutes
+            )
             payload["failed_login_attempts"] = 0
         await self._collection.update_one(self._user_query(user.id), {"$set": payload})
 
@@ -292,7 +293,9 @@ class AuthService:
         )
         await self._otp_provider.send_otp(
             OTPDeliveryPayload(
-                phone=user.email if channel == "email" and getattr(user, "email", None) else user.phone,
+                phone=user.email
+                if channel == "email" and getattr(user, "email", None)
+                else user.phone,
                 otp=otp,
                 channel=channel,
             )
@@ -336,7 +339,9 @@ class AuthService:
 
     async def create_mfa_challenge(self, user_id: str, phone: str) -> None:
         otp = f"{secrets.randbelow(1000000):06d}"
-        otp_hash = hashlib.sha256(f"{otp}:{settings.jwt_refresh_secret_key}".encode("utf-8")).hexdigest()
+        otp_hash = hashlib.sha256(
+            f"{otp}:{settings.jwt_refresh_secret_key}".encode("utf-8")
+        ).hexdigest()
         now = self._now()
         expires_at = now + timedelta(minutes=settings.mfa_otp_expire_minutes)
         await self._mfa_collection.update_many(
@@ -369,7 +374,9 @@ class AuthService:
             return False
         if challenge.get("expires_at") and challenge["expires_at"] < self._now():
             return False
-        otp_hash = hashlib.sha256(f"{otp}:{settings.jwt_refresh_secret_key}".encode("utf-8")).hexdigest()
+        otp_hash = hashlib.sha256(
+            f"{otp}:{settings.jwt_refresh_secret_key}".encode("utf-8")
+        ).hexdigest()
         if not secrets.compare_digest(challenge.get("otp_hash", ""), otp_hash):
             return False
         await self._mfa_collection.update_one(

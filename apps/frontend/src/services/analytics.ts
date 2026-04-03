@@ -59,8 +59,12 @@ export interface AnalyticsFilters {
 
 export type AnalyticsReportFormat = "pdf" | "xlsx";
 
-export const fetchAnalyticsOverview = async (filters: AnalyticsFilters): Promise<AnalyticsOverview> => {
-  const response = await api.get<ApiResponse<AnalyticsOverview>>("/analytics/overview", { params: filters });
+export const fetchAnalyticsOverview = async (
+  filters: AnalyticsFilters,
+): Promise<AnalyticsOverview> => {
+  const response = await api.get<ApiResponse<AnalyticsOverview>>("/analytics/overview", {
+    params: filters,
+  });
   return unwrap(response.data);
 };
 
@@ -69,25 +73,36 @@ export const fetchFarmersNeedingAttention = async (params?: {
   consent_safe?: boolean;
   limit?: number;
 }): Promise<FarmerAttentionItem[]> => {
-  const response = await api.get<ApiResponse<FarmerAttentionItem[]>>("/analytics/farmers-needing-attention", {
-    params
-  });
+  const response = await api.get<ApiResponse<FarmerAttentionItem[]>>(
+    "/analytics/farmers-needing-attention",
+    {
+      params,
+    },
+  );
   return unwrap(response.data);
 };
 
 export const fetchFeedbackReliability = async (params?: {
   location?: string;
 }): Promise<FeedbackReliabilityStats> => {
-  const response = await api.get<ApiResponse<FeedbackReliabilityStats>>("/analytics/feedback-reliability", {
-    params
-  });
+  const response = await api.get<ApiResponse<FeedbackReliabilityStats>>(
+    "/analytics/feedback-reliability",
+    {
+      params,
+    },
+  );
   return unwrap(response.data);
 };
 
-export const fetchRegionalInsights = async (filters: AnalyticsFilters): Promise<RegionalInsightsResponse> => {
-  const response = await api.get<ApiResponse<RegionalInsightsResponse>>("/dashboard/regional-insights", {
-    params: { ...filters, consent_safe: true, limit: 8 }
-  });
+export const fetchRegionalInsights = async (
+  filters: AnalyticsFilters,
+): Promise<RegionalInsightsResponse> => {
+  const response = await api.get<ApiResponse<RegionalInsightsResponse>>(
+    "/dashboard/regional-insights",
+    {
+      params: { ...filters, consent_safe: true, limit: 8 },
+    },
+  );
   return unwrap(response.data);
 };
 
@@ -103,16 +118,16 @@ const extractFilename = (headerValue?: string, fallback = "regional-insights-rep
 
 export const downloadAnalyticsReport = async (
   filters: AnalyticsFilters,
-  format: AnalyticsReportFormat
+  format: AnalyticsReportFormat,
 ): Promise<{ filename: string }> => {
   const response = await api.get<Blob>("/analytics/export", {
     params: { ...filters, format, consent_safe: true, limit: 20 },
-    responseType: "blob"
+    responseType: "blob",
   });
   const contentType = response.headers.get("content-type") || "application/octet-stream";
   const filename = extractFilename(
     response.headers.get("content-disposition") || undefined,
-    `regional-insights.${format}`
+    `regional-insights.${format}`,
   );
 
   if (typeof window !== "undefined") {
@@ -146,7 +161,13 @@ export interface PriceAccuracyItem {
   updated_at: string;
 }
 
-export const fetchPriceAccuracy = async (params?: { crop?: string; market?: string; limit?: number }) => {
-  const response = await api.get<ApiResponse<PriceAccuracyItem[]>>("/analytics/price-accuracy", { params });
+export const fetchPriceAccuracy = async (params?: {
+  crop?: string;
+  market?: string;
+  limit?: number;
+}) => {
+  const response = await api.get<ApiResponse<PriceAccuracyItem[]>>("/analytics/price-accuracy", {
+    params,
+  });
   return unwrap(response.data);
 };

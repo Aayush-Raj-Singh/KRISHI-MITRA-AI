@@ -26,8 +26,12 @@ export interface MandiDirectoryFilters {
   limit?: number;
 }
 
-export const fetchMandiDirectory = async (filters: MandiDirectoryFilters): Promise<MandiDirectoryItem[]> => {
-  const response = await api.get<ApiResponse<MandiDirectoryItem[]>>("/mandi-directory", { params: filters });
+export const fetchMandiDirectory = async (
+  filters: MandiDirectoryFilters,
+): Promise<MandiDirectoryItem[]> => {
+  const response = await api.get<ApiResponse<MandiDirectoryItem[]>>("/mandi-directory", {
+    params: filters,
+  });
   return unwrap(response.data);
 };
 

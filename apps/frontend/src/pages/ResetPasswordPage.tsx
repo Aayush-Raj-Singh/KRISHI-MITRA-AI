@@ -10,7 +10,7 @@ import {
   MenuItem,
   Stack,
   TextField,
-  Typography
+  Typography,
 } from "@mui/material";
 import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
 import LockIcon from "@mui/icons-material/Lock";
@@ -37,14 +37,14 @@ const ResetPasswordPage: React.FC = () => {
     mutationFn: requestPasswordReset,
     onSuccess: () => {
       setNotice(t("reset_password.notice_code_sent"));
-    }
+    },
   });
 
   const confirmMutation = useMutation({
     mutationFn: confirmPasswordReset,
     onSuccess: () => {
       setNotice(t("reset_password.notice_password_updated"));
-    }
+    },
   });
 
   return (
@@ -57,18 +57,22 @@ const ResetPasswordPage: React.FC = () => {
             points={[
               {
                 icon: <ShieldIcon color="primary" fontSize="small" />,
-                text: t("reset_password.point_secure", { defaultValue: "Secure account recovery workflow" })
+                text: t("reset_password.point_secure", {
+                  defaultValue: "Secure account recovery workflow",
+                }),
               },
               {
                 icon: <MarkEmailReadIcon color="secondary" fontSize="small" />,
-                text: t("reset_password.point_otp", { defaultValue: "OTP verification through SMS or email" })
+                text: t("reset_password.point_otp", {
+                  defaultValue: "OTP verification through SMS or email",
+                }),
               },
               {
                 icon: <WaterDropIcon color="primary" fontSize="small" />,
                 text: t("reset_password.point_agri", {
-                  defaultValue: "Continue smart irrigation and crop planning without downtime"
-                })
-              }
+                  defaultValue: "Continue smart irrigation and crop planning without downtime",
+                }),
+              },
             ]}
           />
         </Grid>
@@ -103,7 +107,7 @@ const ResetPasswordPage: React.FC = () => {
                           <InputAdornment position="start">
                             <PhoneIphoneIcon fontSize="small" />
                           </InputAdornment>
-                        )
+                        ),
                       }}
                     />
                   </Grid>
@@ -125,7 +129,9 @@ const ResetPasswordPage: React.FC = () => {
                   onClick={() => requestMutation.mutate({ phone, channel })}
                   disabled={requestMutation.isPending || !phone}
                 >
-                  {requestMutation.isPending ? t("reset_password.sending") : t("reset_password.send_code")}
+                  {requestMutation.isPending
+                    ? t("reset_password.sending")
+                    : t("reset_password.send_code")}
                 </Button>
                 <Divider />
                 <TextField
@@ -138,7 +144,7 @@ const ResetPasswordPage: React.FC = () => {
                       <InputAdornment position="start">
                         <MarkEmailReadIcon fontSize="small" />
                       </InputAdornment>
-                    )
+                    ),
                   }}
                 />
                 <TextField
@@ -152,7 +158,7 @@ const ResetPasswordPage: React.FC = () => {
                       <InputAdornment position="start">
                         <LockIcon fontSize="small" />
                       </InputAdornment>
-                    )
+                    ),
                   }}
                 />
                 <Button
@@ -160,7 +166,9 @@ const ResetPasswordPage: React.FC = () => {
                   onClick={() => confirmMutation.mutate({ phone, otp, new_password: newPassword })}
                   disabled={confirmMutation.isPending || !phone || !otp || !newPassword}
                 >
-                  {confirmMutation.isPending ? t("reset_password.updating") : t("reset_password.update_password")}
+                  {confirmMutation.isPending
+                    ? t("reset_password.updating")
+                    : t("reset_password.update_password")}
                 </Button>
                 <Typography variant="body2">
                   <Link to="/login">{t("reset_password.back_to_login")}</Link>

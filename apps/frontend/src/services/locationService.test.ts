@@ -12,9 +12,9 @@ describe("reverseGeocode", () => {
           city: "Patna",
           state: "Bihar",
           country: "India",
-          label: "Patna, Bihar, India"
-        }
-      })
+          label: "Patna, Bihar, India",
+        },
+      }),
     });
     vi.stubGlobal("fetch", fetchMock);
 

@@ -2,18 +2,20 @@ import React, { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
+import { AuthShowcaseCard } from "../components/AuthShowcaseCard";
 import { authApi } from "../services/api";
 import { FieldInput } from "../components/FieldInput";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { ScreenShell } from "../components/ScreenShell";
 import { SectionCard } from "../components/SectionCard";
+import { registerShowcasePoints } from "../data/appContent";
 import { useAuthStore } from "../store/authStore";
-import { colors } from "../theme/colors";
+import { colors, typography } from "../theme";
 
 const roles = [
   { id: "farmer", label: "Farmer" },
   { id: "extension_officer", label: "Extension Officer" },
-  { id: "admin", label: "Admin" }
+  { id: "admin", label: "Admin" },
 ] as const;
 
 export const RegisterScreen = () => {
@@ -32,14 +34,20 @@ export const RegisterScreen = () => {
     waterSource: "Canal",
     primaryCrops: "Rice, Wheat",
     language: "en",
-    role: "farmer" as (typeof roles)[number]["id"]
+    role: "farmer" as (typeof roles)[number]["id"],
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const assignedRegions = useMemo(
-    () => (form.role === "farmer" ? [] : form.location.split(",").map((item) => item.trim()).filter(Boolean)),
-    [form.location, form.role]
+    () =>
+      form.role === "farmer"
+        ? []
+        : form.location
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean),
+    [form.location, form.role],
   );
 
   const handleRegister = async () => {
@@ -56,18 +64,25 @@ export const RegisterScreen = () => {
         farm_size: Number(form.farmSize),
         soil_type: form.soilType,
         water_source: form.waterSource,
-        primary_crops: form.primaryCrops.split(",").map((item) => item.trim()).filter(Boolean),
+        primary_crops: form.primaryCrops
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean),
         role: form.role,
         language: form.language,
         assigned_regions: assignedRegions,
-        risk_view_consent: form.role !== "farmer"
+        risk_view_consent: form.role !== "farmer",
       });
       if (response.token) {
         setTokens(response.token);
       }
       setUser(response.user);
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Unable to create account right now.");
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "Unable to create account right now.",
+      );
     } finally {
       setLoading(false);
     }
@@ -77,9 +92,22 @@ export const RegisterScreen = () => {
     <ScreenShell
       title="Create mobile access"
       subtitle="Register once and keep the same backend account across web and mobile."
+      eyebrow="Account Setup"
+      heroImageSource={require("../../assets/hero-slide-03.png")}
+      heroBadges={["Farmer", "Extension Officer", "Admin"]}
     >
+      <AuthShowcaseCard
+        points={registerShowcasePoints}
+        subtitle="Field context and operational preferences sync across both clients."
+        title="Unified farmer identity"
+      />
+
       <SectionCard title="Identity" subtitle="Start with your core profile and role.">
-        <FieldInput label="Full name" onChangeText={(value) => setForm((prev) => ({ ...prev, name: value }))} value={form.name} />
+        <FieldInput
+          label="Full name"
+          onChangeText={(value) => setForm((prev) => ({ ...prev, name: value }))}
+          value={form.name}
+        />
         <FieldInput
           keyboardType="phone-pad"
           label="Phone number"
@@ -107,7 +135,9 @@ export const RegisterScreen = () => {
               onPress={() => setForm((prev) => ({ ...prev, role: role.id }))}
               style={[styles.roleChip, form.role === role.id ? styles.roleChipActive : null]}
             >
-              <Text style={[styles.roleLabel, form.role === role.id ? styles.roleLabelActive : null]}>
+              <Text
+                style={[styles.roleLabel, form.role === role.id ? styles.roleLabelActive : null]}
+              >
                 {role.label}
               </Text>
             </Pressable>
@@ -115,15 +145,26 @@ export const RegisterScreen = () => {
         </View>
       </SectionCard>
 
-      <SectionCard title="Farm context" subtitle="These fields feed directly into the existing business workflows.">
-        <FieldInput label="Location" onChangeText={(value) => setForm((prev) => ({ ...prev, location: value }))} value={form.location} />
+      <SectionCard
+        title="Farm context"
+        subtitle="These fields feed directly into the existing business workflows."
+      >
+        <FieldInput
+          label="Location"
+          onChangeText={(value) => setForm((prev) => ({ ...prev, location: value }))}
+          value={form.location}
+        />
         <FieldInput
           keyboardType="decimal-pad"
           label="Farm size (acres)"
           onChangeText={(value) => setForm((prev) => ({ ...prev, farmSize: value }))}
           value={form.farmSize}
         />
-        <FieldInput label="Soil type" onChangeText={(value) => setForm((prev) => ({ ...prev, soilType: value }))} value={form.soilType} />
+        <FieldInput
+          label="Soil type"
+          onChangeText={(value) => setForm((prev) => ({ ...prev, soilType: value }))}
+          value={form.soilType}
+        />
         <FieldInput
           label="Water source"
           onChangeText={(value) => setForm((prev) => ({ ...prev, waterSource: value }))}
@@ -162,7 +203,7 @@ const styles = StyleSheet.create({
   roleRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 10
+    gap: 10,
   },
   roleChip: {
     borderRadius: 999,
@@ -170,35 +211,35 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.surfaceMuted,
     paddingHorizontal: 14,
-    paddingVertical: 10
+    paddingVertical: 10,
   },
   roleChipActive: {
     borderColor: colors.primary,
-    backgroundColor: "#dcebdc"
+    backgroundColor: "#dcebdc",
   },
   roleLabel: {
     color: colors.text,
     fontSize: 13,
-    fontWeight: "700"
+    fontWeight: "700",
   },
   roleLabelActive: {
-    color: colors.primary
+    color: colors.primary,
   },
   errorBanner: {
     backgroundColor: "#fde9e2",
     borderRadius: 14,
     borderWidth: 1,
     borderColor: "#edc2b4",
-    padding: 12
+    padding: 12,
   },
   errorText: {
     color: colors.danger,
     fontSize: 13,
-    lineHeight: 18
+    lineHeight: 18,
   },
   linkText: {
     color: colors.primary,
-    fontSize: 15,
-    fontWeight: "700"
-  }
+    fontSize: typography.body,
+    fontWeight: "700",
+  },
 });

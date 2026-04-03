@@ -44,29 +44,35 @@ export const fetchSchedulerOverview = async (): Promise<SchedulerOverviewRespons
   return unwrap(response.data);
 };
 
-export const triggerWeeklyPriceRefresh = async (asyncMode = true): Promise<TriggerOperationResponse> => {
+export const triggerWeeklyPriceRefresh = async (
+  asyncMode = true,
+): Promise<TriggerOperationResponse> => {
   const response = await api.post<ApiResponse<TriggerOperationResponse>>(
     `/operations/schedule/trigger/weekly-price-refresh`,
     null,
-    { params: { async_mode: asyncMode } }
+    { params: { async_mode: asyncMode } },
   );
   return unwrap(response.data);
 };
 
-export const triggerQuarterlyRetrain = async (asyncMode = true): Promise<TriggerOperationResponse> => {
+export const triggerQuarterlyRetrain = async (
+  asyncMode = true,
+): Promise<TriggerOperationResponse> => {
   const response = await api.post<ApiResponse<TriggerOperationResponse>>(
     `/operations/schedule/trigger/quarterly-retrain`,
     null,
-    { params: { async_mode: asyncMode } }
+    { params: { async_mode: asyncMode } },
   );
   return unwrap(response.data);
 };
 
-export const triggerDailyDataRefresh = async (asyncMode = true): Promise<TriggerOperationResponse> => {
+export const triggerDailyDataRefresh = async (
+  asyncMode = true,
+): Promise<TriggerOperationResponse> => {
   const response = await api.post<ApiResponse<TriggerOperationResponse>>(
     `/operations/schedule/trigger/daily-data-refresh`,
     null,
-    { params: { async_mode: asyncMode } }
+    { params: { async_mode: asyncMode } },
   );
   return unwrap(response.data);
 };

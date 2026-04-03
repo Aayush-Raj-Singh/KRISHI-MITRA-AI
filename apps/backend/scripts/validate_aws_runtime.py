@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 import sys
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -13,7 +13,10 @@ from app.services.aws_validation_service import AWSValidationService
 
 def main() -> None:
     service = AWSValidationService()
-    print(json.dumps(service.validate(), indent=2, default=str))
+    payload = service.validate()
+    print(json.dumps(payload, indent=2, default=str))
+    if not payload.get("summary", {}).get("ok", True):
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":

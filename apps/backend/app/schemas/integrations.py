@@ -24,6 +24,10 @@ class LocationLookupResponse(BaseModel):
     source: str
     city: Optional[str] = None
     state: Optional[str] = None
+    district: Optional[str] = None
+    block: Optional[str] = None
+    village: Optional[str] = None
+    postal_code: Optional[str] = None
     country: Optional[str] = None
 
 
@@ -32,6 +36,10 @@ class LocationSearchResponse(BaseModel):
     source: str
     city: Optional[str] = None
     state: Optional[str] = None
+    district: Optional[str] = None
+    block: Optional[str] = None
+    village: Optional[str] = None
+    postal_code: Optional[str] = None
     country: Optional[str] = None
     latitude: float
     longitude: float
