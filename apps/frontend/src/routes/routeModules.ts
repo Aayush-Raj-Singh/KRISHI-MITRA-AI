@@ -63,7 +63,6 @@ const preloadGroups: Array<{ matches: RegExp; preload: () => Promise<unknown> }>
   { matches: /^\/dashboard(?:\/|$)/, preload: DashboardPageLazy.preload },
   { matches: /^\/portal(?:\/|$)/, preload: PortalPageLazy.preload },
   { matches: /^\/mandi-directory(?:\/|$)/, preload: MarketDirectoryPageLazy.preload },
-  { matches: /^\/services(?:\/|$)/, preload: ServicesPageLazy.preload },
   {
     matches: /^\/services\/national-intelligence(?:\/|$)/,
     preload: NationalAgricultureIntelligencePageLazy.preload,
@@ -87,15 +86,19 @@ const preloadGroups: Array<{ matches: RegExp; preload: () => Promise<unknown> }>
   { matches: /^\/admin\/master-data(?:\/|$)/, preload: AdminMasterDataPageLazy.preload },
   { matches: /^\/admin\/audit-logs(?:\/|$)/, preload: AuditLogsPageLazy.preload },
   { matches: /^\/admin\/quality(?:\/|$)/, preload: DataQualityPageLazy.preload },
+  { matches: /^\/services(?:\/|$)/, preload: ServicesPageLazy.preload },
 ];
 
 const prefetchedPaths = new Set<string>();
+
+const normalizeRoutePath = (path: string) => path.split("#", 1)[0].split("?", 1)[0];
 
 export const preloadRouteModule = (path: string): Promise<unknown> | undefined => {
   if (!path || prefetchedPaths.has(path)) {
     return undefined;
   }
-  const target = preloadGroups.find((item) => item.matches.test(path));
+  const normalizedPath = normalizeRoutePath(path);
+  const target = preloadGroups.find((item) => item.matches.test(normalizedPath));
   if (!target) {
     return undefined;
   }

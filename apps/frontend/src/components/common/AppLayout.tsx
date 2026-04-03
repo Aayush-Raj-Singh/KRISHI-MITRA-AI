@@ -40,6 +40,7 @@ import { getRefreshToken } from "../../services/authStorage";
 import { buildRedirectUrl } from "../../services/links";
 import { resolveWsUrl } from "../../services/runtimeConfig";
 import { useTranslatedStrings } from "../../utils/useTranslatedStrings";
+import { navigateWithViewTransition } from "../../utils/viewTransitions";
 import ExternalPortalsMarquee from "./ExternalPortalsMarquee";
 import ExternalLinkWarningDialog from "./ExternalLinkWarningDialog";
 import LayoutFooterLinks from "./LayoutFooterLinks";
@@ -336,12 +337,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
       } catch {}
     }
     dispatch(logout());
-    navigate("/login");
+    navigateWithViewTransition(navigate, "/login");
   };
 
   const handleNav = (path: string) => {
-    void preloadRouteModule(path);
-    navigate(path);
+    navigateWithViewTransition(navigate, path);
     setMobileOpen(false);
   };
 
@@ -375,7 +375,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, fullBleed = false }) =>
   };
 
   const handleOpenProfile = () => {
-    navigate("/profile");
+    navigateWithViewTransition(navigate, "/profile");
     setMobileOpen(false);
   };
 

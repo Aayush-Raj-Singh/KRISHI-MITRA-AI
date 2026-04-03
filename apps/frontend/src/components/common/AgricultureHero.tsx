@@ -10,6 +10,12 @@ type AgricultureHeroProps = {
   imageSrc?: string;
   logoSrc?: string;
   logoAlt?: string;
+  transitionNames?: {
+    shell?: string;
+    title?: string;
+    subtitle?: string;
+    media?: string;
+  };
 };
 
 const AgricultureHero: React.FC<AgricultureHeroProps> = ({
@@ -20,6 +26,7 @@ const AgricultureHero: React.FC<AgricultureHeroProps> = ({
   imageSrc = "/assets/agri-slider/slide-06.jpg",
   logoSrc,
   logoAlt = "KrishiMitra-AI logo",
+  transitionNames,
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
@@ -37,6 +44,7 @@ const AgricultureHero: React.FC<AgricultureHeroProps> = ({
           ? "linear-gradient(135deg, rgba(16, 40, 28, 0.98) 0%, rgba(12, 32, 22, 0.96) 55%, rgba(14, 36, 26, 0.94) 100%)"
           : "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(245,239,226,0.96) 55%, rgba(232, 244, 236, 0.94) 100%)",
         boxShadow: isDark ? "0 12px 24px rgba(0,0,0,0.24)" : "0 12px 24px rgba(18, 44, 25, 0.08)",
+        viewTransitionName: transitionNames?.shell || "none",
       }}
     >
       <Box
@@ -98,6 +106,7 @@ const AgricultureHero: React.FC<AgricultureHeroProps> = ({
                 fontWeight: 600,
                 letterSpacing: 0.2,
                 fontSize: { xs: "1.7rem", md: "2.05rem" },
+                viewTransitionName: transitionNames?.title || "none",
               }}
             >
               {title}
@@ -106,7 +115,11 @@ const AgricultureHero: React.FC<AgricultureHeroProps> = ({
           <Typography
             variant="body1"
             color="text.secondary"
-            sx={{ maxWidth: 560, fontSize: { xs: "1rem", md: "1.05rem" } }}
+            sx={{
+              maxWidth: 560,
+              fontSize: { xs: "1rem", md: "1.05rem" },
+              viewTransitionName: transitionNames?.subtitle || "none",
+            }}
           >
             {subtitle}
           </Typography>
@@ -137,6 +150,7 @@ const AgricultureHero: React.FC<AgricultureHeroProps> = ({
             border: isDark ? "1px solid rgba(255,255,255,0.16)" : "1px solid #ddceb6",
             overflow: "hidden",
             display: { xs: "none", sm: "block" },
+            viewTransitionName: transitionNames?.media || "none",
           }}
         >
           <Box

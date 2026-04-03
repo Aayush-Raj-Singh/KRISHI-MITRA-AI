@@ -32,6 +32,11 @@ interface HeroOverviewSectionProps {
   sustainabilityValue: string;
   sustainabilityCaption?: string;
   heroLoading?: boolean;
+  transitionNames?: {
+    shell?: string;
+    title?: string;
+    subtitle?: string;
+  };
 }
 
 const HeroOverviewSection: React.FC<HeroOverviewSectionProps> = ({
@@ -53,6 +58,7 @@ const HeroOverviewSection: React.FC<HeroOverviewSectionProps> = ({
   sustainabilityValue,
   sustainabilityCaption,
   heroLoading = false,
+  transitionNames,
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
@@ -70,6 +76,7 @@ const HeroOverviewSection: React.FC<HeroOverviewSectionProps> = ({
           ? "linear-gradient(135deg, rgba(16, 40, 28, 0.98) 0%, rgba(12, 32, 22, 0.96) 55%, rgba(14, 36, 26, 0.94) 100%)"
           : "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(244,238,226,0.96) 55%, rgba(231, 244, 235, 0.94) 100%)",
         boxShadow: isDark ? "0 12px 22px rgba(0,0,0,0.22)" : "0 12px 22px rgba(20, 40, 24, 0.08)",
+        viewTransitionName: transitionNames?.shell || "none",
       }}
     >
       <Box
@@ -98,11 +105,19 @@ const HeroOverviewSection: React.FC<HeroOverviewSectionProps> = ({
                 lineHeight: 1.08,
                 fontFamily: "var(--app-heading-font), var(--app-body-font), serif",
                 letterSpacing: 0.2,
+                viewTransitionName: transitionNames?.title || "none",
               }}
             >
               {t("dashboard_page.hero.title")}
             </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 560 }}>
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{
+                maxWidth: 560,
+                viewTransitionName: transitionNames?.subtitle || "none",
+              }}
+            >
               {t("dashboard_page.hero.description")}
             </Typography>
             <Stack direction="row" spacing={spacingScale.sm} flexWrap="wrap">

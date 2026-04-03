@@ -453,6 +453,12 @@ const AdvisoryPage: React.FC = () => {
           subtitle={copy.runtimeSubtitle}
           badges={heroBadges}
           imageSrc="/assets/agri-slider/slide-04.png"
+          transitionNames={{
+            shell: "page-hero-shell",
+            title: "page-hero-title",
+            subtitle: "page-hero-subtitle",
+            media: "page-hero-media",
+          }}
         />
 
         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>

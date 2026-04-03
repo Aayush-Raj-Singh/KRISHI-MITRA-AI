@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import AppLayout from "../components/common/AppLayout";
 import AgricultureHero from "../components/common/AgricultureHero";
 import { useTranslatedStrings } from "../utils/useTranslatedStrings";
+import { runViewTransition } from "../utils/viewTransitions";
 import { MandiPriceContent } from "./MandiPricePage";
 import { PriceArrivalDashboardContent } from "./PriceArrivalDashboardPage";
 import { TrendAnalyticsContent } from "./TrendAnalyticsPage";
@@ -70,8 +71,10 @@ const MarketIntelligencePage: React.FC = () => {
   }, [tabFromQuery, tabs, activeTab]);
 
   const handleTabChange = (_event: React.SyntheticEvent, value: string) => {
-    setActiveTab(value);
-    setSearchParams({ tab: value });
+    runViewTransition(() => {
+      setActiveTab(value);
+      setSearchParams({ tab: value });
+    });
   };
 
   const activeContent = tabs.find((tab) => tab.id === activeTab)?.content || tabs[0]?.content;
@@ -93,6 +96,12 @@ const MarketIntelligencePage: React.FC = () => {
             copy.badgeAlertMonitoring,
           ]}
           imageSrc="/assets/agri-slider/slide-07.jpg"
+          transitionNames={{
+            shell: "page-hero-shell",
+            title: "page-hero-title",
+            subtitle: "page-hero-subtitle",
+            media: "page-hero-media",
+          }}
         />
 
         <Paper

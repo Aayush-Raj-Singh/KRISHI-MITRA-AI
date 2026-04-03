@@ -10,6 +10,7 @@ interface HeroCarouselSectionProps {
   onScroll: () => void;
   onPrev: () => void;
   onNext: () => void;
+  mediaTransitionName?: string;
 }
 
 const HeroCarouselSection: React.FC<HeroCarouselSectionProps> = ({
@@ -19,6 +20,7 @@ const HeroCarouselSection: React.FC<HeroCarouselSectionProps> = ({
   onScroll,
   onPrev,
   onNext,
+  mediaTransitionName,
 }) => (
   <Paper
     className="dashboard-hero-carousel"
@@ -33,6 +35,7 @@ const HeroCarouselSection: React.FC<HeroCarouselSectionProps> = ({
       contain: "layout paint style",
       breakInside: "avoid",
       pageBreakInside: "avoid",
+      viewTransitionName: mediaTransitionName || "none",
     }}
   >
     <Box

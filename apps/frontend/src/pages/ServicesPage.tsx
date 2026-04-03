@@ -27,6 +27,7 @@ import { useTranslation } from "react-i18next";
 
 import AppLayout from "../components/common/AppLayout";
 import AgricultureHero from "../components/common/AgricultureHero";
+import { navigateWithViewTransition } from "../utils/viewTransitions";
 
 const ServicesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -167,6 +168,12 @@ const ServicesPage: React.FC = () => {
             "Portal-grade workflows",
           ]}
           imageSrc="/assets/agri-slider/slide-10.jpg"
+          transitionNames={{
+            shell: "page-hero-shell",
+            title: "page-hero-title",
+            subtitle: "page-hero-subtitle",
+            media: "page-hero-media",
+          }}
         />
 
         <Grid container spacing={2.2}>
@@ -298,7 +305,7 @@ const ServicesPage: React.FC = () => {
                             fullWidth
                             variant="contained"
                             endIcon={<ArrowOutwardIcon />}
-                            onClick={() => navigate(service.path)}
+                            onClick={() => navigateWithViewTransition(navigate, service.path)}
                             sx={{
                               py: 1.1,
                               borderRadius: 2.2,
@@ -350,7 +357,7 @@ const ServicesPage: React.FC = () => {
                         <Button
                           key={item.path}
                           variant="outlined"
-                          onClick={() => navigate(item.path)}
+                          onClick={() => navigateWithViewTransition(navigate, item.path)}
                           endIcon={<ArrowOutwardIcon />}
                           sx={{
                             justifyContent: "space-between",

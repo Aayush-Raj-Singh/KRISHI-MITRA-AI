@@ -23,6 +23,7 @@ import useDashboardData from "./dashboard/hooks/useDashboardData";
 import useDashboardHashScroll from "./dashboard/hooks/useDashboardHashScroll";
 import useDashboardOnboarding from "./dashboard/hooks/useDashboardOnboarding";
 import useDashboardRealtime from "./dashboard/hooks/useDashboardRealtime";
+import { navigateWithViewTransition } from "../utils/viewTransitions";
 import HeroCarouselSection from "./dashboard/sections/HeroCarouselSection";
 import HeroOverviewSection from "./dashboard/sections/HeroOverviewSection";
 const MarketDataSection = React.lazy(() => import("./dashboard/sections/MarketDataSection"));
@@ -202,14 +203,21 @@ const DashboardPage: React.FC = () => {
           onScroll={handleCarouselScroll}
           onPrev={showPrevSlide}
           onNext={showNextSlide}
+          mediaTransitionName="page-hero-media"
         />
 
         <HeroOverviewSection
           t={t}
-          onNavigateCrop={() => navigate("/services/farm-operations?tab=crop")}
-          onNavigatePrice={() => navigate("/services/market-intelligence?tab=price")}
-          onNavigateWater={() => navigate("/services/farm-operations?tab=water")}
-          onNavigateAdvisory={() => navigate("/advisory")}
+          onNavigateCrop={() =>
+            navigateWithViewTransition(navigate, "/services/farm-operations?tab=crop")
+          }
+          onNavigatePrice={() =>
+            navigateWithViewTransition(navigate, "/services/market-intelligence?tab=price")
+          }
+          onNavigateWater={() =>
+            navigateWithViewTransition(navigate, "/services/farm-operations?tab=water")
+          }
+          onNavigateAdvisory={() => navigateWithViewTransition(navigate, "/advisory")}
           onOpenOnboarding={() => setOnboardingOpen(true)}
           onboardingStartLabel={onboardingLabels.startTour}
           wsUrl={wsUrl}
@@ -225,6 +233,11 @@ const DashboardPage: React.FC = () => {
           sustainabilityValue={sustainabilityValue}
           sustainabilityCaption={sustainabilityCaption}
           heroLoading={heroSummaryMutation.isPending && !heroSummary}
+          transitionNames={{
+            shell: "page-hero-shell",
+            title: "page-hero-title",
+            subtitle: "page-hero-subtitle",
+          }}
         />
 
         {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
