@@ -20,6 +20,7 @@ from app.schemas.operations import (
 )
 from app.services.external_data_service import ExternalDataService
 from app.services.geo_hierarchy_service import GeoHierarchyService
+from app.services.ml_runtime_service import MLRuntimeService
 from app.services.state_portal_service import StatePortalService
 
 logger = get_logger(__name__)
@@ -78,13 +79,13 @@ class OperationsService:
         )
 
     async def trigger_quarterly_retrain(
-        self, triggered_by: str, async_mode: bool = True
+        self, triggered_by: str, async_mode: bool = True, force: bool = False
     ) -> TriggerOperationResponse:
         return await self._trigger_operation(
             operation="quarterly_full_retrain",
             task_name="quarterly_full_retrain",
             triggered_by=triggered_by,
-            task=lambda: run_pipeline(db=self._db),
+            task=lambda: run_pipeline(db=self._db, force=force),
             async_mode=async_mode,
         )
 
@@ -216,14 +217,38 @@ class OperationsService:
         triggered_by: str,
         async_mode: bool,
         operation: str,
+        force: bool = False,
     ) -> TriggerOperationResponse:
         return await self._trigger_operation(
             operation=operation,
             task_name=operation,
             triggered_by=triggered_by,
-            task=lambda: run_pipeline(db=self._db),
+            task=lambda: run_pipeline(db=self._db, force=force),
             async_mode=async_mode,
         )
+
+    async def rollback_model_version(
+        self,
+        *,
+        model_key: str,
+        version: str,
+        triggered_by: str,
+    ) -> dict:
+        result = MLRuntimeService().rollback(model_key, version)
+        await self._runs.insert_one(
+            {
+                "operation": "ml_model_rollback",
+                "status": "completed",
+                "triggered_by": triggered_by,
+                "mode": "sync",
+                "triggered_at": datetime.now(timezone.utc),
+                "started_at": datetime.now(timezone.utc),
+                "completed_at": datetime.now(timezone.utc),
+                "result": result,
+                "error": None,
+            }
+        )
+        return result
 
     async def _trigger_operation(
         self,

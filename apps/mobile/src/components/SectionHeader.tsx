@@ -1,6 +1,7 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { colors, spacing, typography } from "../theme";
 
 interface SectionHeaderProps {
@@ -15,19 +16,23 @@ export const SectionHeader = ({
   subtitle,
   actionLabel,
   onPressAction,
-}: SectionHeaderProps) => (
-  <View style={styles.row}>
-    <View style={styles.copy}>
-      <Text style={styles.title}>{title}</Text>
-      {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+}: SectionHeaderProps) => {
+  const copy = useMobileTranslatedContent({ title, subtitle, actionLabel });
+
+  return (
+    <View style={styles.row}>
+      <View style={styles.copy}>
+        <Text style={styles.title}>{copy.title}</Text>
+        {copy.subtitle ? <Text style={styles.subtitle}>{copy.subtitle}</Text> : null}
+      </View>
+      {copy.actionLabel && onPressAction ? (
+        <Pressable onPress={onPressAction}>
+          <Text style={styles.action}>{copy.actionLabel}</Text>
+        </Pressable>
+      ) : null}
     </View>
-    {actionLabel && onPressAction ? (
-      <Pressable onPress={onPressAction}>
-        <Text style={styles.action}>{actionLabel}</Text>
-      </Pressable>
-    ) : null}
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   row: {

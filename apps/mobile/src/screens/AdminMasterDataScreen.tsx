@@ -8,6 +8,7 @@ import { PrimaryButton } from "../components/PrimaryButton";
 import { ScreenShell } from "../components/ScreenShell";
 import { SectionCard } from "../components/SectionCard";
 import { StatBox } from "../components/StatBox";
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { masterDataApi, withRetry } from "../services/api";
 import { useAuthStore } from "../store/authStore";
 import { colors, spacing, typography } from "../theme";
@@ -59,6 +60,16 @@ export const AdminMasterDataScreen = () => {
     );
   }
 
+  const copy = useMobileTranslatedContent({
+    loadError: "Unable to load master data.",
+    saveError: "Unable to save the master data record.",
+    noRecords: "No records found for this catalog.",
+    active: "Active",
+    inactive: "Inactive",
+    record: "Record",
+  });
+  const translatedNotice = useMobileTranslatedContent({ notice: notice || "" }).notice;
+
   const loadAll = async () => {
     setLoading(true);
     setNotice(null);
@@ -73,7 +84,7 @@ export const AdminMasterDataScreen = () => {
       ]);
       setDatasets({ commodities, varieties, grades, units, seasons, msp });
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Unable to load master data.");
+      setNotice(error instanceof Error ? error.message : copy.loadError);
     } finally {
       setLoading(false);
     }
@@ -173,7 +184,7 @@ export const AdminMasterDataScreen = () => {
       }
       await loadAll();
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Unable to save the master data record.");
+      setNotice(error instanceof Error ? error.message : copy.saveError);
       setLoading(false);
     }
   };
@@ -364,7 +375,7 @@ export const AdminMasterDataScreen = () => {
           onPress={() => void submitActiveForm()}
         />
         <PrimaryButton label="Refresh catalogs" onPress={() => void loadAll()} tone="secondary" />
-        {notice ? <Text style={styles.notice}>{notice}</Text> : null}
+        {notice ? <Text style={styles.notice}>{translatedNotice}</Text> : null}
       </SectionCard>
 
       <SectionCard
@@ -372,17 +383,17 @@ export const AdminMasterDataScreen = () => {
         subtitle="The list below mirrors the web master-data table in compact mobile cards."
       >
         {activeRows.length === 0 && !loading ? (
-          <Text style={styles.empty}>No records found for this catalog.</Text>
+          <Text style={styles.empty}>{copy.noRecords}</Text>
         ) : null}
         {activeRows.slice(0, 40).map((row, index) => (
           <View key={String(row._id || row.id || row.name || index)} style={styles.row}>
             <Text style={styles.title}>
-              {row.name || row.season || row.market || row.commodity_id || "Record"}
+              {row.name || row.season || row.market || row.commodity_id || copy.record}
             </Text>
             <Text style={styles.meta}>
               {row.code || row.symbol || row.price_per_quintal || "-"}
             </Text>
-            <Text style={styles.meta}>{row.active === false ? "Inactive" : "Active"}</Text>
+            <Text style={styles.meta}>{row.active === false ? copy.inactive : copy.active}</Text>
           </View>
         ))}
       </SectionCard>

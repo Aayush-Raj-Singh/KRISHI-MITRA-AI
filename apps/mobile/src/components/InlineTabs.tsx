@@ -1,6 +1,7 @@
 import React from "react";
 import { Pressable, ScrollView, StyleSheet, Text } from "react-native";
 
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { colors, radius, spacing, typography } from "../theme";
 
 export interface InlineTabItem {
@@ -14,22 +15,26 @@ interface InlineTabsProps {
   onChange: (key: string) => void;
 }
 
-export const InlineTabs = ({ activeKey, items, onChange }: InlineTabsProps) => (
-  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
-    {items.map((item) => {
-      const active = item.key === activeKey;
-      return (
-        <Pressable
-          key={item.key}
-          onPress={() => onChange(item.key)}
-          style={[styles.tab, active ? styles.activeTab : null]}
-        >
-          <Text style={[styles.label, active ? styles.activeLabel : null]}>{item.label}</Text>
-        </Pressable>
-      );
-    })}
-  </ScrollView>
-);
+export const InlineTabs = ({ activeKey, items, onChange }: InlineTabsProps) => {
+  const translatedItems = useMobileTranslatedContent(items, { ignoreKeys: ["key"] });
+
+  return (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
+      {translatedItems.map((item) => {
+        const active = item.key === activeKey;
+        return (
+          <Pressable
+            key={item.key}
+            onPress={() => onChange(item.key)}
+            style={[styles.tab, active ? styles.activeTab : null]}
+          >
+            <Text style={[styles.label, active ? styles.activeLabel : null]}>{item.label}</Text>
+          </Pressable>
+        );
+      })}
+    </ScrollView>
+  );
+};
 
 const styles = StyleSheet.create({
   row: {

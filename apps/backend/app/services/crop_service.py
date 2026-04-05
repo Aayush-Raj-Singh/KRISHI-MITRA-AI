@@ -2,13 +2,23 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from time import perf_counter
 from typing import Dict, List
 
-import joblib
 import numpy as np
 import pandas as pd
-from ml.training.train_crop_model import FEATURE_COLUMNS, train_crop_model
+from ml.common.feature_engineering import stable_bucket
+from ml.crop.model import (
+    REQUEST_FEATURE_COLUMNS,
+    build_feature_row,
+    explanation_from_feature_values,
+    predict_proba,
+)
+from ml.monitoring.metrics_logger import log_inference_metrics
+from ml.crop.predict import clear_crop_bundle_cache, load_or_train_crop_bundle
+from ml.crop.train import train_crop_model
 
+from app.data.india_state_registry import INDIA_STATE_REGISTRY
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.schemas.recommendations import CropRecommendationItem, CropRecommendationRequest
@@ -19,34 +29,21 @@ logger = get_logger(__name__)
 @dataclass
 class CropModelBundle:
     model: object
+    models: Dict[str, object]
+    model_weights: Dict[str, float]
     feature_columns: List[str]
     feature_medians: Dict[str, float]
     version: str
+    regional_priors: Dict[str, Dict[str, float]]
 
 
 class CropRecommender:
     def __init__(self) -> None:
         self._artifact_path = settings.crop_model_artifact_resolved_path
-        self._legacy_artifact_path = settings.crop_model_legacy_artifact_path
         self._bundle = self._load_or_train()
 
-    @staticmethod
-    def _season_index(season: str | None) -> float:
-        if not season:
-            return 0.0
-        season_map = {"kharif": 1.0, "rabi": 2.0, "zaid": 3.0}
-        return season_map.get(season.strip().lower(), 0.0)
-
-    @staticmethod
-    def _location_score(location: str) -> float:
-        return (sum(ord(char) for char in (location or "")) % 1000) / 1000.0
-
     def _load_or_train(self) -> CropModelBundle:
-        artifact_path = self._artifact_path
-        if not artifact_path.exists() and self._legacy_artifact_path.exists():
-            artifact_path = self._legacy_artifact_path
-
-        if not artifact_path.exists():
+        if not self._artifact_path.exists():
             self._artifact_path.parent.mkdir(parents=True, exist_ok=True)
             logger.info("crop_model_missing_training_started", artifact=str(self._artifact_path))
             metadata = train_crop_model(model_path=self._artifact_path)
@@ -55,87 +52,42 @@ class CropRecommender:
                 version=metadata["version"],
                 accuracy=metadata["accuracy"],
             )
-            artifact_path = self._artifact_path
+            clear_crop_bundle_cache()
 
-        payload = joblib.load(artifact_path)
+        payload = load_or_train_crop_bundle()
         return CropModelBundle(
-            model=payload["model"],
-            feature_columns=list(payload["feature_columns"]),
-            feature_medians={
-                key: float(value) for key, value in payload["feature_medians"].items()
-            },
-            version=str(payload.get("version", "rf-crop-v1")),
+            model=payload.model,
+            models=dict(payload.models),
+            model_weights=dict(payload.model_weights),
+            feature_columns=list(payload.feature_columns),
+            feature_medians=dict(payload.feature_medians),
+            version=str(payload.version),
+            regional_priors=dict(payload.regional_priors),
         )
 
-    def _feature_row(self, request: CropRecommendationRequest) -> pd.DataFrame:
-        historical_yield = request.historical_yield if request.historical_yield is not None else 0.0
-        if 0 < historical_yield < 50:
-            historical_yield = historical_yield * 1000
-        feature_map = {
-            "soil_n": request.soil_n,
-            "soil_p": request.soil_p,
-            "soil_k": request.soil_k,
-            "soil_ph": request.soil_ph,
-            "temperature_c": request.temperature_c,
-            "humidity_pct": request.humidity_pct,
-            "rainfall_mm": request.rainfall_mm,
-            "season_index": self._season_index(request.season),
-            "location_score": self._location_score(request.location),
-            "historical_yield": historical_yield,
-        }
-        values = [
-            float(feature_map.get(column, self._bundle.feature_medians.get(column, 0.0)))
-            for column in FEATURE_COLUMNS
-        ]
-        return pd.DataFrame([values], columns=FEATURE_COLUMNS)
+    def _feature_row(
+        self,
+        request: CropRecommendationRequest,
+        location_context: Dict[str, object] | None = None,
+    ) -> pd.DataFrame:
+        weather_history = None
+        if location_context:
+            weather_history = location_context.get("weather_history")
+        return build_feature_row(request, weather_history=weather_history)
 
     def _explanation(self, feature_values: pd.DataFrame) -> str:
-        model = self._bundle.model
-        importances = np.array(
-            getattr(model, "feature_importances_", np.zeros(len(FEATURE_COLUMNS))), dtype=float
-        )
-        medians = np.array(
-            [self._bundle.feature_medians.get(name, 0.0) for name in FEATURE_COLUMNS], dtype=float
-        )
-        point = feature_values.iloc[0].to_numpy(dtype=float)
-        delta = np.abs(point - medians) / (np.abs(medians) + 1.0)
-        contribution = importances * delta
-        top_indices = np.argsort(contribution)[::-1][:3]
-
-        phrases: List[str] = []
-        for idx in top_indices:
-            name = FEATURE_COLUMNS[int(idx)]
-            value = point[int(idx)]
-            median = medians[int(idx)]
-            direction = "higher" if value > median else "lower"
-            label_map = {
-                "soil_n": "soil nitrogen",
-                "soil_p": "soil phosphorus",
-                "soil_k": "soil potassium",
-                "soil_ph": "soil pH",
-                "temperature_c": "temperature",
-                "humidity_pct": "humidity",
-                "rainfall_mm": "rainfall",
-                "season_index": "seasonal pattern",
-                "location_score": "location suitability",
-                "historical_yield": "historical yield",
-            }
-            phrases.append(f"{label_map.get(name, name)} is {direction} than baseline")
-
-        return "Key drivers: " + "; ".join(phrases) + "."
+        return explanation_from_feature_values(load_or_train_crop_bundle(), feature_values)
 
     def _apply_personalization(
         self,
         labels: List[str],
         probabilities: np.ndarray,
         personalization_context: Dict[str, object] | None = None,
+        request: CropRecommendationRequest | None = None,
     ) -> np.ndarray:
-        if not personalization_context:
-            return probabilities
-
         adjusted = probabilities.astype(float).copy()
-        preferred = personalization_context.get("preferred_crops", {}) or {}
-        seasonal = personalization_context.get("seasonal_preference", {}) or {}
+        preferred = (personalization_context or {}).get("preferred_crops", {}) or {}
+        seasonal = (personalization_context or {}).get("seasonal_preference", {}) or {}
 
         if isinstance(preferred, dict):
             for idx, label in enumerate(labels):
@@ -151,32 +103,83 @@ class CropRecommender:
                 if weight > 0:
                     adjusted[idx] *= 1 + min(weight, 0.8) * 0.25
 
+        if request:
+            regional_bias = self._regional_bias(labels, request)
+            for idx, label in enumerate(labels):
+                adjusted[idx] *= 1 + regional_bias.get(label.strip().lower(), 0.0)
+
         total = float(np.sum(adjusted))
         if total <= 0:
             return probabilities
         return adjusted / total
 
+    def _regional_bias(
+        self,
+        labels: List[str],
+        request: CropRecommendationRequest,
+    ) -> Dict[str, float]:
+        location_label = (request.location or "").strip().lower()
+        regional_bias: Dict[str, float] = {}
+        if location_label:
+            for state in INDIA_STATE_REGISTRY:
+                state_name = str(state.get("name", "")).strip().lower()
+                if state_name and state_name in location_label:
+                    focus_crops = {
+                        str(item).strip().lower() for item in state.get("focus_crops", [])
+                    }
+                    for label in labels:
+                        key = label.strip().lower()
+                        if key in focus_crops:
+                            regional_bias[key] = regional_bias.get(key, 0.0) + 0.12
+                    break
+
+        request_frame = self._feature_row(request)
+        region_cluster = str(
+            int(float(request_frame.iloc[0].get("region_cluster", stable_bucket(location_label))))
+        )
+        for label, score in self._bundle.regional_priors.get(region_cluster, {}).items():
+            key = label.strip().lower()
+            regional_bias[key] = regional_bias.get(key, 0.0) + min(float(score), 0.25)
+        return regional_bias
+
+    def recommend_many(
+        self,
+        requests: List[CropRecommendationRequest],
+        personalization_contexts: List[Dict[str, object] | None] | None = None,
+    ) -> List[Dict[str, object]]:
+        contexts = personalization_contexts or [None] * len(requests)
+        return [
+            self.recommend(request, personalization_context=context)
+            for request, context in zip(requests, contexts)
+        ]
+
     def recommend(
         self,
         request: CropRecommendationRequest,
         personalization_context: Dict[str, object] | None = None,
+        location_context: Dict[str, object] | None = None,
     ) -> Dict[str, object]:
+        started_at = perf_counter()
         if personalization_context:
             hint = personalization_context.get("historical_yield_hint")
             if request.historical_yield is None and isinstance(hint, (float, int)) and hint > 0:
                 request = request.model_copy(update={"historical_yield": float(hint)})
 
-        feature_values = self._feature_row(request)
+        feature_values = self._feature_row(request, location_context=location_context)
         model = self._bundle.model
         if hasattr(model, "n_jobs"):
             setattr(model, "n_jobs", 1)
 
-        probabilities = model.predict_proba(feature_values)[0]
-        labels = [str(item) for item in model.classes_]
+        model_frame = feature_values[
+            [column for column in REQUEST_FEATURE_COLUMNS if column in self._bundle.feature_columns]
+        ]
+        probabilities = predict_proba(load_or_train_crop_bundle(), model_frame)
+        labels = [str(item) for item in load_or_train_crop_bundle().classes]
         adjusted_probabilities = self._apply_personalization(
             labels=labels,
             probabilities=probabilities,
             personalization_context=personalization_context,
+            request=request,
         )
         top_indices = np.argsort(adjusted_probabilities)[::-1][:3]
         explanation = self._explanation(feature_values)
@@ -185,6 +188,10 @@ class CropRecommender:
             or personalization_context.get("seasonal_preference")
         ):
             explanation = f"{explanation} Personalized using your historical outcomes and seasonal success trends."
+        if request.location:
+            explanation = (
+                f"{explanation} Regional crop patterns for {request.location} were also considered."
+            )
 
         recommendations = [
             CropRecommendationItem(
@@ -195,6 +202,12 @@ class CropRecommender:
             for idx in top_indices
         ]
 
+        log_inference_metrics(
+            "crop",
+            latency_ms=(perf_counter() - started_at) * 1000,
+            batch_size=1,
+            success=True,
+        )
         logger.info("crop_recommendation_generated", model_version=self._bundle.version)
         return {
             "recommendations": recommendations,

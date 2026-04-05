@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 import base64
+from time import perf_counter
 from typing import List, Tuple
 
 from app.core.logging import get_logger
 from app.data.disease_catalog import get_disease_info
-from app.ml.disease_model import DiseasePredictor
 from app.schemas.disease import DiseasePredictionResponse
 from app.services.llm_factory import get_llm_service
+from ml.monitoring.metrics_logger import log_inference_metrics
+from ml.disease import DiseasePredictor
 
 logger = get_logger(__name__)
 
@@ -89,6 +91,7 @@ class DiseaseDetectionService:
             return f"Based on detected {disease} on {crop}, follow treatment and prevention steps provided."
 
     def predict(self, image_bytes: bytes) -> DiseasePredictionResponse:
+        started_at = perf_counter()
         prediction = self._predictor.predict(image_bytes)
         info = get_disease_info(prediction.crop, prediction.disease)
         severity = self._severity_from_confidence(prediction.confidence)
@@ -112,3 +115,10 @@ class DiseaseDetectionService:
             advisory=advisory,
             clarifying_questions=clarifying_questions,
         )
+        log_inference_metrics(
+            "disease",
+            latency_ms=(perf_counter() - started_at) * 1000,
+            batch_size=1,
+            success=True,
+        )
+        return response

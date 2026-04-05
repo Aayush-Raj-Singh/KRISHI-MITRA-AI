@@ -9,6 +9,7 @@ import { PrimaryButton } from "../components/PrimaryButton";
 import { ScreenShell } from "../components/ScreenShell";
 import { SectionCard } from "../components/SectionCard";
 import { loginShowcasePoints } from "../data/appContent";
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { useAuthStore } from "../store/authStore";
 import { colors, typography } from "../theme";
 
@@ -23,15 +24,25 @@ export const LoginScreen = () => {
   const [error, setError] = useState<string | null>(null);
   const normalizedPhone = phone.replace(/\D/g, "").slice(0, 10);
   const canSubmit = normalizedPhone.length === 10 && password.length >= 8 && !loading;
+  const copy = useMobileTranslatedContent({
+    phoneDigits: "Phone number must be 10 digits.",
+    passwordMin: "Password must be at least 8 characters.",
+    fallbackError: "Unable to sign in right now.",
+    helper:
+      "Enter a 10-digit phone number and a password with at least 8 characters.",
+    resetPassword: "Reset password",
+    createAccount: "Create an account",
+  });
+  const translatedError = useMobileTranslatedContent({ error: error || "" }).error;
 
   const handleLogin = async () => {
     setError(null);
     if (normalizedPhone.length !== 10) {
-      setError("Phone number must be 10 digits.");
+      setError(copy.phoneDigits);
       return;
     }
     if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
+      setError(copy.passwordMin);
       return;
     }
     setLoading(true);
@@ -42,9 +53,7 @@ export const LoginScreen = () => {
       const profile = await authApi.getCurrentUser();
       setUser(profile);
     } catch (requestError) {
-      setError(
-        requestError instanceof Error ? requestError.message : "Unable to sign in right now.",
-      );
+      setError(requestError instanceof Error ? requestError.message : copy.fallbackError);
     } finally {
       setLoading(false);
     }
@@ -87,15 +96,13 @@ export const LoginScreen = () => {
 
         {error ? (
           <View style={styles.errorBanner}>
-            <Text style={styles.errorText}>{error}</Text>
+            <Text style={styles.errorText}>{translatedError}</Text>
           </View>
         ) : null}
 
         {!error && !canSubmit ? (
           <View style={styles.helperBanner}>
-            <Text style={styles.helperText}>
-              Enter a 10-digit phone number and a password with at least 8 characters.
-            </Text>
+            <Text style={styles.helperText}>{copy.helper}</Text>
           </View>
         ) : null}
 
@@ -106,7 +113,7 @@ export const LoginScreen = () => {
           disabled={!canSubmit}
         />
         <Pressable onPress={() => navigation.navigate("ResetPassword")}>
-          <Text style={styles.linkText}>Reset password</Text>
+          <Text style={styles.linkText}>{copy.resetPassword}</Text>
         </Pressable>
       </SectionCard>
 
@@ -115,7 +122,7 @@ export const LoginScreen = () => {
         subtitle="Create a farmer, officer, or admin account without leaving mobile."
       >
         <Pressable onPress={() => navigation.navigate("Register")}>
-          <Text style={styles.linkText}>Create an account</Text>
+          <Text style={styles.linkText}>{copy.createAccount}</Text>
         </Pressable>
       </SectionCard>
     </ScreenShell>

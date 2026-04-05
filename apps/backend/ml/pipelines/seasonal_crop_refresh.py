@@ -3,11 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 from datetime import datetime, timezone
-from pathlib import Path
-
-import pandas as pd
-
-from ml.training.train_crop_model import train_crop_model
+from ml.crop.train import train_crop_model
 
 
 def _current_season() -> str:
@@ -20,30 +16,12 @@ def _current_season() -> str:
 
 
 def run_seasonal_refresh(season: str | None = None) -> dict:
-    root = Path(__file__).resolve().parents[2]
     season_key = (season or _current_season()).strip().lower()
-    csv_path = root / "ml" / "crop_model" / "crop_training_data.csv"
-    seasonal_csv = root / "ml" / "crop_model" / f"crop_training_data_{season_key}.csv"
-
-    if csv_path.exists():
-        frame = pd.read_csv(csv_path)
-        if "season" in frame.columns:
-            seasonal_frame = frame[frame["season"].astype(str).str.lower() == season_key]
-            if len(seasonal_frame) >= 120:
-                seasonal_frame.to_csv(seasonal_csv, index=False)
-                train_input = seasonal_csv
-            else:
-                train_input = csv_path
-        else:
-            train_input = csv_path
-    else:
-        train_input = csv_path
-
-    metadata = train_crop_model(csv_path=train_input)
+    metadata = train_crop_model(force_refresh_dataset=False)
     metadata.update(
         {
             "season_refresh": season_key,
-            "dataset_used": str(train_input),
+            "dataset_used": "dynamic remote crop dataset",
             "refreshed_at": datetime.now(timezone.utc).isoformat(),
         }
     )

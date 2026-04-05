@@ -7,6 +7,7 @@ import { FieldInput } from "../components/FieldInput";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { ScreenShell } from "../components/ScreenShell";
 import { SectionCard } from "../components/SectionCard";
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { authApi } from "../services/api";
 import { colors, spacing, typography } from "../theme";
 
@@ -31,17 +32,23 @@ export const ResetPasswordScreen = () => {
   const [notice, setNotice] = useState<string | null>(null);
   const [loadingRequest, setLoadingRequest] = useState(false);
   const [loadingConfirm, setLoadingConfirm] = useState(false);
+  const copy = useMobileTranslatedContent({
+    codeSent: "Recovery code sent. Check your selected channel and continue below.",
+    requestError: "Unable to send a recovery code right now.",
+    passwordUpdated: "Password updated. You can now return to sign in.",
+    updateError: "Unable to update the password right now.",
+    backToSignIn: "Back to sign in",
+  });
+  const translatedNotice = useMobileTranslatedContent({ notice: notice || "" }).notice;
 
   const requestCode = async () => {
     setLoadingRequest(true);
     setNotice(null);
     try {
       await authApi.requestPasswordReset({ phone, channel });
-      setNotice("Recovery code sent. Check your selected channel and continue below.");
+      setNotice(copy.codeSent);
     } catch (error) {
-      setNotice(
-        error instanceof Error ? error.message : "Unable to send a recovery code right now.",
-      );
+      setNotice(error instanceof Error ? error.message : copy.requestError);
     } finally {
       setLoadingRequest(false);
     }
@@ -52,11 +59,9 @@ export const ResetPasswordScreen = () => {
     setNotice(null);
     try {
       await authApi.confirmPasswordReset({ phone, otp, new_password: newPassword });
-      setNotice("Password updated. You can now return to sign in.");
+      setNotice(copy.passwordUpdated);
     } catch (error) {
-      setNotice(
-        error instanceof Error ? error.message : "Unable to update the password right now.",
-      );
+      setNotice(error instanceof Error ? error.message : copy.updateError);
     } finally {
       setLoadingConfirm(false);
     }
@@ -97,7 +102,7 @@ export const ResetPasswordScreen = () => {
         />
         {notice ? (
           <View style={styles.banner}>
-            <Text style={styles.bannerText}>{notice}</Text>
+            <Text style={styles.bannerText}>{translatedNotice}</Text>
           </View>
         ) : null}
         <PrimaryButton
@@ -123,7 +128,7 @@ export const ResetPasswordScreen = () => {
           disabled={!phone || !otp || !newPassword}
         />
         <Pressable onPress={() => navigation.goBack()}>
-          <Text style={styles.link}>Back to sign in</Text>
+          <Text style={styles.link}>{copy.backToSignIn}</Text>
         </Pressable>
       </SectionCard>
     </ScreenShell>

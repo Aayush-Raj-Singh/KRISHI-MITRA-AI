@@ -2,6 +2,7 @@ import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
 
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { colors, radius, shadows, spacing, typography } from "../theme";
 
 interface AuthShowcasePoint {
@@ -15,25 +16,34 @@ interface AuthShowcaseCardProps {
   points: AuthShowcasePoint[];
 }
 
-export const AuthShowcaseCard = ({ title, subtitle, points }: AuthShowcaseCardProps) => (
-  <View style={styles.card}>
-    <View style={styles.mediaPanel}>
-      <Text style={styles.mediaEyebrow}>KrishiMitra Portal</Text>
-      <Text style={styles.mediaTitle}>{title}</Text>
-      <Text style={styles.mediaSubtitle}>{subtitle}</Text>
-    </View>
-    <View style={styles.pointsCard}>
-      {points.map((point) => (
-        <View key={point.text} style={styles.pointRow}>
-          <View style={styles.pointIcon}>
-            <MaterialIcons color={colors.primary} name={point.icon} size={16} />
+export const AuthShowcaseCard = ({ title, subtitle, points }: AuthShowcaseCardProps) => {
+  const copy = useMobileTranslatedContent({
+    eyebrow: "KrishiMitra Portal",
+    title,
+    subtitle,
+    points,
+  }, { ignoreKeys: ["icon"] });
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.mediaPanel}>
+        <Text style={styles.mediaEyebrow}>{copy.eyebrow}</Text>
+        <Text style={styles.mediaTitle}>{copy.title}</Text>
+        <Text style={styles.mediaSubtitle}>{copy.subtitle}</Text>
+      </View>
+      <View style={styles.pointsCard}>
+        {copy.points.map((point) => (
+          <View key={point.text} style={styles.pointRow}>
+            <View style={styles.pointIcon}>
+              <MaterialIcons color={colors.primary} name={point.icon} size={16} />
+            </View>
+            <Text style={styles.pointText}>{point.text}</Text>
           </View>
-          <Text style={styles.pointText}>{point.text}</Text>
-        </View>
-      ))}
+        ))}
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   card: {

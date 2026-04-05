@@ -148,6 +148,12 @@ class KnowledgeBaseRetriever:
             )
         return results
 
+    def _tfidf_scores(self, query: str) -> np.ndarray:
+        if self._tfidf_vectorizer is None or self._tfidf_matrix is None:
+            return np.zeros(len(self._chunks), dtype=float)
+        query_vector = self._tfidf_vectorizer.transform([query])
+        return (self._tfidf_matrix @ query_vector.T).toarray().flatten()
+
     def _rank_with_semantic(self, query: str, top_k: int) -> List[RetrievedDocument]:
         if not self._ensure_semantic_model():
             return []
@@ -162,6 +168,49 @@ class KnowledgeBaseRetriever:
         for idx in top_indices:
             score = float(similarities[int(idx)])
             if score <= 0.18:
+                continue
+            chunk = self._chunks[int(idx)]
+            results.append(
+                RetrievedDocument(
+                    name=chunk.name,
+                    reference=chunk.reference,
+                    text=chunk.text,
+                    score=round(score, 4),
+                )
+            )
+        return results
+
+    def _semantic_scores(self, query: str) -> np.ndarray:
+        if not self._ensure_semantic_model():
+            return np.zeros(len(self._chunks), dtype=float)
+        query_embedding = self._semantic_model.encode(
+            [query], convert_to_numpy=True, normalize_embeddings=True
+        )
+        return cosine_similarity(self._semantic_matrix, query_embedding).flatten()
+
+    def _rank_hybrid(self, query: str, top_k: int) -> List[RetrievedDocument]:
+        if not self._chunks:
+            return []
+        tfidf_scores = self._tfidf_scores(query)
+        semantic_scores = self._semantic_scores(query)
+        if tfidf_scores.size == 0 and semantic_scores.size == 0:
+            return []
+
+        def normalize(values: np.ndarray) -> np.ndarray:
+            if values.size == 0:
+                return values
+            max_value = float(np.max(values))
+            min_value = float(np.min(values))
+            if abs(max_value - min_value) < 1e-9:
+                return np.zeros_like(values, dtype=float)
+            return (values - min_value) / (max_value - min_value)
+
+        hybrid = (0.42 * normalize(tfidf_scores)) + (0.58 * normalize(semantic_scores))
+        top_indices = np.argsort(hybrid)[::-1][:top_k]
+        results: List[RetrievedDocument] = []
+        for idx in top_indices:
+            score = float(hybrid[int(idx)])
+            if score <= 0.08:
                 continue
             chunk = self._chunks[int(idx)]
             results.append(
@@ -194,7 +243,12 @@ class KnowledgeBaseRetriever:
             return self._retrieve_opensearch_stub(query, top_k=top_k)
         if backend == "local_tfidf":
             return self._rank_with_tfidf(query, top_k)
+        if backend == "local_hybrid":
+            return self._rank_hybrid(query, top_k)
 
+        hybrid_results = self._rank_hybrid(query, top_k)
+        if hybrid_results:
+            return hybrid_results
         semantic_results = self._rank_with_semantic(query, top_k)
         if semantic_results:
             return semantic_results

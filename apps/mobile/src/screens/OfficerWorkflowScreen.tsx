@@ -2,16 +2,17 @@ import React, { useEffect, useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { FieldInput } from "../components/FieldInput";
-import { ForbiddenScreen } from "./ForbiddenScreen";
 import { InfoPill } from "../components/InfoPill";
 import { OptionChips } from "../components/OptionChips";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { ScreenShell } from "../components/ScreenShell";
 import { SectionCard } from "../components/SectionCard";
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { marketApi, operationsApi, type MandiEntry, withRetry } from "../services/api";
 import { useAuthStore } from "../store/authStore";
 import { colors, spacing, typography } from "../theme";
 import { buildMandiOptions } from "../utils/mandiOptions";
+import { ForbiddenScreen } from "./ForbiddenScreen";
 
 const uniqueValues = (items: string[]) =>
   Array.from(new Set(items.map((item) => item.trim()).filter(Boolean)));
@@ -44,6 +45,20 @@ export const OfficerWorkflowScreen = () => {
     );
   }
 
+  const copy = useMobileTranslatedContent({
+    loadError: "Unable to load mandi entries.",
+    draftSaved: "Draft mandi entry saved.",
+    createError: "Unable to create the mandi entry.",
+    submitError: "Unable to submit the entry.",
+    approveError: "Unable to approve the entry.",
+    rejectError: "Unable to reject the entry.",
+    noEntries: "No mandi entries yet.",
+    modalLabel: "Modal",
+    arrivalsLabel: "Arrivals",
+    qtl: "qtl",
+  });
+  const translatedNotice = useMobileTranslatedContent({ notice: notice || "" }).notice;
+
   const loadEntries = async () => {
     setLoading(true);
     setNotice(null);
@@ -51,7 +66,7 @@ export const OfficerWorkflowScreen = () => {
       const response = await withRetry(() => operationsApi.getMandiEntries({ limit: 50 }));
       setEntries(response.items);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Unable to load mandi entries.");
+      setNotice(error instanceof Error ? error.message : copy.loadError);
     } finally {
       setLoading(false);
     }
@@ -109,9 +124,9 @@ export const OfficerWorkflowScreen = () => {
         arrivals_qtl: "",
       });
       await loadEntries();
-      setNotice("Draft mandi entry saved.");
+      setNotice(copy.draftSaved);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Unable to create the mandi entry.");
+      setNotice(error instanceof Error ? error.message : copy.createError);
       setLoading(false);
     }
   };
@@ -123,7 +138,7 @@ export const OfficerWorkflowScreen = () => {
       await withRetry(() => operationsApi.submitMandiEntry(entryId));
       await loadEntries();
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Unable to submit the entry.");
+      setNotice(error instanceof Error ? error.message : copy.submitError);
       setLoading(false);
     }
   };
@@ -135,7 +150,7 @@ export const OfficerWorkflowScreen = () => {
       await withRetry(() => operationsApi.approveMandiEntry(entryId));
       await loadEntries();
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Unable to approve the entry.");
+      setNotice(error instanceof Error ? error.message : copy.approveError);
       setLoading(false);
     }
   };
@@ -147,7 +162,7 @@ export const OfficerWorkflowScreen = () => {
       await withRetry(() => operationsApi.rejectMandiEntry(entryId, reviewReason || undefined));
       await loadEntries();
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Unable to reject the entry.");
+      setNotice(error instanceof Error ? error.message : copy.rejectError);
       setLoading(false);
     }
   };
@@ -268,16 +283,14 @@ export const OfficerWorkflowScreen = () => {
           />
         ) : null}
         <PrimaryButton label="Save draft" loading={loading} onPress={() => void handleCreate()} />
-        {notice ? <Text style={styles.notice}>{notice}</Text> : null}
+        {notice ? <Text style={styles.notice}>{translatedNotice}</Text> : null}
       </SectionCard>
 
       <SectionCard
         title="Recent entries"
         subtitle="Draft, submitted, approved, and rejected entries are visible in the same workflow stage order as web."
       >
-        {entries.length === 0 && !loading ? (
-          <Text style={styles.empty}>No mandi entries yet.</Text>
-        ) : null}
+        {entries.length === 0 && !loading ? <Text style={styles.empty}>{copy.noEntries}</Text> : null}
         {entries.map((entry) => (
           <View key={entry._id} style={styles.row}>
             <View style={styles.rowHeader}>
@@ -297,7 +310,8 @@ export const OfficerWorkflowScreen = () => {
               {entry.commodity} • {entry.arrival_date}
             </Text>
             <Text style={styles.meta}>
-              Modal {entry.modal_price} • Arrivals {entry.arrivals_qtl} qtl
+              {copy.modalLabel} {entry.modal_price} • {copy.arrivalsLabel} {entry.arrivals_qtl}{" "}
+              {copy.qtl}
             </Text>
             {entry.status === "draft" ? (
               <PrimaryButton

@@ -75,13 +75,21 @@ def test_run_pipeline_reuses_provided_database_without_closing_global_pool(monke
         nonlocal close_called
         close_called = True
 
-    monkeypatch.setattr(retrain_all, "_root", lambda: tmp_path)
     monkeypatch.setattr(retrain_all, "close_postgres", _fake_close_postgres)
     monkeypatch.setattr(retrain_all, "train_crop_model", lambda: {"status": "ok"})
     monkeypatch.setattr(
         retrain_all,
         "retrain_price_models",
         lambda requested_pairs: {"models": list(requested_pairs), "failures": []},
+    )
+    monkeypatch.setattr(retrain_all, "_should_retrain", lambda *args, **kwargs: (True, "forced"))
+    monkeypatch.setattr(retrain_all, "_load_dashboard", lambda: {"models": {}})
+    monkeypatch.setattr(retrain_all, "_load_pipeline_state", lambda: {"models": {}})
+    monkeypatch.setattr(retrain_all, "_save_pipeline_state", lambda payload: None)
+    monkeypatch.setattr(
+        retrain_all,
+        "load_dataset_manifest",
+        lambda dataset_key: {"active_version": f"{dataset_key}-v1"},
     )
 
     result = asyncio.run(retrain_all.run_pipeline(db=db))

@@ -7,11 +7,16 @@ import { ScreenShell } from "../components/ScreenShell";
 import { SectionCard } from "../components/SectionCard";
 import { SectionHeader } from "../components/SectionHeader";
 import { serviceCatalog } from "../data/appContent";
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { openAppRoute } from "../navigation/routeHelpers";
 import { colors, spacing, typography } from "../theme";
 
 export const ServicesScreen = () => {
   const navigation = useNavigation<any>();
+  const copy = useMobileTranslatedContent({
+    body:
+      "Dashboard summaries, advisory chat, disease scanning, market intelligence, farm operations, feedback, notices, portal access, and profile management all use the same backend flows and response contracts as web.",
+  });
 
   return (
     <ScreenShell
@@ -48,9 +53,7 @@ export const ServicesScreen = () => {
           subtitle="The web navbar becomes bottom tabs plus focused task screens so crop, market, and support actions stay reachable with fewer taps."
         />
         <Text style={styles.copy}>
-          Dashboard summaries, advisory chat, disease scanning, market intelligence, farm
-          operations, feedback, notices, portal access, and profile management all use the same
-          backend flows and response contracts as web.
+          {copy.body}
         </Text>
       </SectionCard>
     </ScreenShell>

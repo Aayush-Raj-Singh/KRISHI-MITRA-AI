@@ -8,6 +8,7 @@ import ForbiddenPage from "./pages/ForbiddenPage";
 import RegisterPage from "./pages/RegisterPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ProtectedRoute from "./components/common/ProtectedRoute";
+import { RuntimeTranslationBoundary } from "./components/common/RuntimeTranslationBoundary";
 import { useAppSelector } from "./store/hooks";
 import {
   AdminMasterDataPageLazy,
@@ -72,8 +73,10 @@ const AppRoutes: React.FC = () => {
   }, []);
 
   return (
-    <Suspense key={routeSignature} fallback={<RouteLoadingFallback />}>
-      <Box key={routeSignature} className="route-transition-shell route-transition-shell--field">
+    <>
+      <RuntimeTranslationBoundary routeSignature={routeSignature} />
+      <Suspense key={routeSignature} fallback={<RouteLoadingFallback />}>
+        <Box key={routeSignature} className="route-transition-shell route-transition-shell--field">
         <Routes>
         <Route path="/" element={<LandingRoute />} />
         <Route path="/login" element={<LoginPage />} />
@@ -136,8 +139,9 @@ const AppRoutes: React.FC = () => {
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </Box>
-    </Suspense>
+        </Box>
+      </Suspense>
+    </>
   );
 };
 

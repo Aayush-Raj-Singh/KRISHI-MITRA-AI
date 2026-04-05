@@ -3,18 +3,29 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { InfoPill } from "../components/InfoPill";
 import { PrimaryButton } from "../components/PrimaryButton";
-import { ForbiddenScreen } from "./ForbiddenScreen";
 import { ScreenShell } from "../components/ScreenShell";
 import { SectionCard } from "../components/SectionCard";
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { operationsApi, type AuditLogRecord, withRetry } from "../services/api";
 import { useAuthStore } from "../store/authStore";
 import { colors, spacing, typography } from "../theme";
+import { ForbiddenScreen } from "./ForbiddenScreen";
 
 export const AuditLogsScreen = () => {
   const role = useAuthStore((state) => state.user?.role);
   const [logs, setLogs] = useState<AuditLogRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState<string | null>(null);
+  const copy = useMobileTranslatedContent({
+    loadError: "Unable to load audit logs.",
+    recordsLoaded: `${logs.length} records loaded`,
+    noRecords: "No audit records available yet.",
+    actorPrefix: "Actor",
+    system: "system",
+    unknown: "unknown",
+    timestampUnavailable: "Timestamp unavailable",
+  });
+  const translatedNotice = useMobileTranslatedContent({ notice: notice || "" }).notice;
 
   if (role !== "admin") {
     return (
@@ -29,7 +40,7 @@ export const AuditLogsScreen = () => {
       const response = await withRetry(() => operationsApi.getAuditLogs({ limit: 200 }));
       setLogs(response);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Unable to load audit logs.");
+      setNotice(error instanceof Error ? error.message : copy.loadError);
     } finally {
       setLoading(false);
     }
@@ -56,27 +67,25 @@ export const AuditLogsScreen = () => {
           loading={loading}
           onPress={() => void loadLogs()}
         />
-        {notice ? <Text style={styles.notice}>{notice}</Text> : null}
-        <InfoPill label={`${logs.length} records loaded`} tone="accent" />
+        {notice ? <Text style={styles.notice}>{translatedNotice}</Text> : null}
+        <InfoPill label={copy.recordsLoaded} tone="accent" />
       </SectionCard>
 
       <SectionCard
         title="Recent events"
         subtitle="Action, entity, actor, role, and timestamp cards mirror the web layout hierarchy."
       >
-        {logs.length === 0 && !loading ? (
-          <Text style={styles.empty}>No audit records available yet.</Text>
-        ) : null}
+        {logs.length === 0 && !loading ? <Text style={styles.empty}>{copy.noRecords}</Text> : null}
         {logs.map((log, index) => (
           <View key={log._id || log.id || `${log.action}-${index}`} style={styles.row}>
             <Text style={styles.title}>
               {log.action} • {log.entity}
             </Text>
             <Text style={styles.meta}>
-              Actor: {log.actor_id || "system"} ({log.actor_role || "unknown"})
+              {copy.actorPrefix}: {log.actor_id || copy.system} ({log.actor_role || copy.unknown})
             </Text>
             <Text style={styles.meta}>
-              {log.ts ? new Date(log.ts).toLocaleString() : "Timestamp unavailable"}
+              {log.ts ? new Date(log.ts).toLocaleString() : copy.timestampUnavailable}
             </Text>
           </View>
         ))}

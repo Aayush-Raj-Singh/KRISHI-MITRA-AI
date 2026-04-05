@@ -2,9 +2,16 @@ import React from "react";
 import { Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { EXTERNAL_PORTALS } from "../data/layoutPortalData";
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { colors, radius, shadows, spacing, typography } from "../theme";
 
 export const AppFooter = () => {
+  const copy = useMobileTranslatedContent({
+    eyebrow: "External Links",
+    title: "Connected public-service network",
+    pill: "Verified links",
+  });
+
   const handleExternal = (url: string) => {
     void Linking.openURL(url).catch(() => undefined);
   };
@@ -13,11 +20,11 @@ export const AppFooter = () => {
     <View style={styles.footerCard}>
       <View style={styles.headerRow}>
         <View style={styles.copy}>
-          <Text style={styles.eyebrow}>External Links</Text>
-          <Text style={styles.title}>Connected public-service network</Text>
+          <Text style={styles.eyebrow}>{copy.eyebrow}</Text>
+          <Text style={styles.title}>{copy.title}</Text>
         </View>
         <View style={styles.livePill}>
-          <Text style={styles.livePillText}>Verified links</Text>
+          <Text style={styles.livePillText}>{copy.pill}</Text>
         </View>
       </View>
       <ScrollView

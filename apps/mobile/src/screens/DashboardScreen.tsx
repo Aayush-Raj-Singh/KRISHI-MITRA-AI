@@ -10,6 +10,7 @@ import { ScreenShell } from "../components/ScreenShell";
 import { SectionCard } from "../components/SectionCard";
 import { StatBox } from "../components/StatBox";
 import { importantLinks, notices, serviceCatalog } from "../data/appContent";
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { openAppRoute } from "../navigation/routeHelpers";
 import { dashboardApi, withRetry } from "../services/api";
 import { syncOfflineQueue } from "../services/offlineSync";
@@ -27,6 +28,20 @@ export const DashboardScreen = () => {
   const [summary, setSummary] = useState<DashboardHeroSummary | null>(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+  const copy = useMobileTranslatedContent({
+    latestActivity: "Latest activity",
+    savedInHistory: "Saved in history",
+    noRecommendations: "No recommendations have been created yet.",
+    role: "Role",
+    location: "Location",
+    notSet: "Not set",
+    primaryCrops: "Primary crops",
+  });
+  const translatedStatus = useMobileTranslatedContent({ status: status || "" }).status;
+  const translatedNotices = useMobileTranslatedContent(notices);
+  const translatedImportantLinks = useMobileTranslatedContent(importantLinks, {
+    ignoreKeys: ["route", "icon"],
+  });
 
   const loadSummary = async () => {
     setLoading(true);
@@ -83,7 +98,7 @@ export const DashboardScreen = () => {
     >
       {status ? (
         <View style={styles.banner}>
-          <Text style={styles.bannerText}>{status}</Text>
+          <Text style={styles.bannerText}>{translatedStatus}</Text>
         </View>
       ) : null}
 
@@ -112,11 +127,13 @@ export const DashboardScreen = () => {
         </View>
 
         <View style={styles.contextBlock}>
-          <Text style={styles.contextTitle}>Latest activity</Text>
+          <Text style={styles.contextTitle}>{copy.latestActivity}</Text>
           <Text style={styles.contextText}>
             {summary?.latest_recommendation_kind
-              ? `${summary.latest_recommendation_kind} | ${summary.latest_recommendation_context || "Saved in history"}`
-              : "No recommendations have been created yet."}
+              ? `${summary.latest_recommendation_kind} | ${
+                  summary.latest_recommendation_context || copy.savedInHistory
+                }`
+              : copy.noRecommendations}
           </Text>
         </View>
       </SectionCard>
@@ -144,13 +161,13 @@ export const DashboardScreen = () => {
         subtitle="Current updates and shortcuts mirrored from the web dashboard."
       >
         <View style={styles.noticeList}>
-          {notices.slice(0, 3).map((notice) => (
+          {translatedNotices.slice(0, 3).map((notice) => (
             <View key={notice.title} style={styles.noticeRow}>
               <Text style={styles.noticeTitle}>{notice.title}</Text>
               <Text style={styles.noticeMeta}>{notice.date}</Text>
             </View>
           ))}
-          {importantLinks.slice(0, 2).map((link) => (
+          {translatedImportantLinks.slice(0, 2).map((link) => (
             <Pressable
               key={link.label}
               onPress={() => openAppRoute(navigation, link.route)}
@@ -167,10 +184,14 @@ export const DashboardScreen = () => {
         title="Farmer profile"
         subtitle="Persisted locally for faster launch and offline continuity."
       >
-        <Text style={styles.profileText}>Role: {user?.role || "farmer"}</Text>
-        <Text style={styles.profileText}>Location: {user?.location || "Not set"}</Text>
         <Text style={styles.profileText}>
-          Primary crops: {user?.primary_crops?.length ? user.primary_crops.join(", ") : "Not set"}
+          {copy.role}: {user?.role || "farmer"}
+        </Text>
+        <Text style={styles.profileText}>
+          {copy.location}: {user?.location || copy.notSet}
+        </Text>
+        <Text style={styles.profileText}>
+          {copy.primaryCrops}: {user?.primary_crops?.length ? user.primary_crops.join(", ") : copy.notSet}
         </Text>
       </SectionCard>
 

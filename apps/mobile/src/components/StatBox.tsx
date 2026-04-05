@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { colors, radius, spacing, typography } from "../theme";
 
 interface StatBoxProps {
@@ -9,13 +10,17 @@ interface StatBoxProps {
   caption?: string;
 }
 
-export const StatBox = ({ label, value, caption }: StatBoxProps) => (
-  <View style={styles.card}>
-    <Text style={styles.label}>{label}</Text>
-    <Text style={styles.value}>{value}</Text>
-    {caption ? <Text style={styles.caption}>{caption}</Text> : null}
-  </View>
-);
+export const StatBox = ({ label, value, caption }: StatBoxProps) => {
+  const copy = useMobileTranslatedContent({ label, caption });
+
+  return (
+    <View style={styles.card}>
+      <Text style={styles.label}>{copy.label}</Text>
+      <Text style={styles.value}>{value}</Text>
+      {copy.caption ? <Text style={styles.caption}>{copy.caption}</Text> : null}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   card: {

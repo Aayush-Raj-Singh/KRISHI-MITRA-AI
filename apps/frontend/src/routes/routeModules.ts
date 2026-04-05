@@ -111,19 +111,20 @@ export const preloadRouteModule = (path: string): Promise<unknown> | undefined =
 export const primeRouteModules = () => {
   const preloadAll = () => {
     void DashboardPageLazy.preload();
-    void PortalPageLazy.preload();
-    void MarketDirectoryPageLazy.preload();
-    void MarketIntelligencePageLazy.preload();
-    void FarmOperationsPageLazy.preload();
-    void HelpdeskPageLazy.preload();
-    void AdvisoryPageLazy.preload();
-    void NoticesPageLazy.preload();
     void ServicesPageLazy.preload();
-    void NationalAgricultureIntelligencePageLazy.preload();
+    void AdvisoryPageLazy.preload();
   };
 
   if (typeof window === "undefined") {
     preloadAll();
+    return;
+  }
+
+  const connection = (window.navigator as Navigator & {
+    connection?: { saveData?: boolean; effectiveType?: string };
+  }).connection;
+
+  if (connection?.saveData || connection?.effectiveType?.includes("2g")) {
     return;
   }
 
@@ -133,5 +134,5 @@ export const primeRouteModules = () => {
     return;
   }
 
-  globalThis.setTimeout(preloadAll, 250);
+  globalThis.setTimeout(preloadAll, 1200);
 };

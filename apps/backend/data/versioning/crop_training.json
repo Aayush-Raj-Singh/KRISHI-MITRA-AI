@@ -1,0 +1,22 @@
+{
+  "dataset": "crop_training",
+  "versions": [
+    {
+      "version": "crop_training-20260404180921-d4d8ae8b13db",
+      "created_at": "2026-04-04T18:09:21.010503+00:00",
+      "dataset_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\data\\processed\\crop\\crop_recommendation.csv",
+      "checksum": "d4d8ae8b13dbf17b3e5ff9e05a6f53ce5057460ee0f05f2009f50595b398ed1c",
+      "row_count": 2200,
+      "incremental": false,
+      "latest_observation": null,
+      "source_ref": "https://raw.githubusercontent.com/nileshely/Crop-Recommendation/main/Crop_Recommendation.csv,https://raw.githubusercontent.com/Ibrahim-Hegazi/Crop-Recomendation-System/main/Crop_recommendation.csv",
+      "metadata": {
+        "mode": "cached"
+      }
+    }
+  ],
+  "active_version": "crop_training-20260404180921-d4d8ae8b13db",
+  "latest_checksum": "d4d8ae8b13dbf17b3e5ff9e05a6f53ce5057460ee0f05f2009f50595b398ed1c",
+  "latest_observation": null,
+  "updated_at": "2026-04-04T18:09:21.010503+00:00"
+}

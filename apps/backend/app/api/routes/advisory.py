@@ -64,7 +64,6 @@ async def advisory_sla_telemetry(
 @router.post("/translate", response_model=APIResponse[TranslationResponse])
 async def translate(
     payload: TranslationRequest,
-    _: UserInDB = Depends(require_roles(["farmer", "extension_officer", "admin"])),
     service: TranslationService = Depends(get_translation_service),
 ) -> APIResponse[TranslationResponse]:
     translations: dict[str, str] = {}

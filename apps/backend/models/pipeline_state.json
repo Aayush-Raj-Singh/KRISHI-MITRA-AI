@@ -1,0 +1,15 @@
+{
+  "models": {
+    "price": {
+      "dataset_version": "price_history-20260404182039-0a1ce5b1659c",
+      "model_version": "2026-04-04T18:42:37.895818+00:00",
+      "updated_at": "2026-04-04T18:42:37.900817+00:00"
+    },
+    "crop": {
+      "dataset_version": "crop_training-20260404180921-d4d8ae8b13db",
+      "model_version": "crop-ensemble-v20260404183359",
+      "updated_at": "2026-04-04T18:34:00.979072+00:00"
+    }
+  },
+  "updated_at": "2026-04-04T18:42:37.900817+00:00"
+}

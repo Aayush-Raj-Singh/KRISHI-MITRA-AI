@@ -4,6 +4,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { HEADER_BADGES } from "../data/layoutPortalData";
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { openAppRoute } from "../navigation/routeHelpers";
 import { useAuthStore } from "../store/authStore";
 import { colors, radius, shadows, spacing, typography } from "../theme";
@@ -107,7 +108,6 @@ export const AppChrome = () => {
   }, [accessToken, primaryNav]);
 
   const activeRoute = route.name;
-  const roleLabel = formatRoleLabel(user?.role);
   const initials = getInitials(user?.name);
   const season = currentSeason();
 
@@ -145,9 +145,49 @@ export const AppChrome = () => {
   const isActive = (routeName: string) =>
     (routeGroups[routeName] || [routeName]).includes(activeRoute);
 
+  const translatedPrimaryNav = useMobileTranslatedContent(primaryNav, {
+    ignoreKeys: ["route", "params"],
+  });
+  const translatedAdminExtras = useMobileTranslatedContent(adminExtras, {
+    ignoreKeys: ["route", "params"],
+  });
+  const translatedServiceNav = useMobileTranslatedContent(serviceNav, {
+    ignoreKeys: ["route", "params"],
+  });
+  const translatedQuickNav = useMobileTranslatedContent(quickNav, {
+    ignoreKeys: ["route", "params"],
+  });
+  const chromeCopy = useMobileTranslatedContent({
+    brandEyebrow: "KrishiMitra Portal",
+    brandTitle: "KrishiMitra AI",
+    brandHeading: "Agriculture Services Portal",
+    brandSubtitle: "Rural decision intelligence powered by AI",
+    metaSeason: "Season",
+    metaStatus: "Status",
+    metaMode: "Mode",
+    metaLight: "Light",
+    statusConnected: "Connected",
+    statusPublic: "Public",
+    guestAccess: "Guest access",
+    tapToSignIn: "Tap to sign in",
+    openFeatureMenu: "Open feature menu",
+    seasonChip: `Season: ${season}`,
+    liveUpdates: "Live updates",
+    guest: "Guest",
+    menu: "Menu",
+    roleTools: "Role tools",
+    services: "Services",
+    logout: "Logout",
+    publicUser: "Public user",
+    roleLabel: formatRoleLabel(user?.role),
+    liveSummaryAuthenticated: `${
+      user?.location || "Field-ready"
+    } | ${formatRoleLabel(user?.role)} workspace | Offline sync ready`,
+    liveSummaryPublic: "Public portal active | Sign in, register, and advisory access available",
+  });
   const liveSummary = accessToken
-    ? `${user?.location || "Field-ready"} | ${roleLabel} workspace | Offline sync ready`
-    : "Public portal active | Sign in, register, and advisory access available";
+    ? chromeCopy.liveSummaryAuthenticated
+    : chromeCopy.liveSummaryPublic;
 
   const handleExternal = (url: string) => {
     void Linking.openURL(url).catch(() => undefined);
@@ -182,27 +222,27 @@ export const AppChrome = () => {
                   style={styles.logo}
                 />
                 <View style={styles.brandCopy}>
-                  <Text style={styles.brandEyebrow}>KrishiMitra Portal</Text>
-                  <Text style={styles.brandTitle}>KrishiMitra AI</Text>
-                  <Text style={styles.brandHeading}>Agriculture Services Portal</Text>
-                  <Text style={styles.brandSubtitle}>
-                    Rural decision intelligence powered by AI
-                  </Text>
+                  <Text style={styles.brandEyebrow}>{chromeCopy.brandEyebrow}</Text>
+                  <Text style={styles.brandTitle}>{chromeCopy.brandTitle}</Text>
+                  <Text style={styles.brandHeading}>{chromeCopy.brandHeading}</Text>
+                  <Text style={styles.brandSubtitle}>{chromeCopy.brandSubtitle}</Text>
                 </View>
               </View>
               <View style={styles.brandDivider} />
               <View style={styles.metaRow}>
                 <View style={styles.metaPill}>
-                  <Text style={styles.metaLabel}>Season</Text>
+                  <Text style={styles.metaLabel}>{chromeCopy.metaSeason}</Text>
                   <Text style={styles.metaValue}>{season}</Text>
                 </View>
                 <View style={styles.metaPill}>
-                  <Text style={styles.metaLabel}>Status</Text>
-                  <Text style={styles.metaValue}>{accessToken ? "Connected" : "Public"}</Text>
+                  <Text style={styles.metaLabel}>{chromeCopy.metaStatus}</Text>
+                  <Text style={styles.metaValue}>
+                    {accessToken ? chromeCopy.statusConnected : chromeCopy.statusPublic}
+                  </Text>
                 </View>
                 <View style={styles.metaPill}>
-                  <Text style={styles.metaLabel}>Mode</Text>
-                  <Text style={styles.metaValue}>Light</Text>
+                  <Text style={styles.metaLabel}>{chromeCopy.metaMode}</Text>
+                  <Text style={styles.metaValue}>{chromeCopy.metaLight}</Text>
                 </View>
               </View>
             </View>
@@ -218,10 +258,10 @@ export const AppChrome = () => {
                 </View>
                 <View style={styles.userCopy}>
                   <Text numberOfLines={1} style={styles.userName}>
-                    {user?.name || "Guest access"}
+                    {user?.name || chromeCopy.guestAccess}
                   </Text>
                   <Text numberOfLines={1} style={styles.userRole}>
-                    {accessToken ? roleLabel : "Tap to sign in"}
+                    {accessToken ? chromeCopy.roleLabel : chromeCopy.tapToSignIn}
                   </Text>
                 </View>
                 <MaterialIcons color={colors.white} name="chevron-right" size={20} />
@@ -257,7 +297,7 @@ export const AppChrome = () => {
         <View style={styles.ribbon}>
           <View style={styles.ribbonTopRow}>
             <Pressable
-              accessibilityLabel="Open feature menu"
+              accessibilityLabel={chromeCopy.openFeatureMenu}
               accessibilityRole="button"
               onPress={() => setMenuOpen(true)}
               style={({ pressed }) => [
@@ -273,7 +313,7 @@ export const AppChrome = () => {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.quickNavRow}
             >
-              {quickNav.map((item) => {
+              {translatedQuickNav.map((item) => {
                 const active = isActive(item.route);
                 return (
                   <Pressable
@@ -306,17 +346,17 @@ export const AppChrome = () => {
 
           <View style={styles.liveRow}>
             <View style={styles.seasonChip}>
-              <Text style={styles.seasonChipText}>Season: {season}</Text>
+              <Text style={styles.seasonChipText}>{chromeCopy.seasonChip}</Text>
             </View>
             <View style={styles.liveCard}>
               <View style={styles.liveHeaderRow}>
                 <View style={styles.liveTitleRow}>
                   <View style={styles.liveDot} />
-                  <Text style={styles.liveTitle}>Live updates</Text>
+                  <Text style={styles.liveTitle}>{chromeCopy.liveUpdates}</Text>
                 </View>
                 <View style={styles.liveStatusChip}>
                   <Text style={styles.liveStatusChipText}>
-                    {accessToken ? "Connected" : "Guest"}
+                    {accessToken ? chromeCopy.statusConnected : chromeCopy.guest}
                   </Text>
                 </View>
               </View>
@@ -346,10 +386,10 @@ export const AppChrome = () => {
                 </View>
                 <View style={styles.drawerUserCopy}>
                   <Text numberOfLines={1} style={styles.drawerUserName}>
-                    {user?.name || "Guest access"}
+                    {user?.name || chromeCopy.guestAccess}
                   </Text>
                   <Text style={styles.drawerUserRole}>
-                    {accessToken ? roleLabel : "Public user"}
+                    {accessToken ? chromeCopy.roleLabel : chromeCopy.publicUser}
                   </Text>
                 </View>
               </Pressable>
@@ -362,8 +402,8 @@ export const AppChrome = () => {
               contentContainerStyle={styles.drawerContent}
               showsVerticalScrollIndicator={false}
             >
-              <Text style={styles.drawerSectionLabel}>Menu</Text>
-              {primaryNav.map((item) => (
+              <Text style={styles.drawerSectionLabel}>{chromeCopy.menu}</Text>
+              {translatedPrimaryNav.map((item) => (
                 <Pressable
                   key={item.route}
                   accessibilityRole="button"
@@ -393,8 +433,8 @@ export const AppChrome = () => {
               {adminExtras.length ? (
                 <>
                   <View style={styles.drawerDivider} />
-                  <Text style={styles.drawerSectionLabel}>Role tools</Text>
-                  {adminExtras.map((item) => (
+                  <Text style={styles.drawerSectionLabel}>{chromeCopy.roleTools}</Text>
+                  {translatedAdminExtras.map((item) => (
                     <Pressable
                       key={item.route}
                       accessibilityRole="button"
@@ -426,8 +466,8 @@ export const AppChrome = () => {
               {serviceNav.length ? (
                 <>
                   <View style={styles.drawerDivider} />
-                  <Text style={styles.drawerSectionLabel}>Services</Text>
-                  {serviceNav.map((item) => (
+                  <Text style={styles.drawerSectionLabel}>{chromeCopy.services}</Text>
+                  {translatedServiceNav.map((item) => (
                     <Pressable
                       key={item.route}
                       accessibilityRole="button"
@@ -470,7 +510,7 @@ export const AppChrome = () => {
                 ]}
               >
                 <MaterialIcons color={colors.primary} name="logout" size={20} />
-                <Text style={styles.logoutText}>Logout</Text>
+                <Text style={styles.logoutText}>{chromeCopy.logout}</Text>
               </Pressable>
             ) : null}
           </View>

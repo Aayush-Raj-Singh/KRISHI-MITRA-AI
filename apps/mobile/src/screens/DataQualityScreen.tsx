@@ -9,6 +9,7 @@ import { PrimaryButton } from "../components/PrimaryButton";
 import { ScreenShell } from "../components/ScreenShell";
 import { SectionCard } from "../components/SectionCard";
 import { StatBox } from "../components/StatBox";
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import {
   marketApi,
   operationsApi,
@@ -41,6 +42,12 @@ export const DataQualityScreen = () => {
       <ForbiddenScreen description="Your account does not have permission to use the data-quality monitor on mobile." />
     );
   }
+
+  const copy = useMobileTranslatedContent({
+    runError: "Unable to run quality checks.",
+    noRecentIssues: "No recent issues reported.",
+  });
+  const translatedNotice = useMobileTranslatedContent({ notice: notice || "" }).notice;
 
   useEffect(() => {
     withRetry(() => marketApi.getMandiDirectory({ limit: 200 }))
@@ -78,7 +85,7 @@ export const DataQualityScreen = () => {
       );
       setReport(response);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Unable to run quality checks.");
+      setNotice(error instanceof Error ? error.message : copy.runError);
     } finally {
       setLoading(false);
     }
@@ -160,7 +167,7 @@ export const DataQualityScreen = () => {
           loading={loading}
           onPress={() => void runChecks()}
         />
-        {notice ? <Text style={styles.notice}>{notice}</Text> : null}
+        {notice ? <Text style={styles.notice}>{translatedNotice}</Text> : null}
       </SectionCard>
 
       {report ? (
@@ -217,7 +224,7 @@ export const DataQualityScreen = () => {
         subtitle="Independent issue feed from the same endpoint the web monitor uses below the report summary."
       >
         {recentIssues.length === 0 ? (
-          <Text style={styles.empty}>No recent issues reported.</Text>
+          <Text style={styles.empty}>{copy.noRecentIssues}</Text>
         ) : null}
         {recentIssues.slice(0, 8).map((issue, index) => (
           <View key={`${issue.issue_type}-${issue.detected_at}-${index}`} style={styles.row}>

@@ -2,6 +2,7 @@ import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { colors, radius, shadows, spacing, typography } from "../theme";
 
 interface ActionTileProps {
@@ -12,23 +13,27 @@ interface ActionTileProps {
   onPress: () => void;
 }
 
-export const ActionTile = ({ icon, title, description, meta, onPress }: ActionTileProps) => (
-  <Pressable
-    accessibilityRole="button"
-    onPress={onPress}
-    style={({ pressed }) => [styles.card, pressed ? styles.pressed : null]}
-  >
-    <View style={styles.iconShell}>
-      <MaterialIcons color={colors.primary} name={icon} size={24} />
-    </View>
-    <Text style={styles.title}>{title}</Text>
-    <Text style={styles.description}>{description}</Text>
-    <View style={styles.footerRow}>
-      {meta ? <Text style={styles.meta}>{meta}</Text> : <View />}
-      <MaterialIcons color={colors.primary} name="arrow-forward" size={18} />
-    </View>
-  </Pressable>
-);
+export const ActionTile = ({ icon, title, description, meta, onPress }: ActionTileProps) => {
+  const copy = useMobileTranslatedContent({ title, description, meta });
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => [styles.card, pressed ? styles.pressed : null]}
+    >
+      <View style={styles.iconShell}>
+        <MaterialIcons color={colors.primary} name={icon} size={24} />
+      </View>
+      <Text style={styles.title}>{copy.title}</Text>
+      <Text style={styles.description}>{copy.description}</Text>
+      <View style={styles.footerRow}>
+        {copy.meta ? <Text style={styles.meta}>{copy.meta}</Text> : <View />}
+        <MaterialIcons color={colors.primary} name="arrow-forward" size={18} />
+      </View>
+    </Pressable>
+  );
+};
 
 const styles = StyleSheet.create({
   card: {

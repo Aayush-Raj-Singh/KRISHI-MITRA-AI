@@ -8,6 +8,7 @@ import { InfoPill } from "../components/InfoPill";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { ScreenShell } from "../components/ScreenShell";
 import { SectionCard } from "../components/SectionCard";
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { diseaseApi } from "../services/api";
 import { buildCacheKey, readCacheRecord, writeCacheRecord } from "../services/storage";
 import { colors, spacing, typography } from "../theme";
@@ -19,6 +20,19 @@ export const DiseaseDetectionScreen = () => {
   const [result, setResult] = useState<DiseasePredictionResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const copy = useMobileTranslatedContent({
+    cameraPermission: "Camera permission is required to capture a disease image.",
+    mediaPermission: "Media library permission is required to select an image.",
+    chooseImage: "Choose or capture an image first.",
+    processError: "Unable to process the image right now.",
+    treatment: "Treatment",
+    prevention: "Prevention",
+    organicSolutions: "Organic solutions",
+    recommendedProducts: "Recommended products",
+    clarifyingQuestions: "Clarifying questions",
+  });
+  const translatedNotice = useMobileTranslatedContent({ notice: notice || "" }).notice;
+  const translatedResult = useMobileTranslatedContent(result, { ignoreKeys: ["confidence"] });
 
   const pickImage = async (mode: "camera" | "library") => {
     setNotice(null);
@@ -26,13 +40,13 @@ export const DiseaseDetectionScreen = () => {
     if (mode === "camera") {
       const permission = await ImagePicker.requestCameraPermissionsAsync();
       if (!permission.granted) {
-        setNotice("Camera permission is required to capture a disease image.");
+        setNotice(copy.cameraPermission);
         return;
       }
     } else {
       const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!permission.granted) {
-        setNotice("Media library permission is required to select an image.");
+        setNotice(copy.mediaPermission);
         return;
       }
     }
@@ -53,7 +67,7 @@ export const DiseaseDetectionScreen = () => {
 
   const handleDetect = async () => {
     if (!imageUri) {
-      setNotice("Choose or capture an image first.");
+      setNotice(copy.chooseImage);
       return;
     }
 
@@ -79,9 +93,7 @@ export const DiseaseDetectionScreen = () => {
           `Live detection failed. Showing cached result from ${new Date(cached.updatedAt).toLocaleString()}.`,
         );
       } else {
-        setNotice(
-          error instanceof Error ? error.message : "Unable to process the image right now.",
-        );
+        setNotice(error instanceof Error ? error.message : copy.processError);
       }
     } finally {
       setLoading(false);
@@ -98,7 +110,7 @@ export const DiseaseDetectionScreen = () => {
     >
       {notice ? (
         <View style={styles.noticeBanner}>
-          <Text style={styles.noticeText}>{notice}</Text>
+          <Text style={styles.noticeText}>{translatedNotice}</Text>
         </View>
       ) : null}
 
@@ -128,52 +140,54 @@ export const DiseaseDetectionScreen = () => {
         />
       </SectionCard>
 
-      {result ? (
+      {translatedResult ? (
         <SectionCard
-          title={`${result.crop} | ${result.disease}`}
-          subtitle={`Confidence ${(result.confidence * 100).toFixed(1)}% | Severity ${result.severity}`}
+          title={`${translatedResult.crop} | ${translatedResult.disease}`}
+          subtitle={`Confidence ${(translatedResult.confidence * 100).toFixed(1)}% | Severity ${translatedResult.severity}`}
         >
           <View style={styles.pillRow}>
             <InfoPill
-              label={`Confidence ${(result.confidence * 100).toFixed(1)}%`}
+              label={`Confidence ${(translatedResult.confidence * 100).toFixed(1)}%`}
               tone="success"
             />
-            <InfoPill label={`Severity ${result.severity}`} tone="accent" />
+            <InfoPill label={`Severity ${translatedResult.severity}`} tone="accent" />
           </View>
-          {result.advisory ? <Text style={styles.bodyText}>{result.advisory}</Text> : null}
-
-          <Text style={styles.sectionTitle}>Treatment</Text>
-          {result.treatment.map((item) => (
-            <Text key={item} style={styles.bodyText}>
-              - {item}
-            </Text>
-          ))}
-
-          <Text style={styles.sectionTitle}>Prevention</Text>
-          {result.prevention.map((item) => (
-            <Text key={item} style={styles.bodyText}>
-              - {item}
-            </Text>
-          ))}
-
-          <Text style={styles.sectionTitle}>Organic solutions</Text>
-          {result.organic_solutions.map((item) => (
-            <Text key={item} style={styles.bodyText}>
-              - {item}
-            </Text>
-          ))}
-
-          <Text style={styles.sectionTitle}>Recommended products</Text>
-          {result.recommended_products.map((item) => (
-            <Text key={item} style={styles.bodyText}>
-              - {item}
-            </Text>
-          ))}
-
-          {result.clarifying_questions.length > 0 ? (
-            <Text style={styles.sectionTitle}>Clarifying questions</Text>
+          {translatedResult.advisory ? (
+            <Text style={styles.bodyText}>{translatedResult.advisory}</Text>
           ) : null}
-          {result.clarifying_questions.map((item) => (
+
+          <Text style={styles.sectionTitle}>{copy.treatment}</Text>
+          {translatedResult.treatment.map((item) => (
+            <Text key={item} style={styles.bodyText}>
+              - {item}
+            </Text>
+          ))}
+
+          <Text style={styles.sectionTitle}>{copy.prevention}</Text>
+          {translatedResult.prevention.map((item) => (
+            <Text key={item} style={styles.bodyText}>
+              - {item}
+            </Text>
+          ))}
+
+          <Text style={styles.sectionTitle}>{copy.organicSolutions}</Text>
+          {translatedResult.organic_solutions.map((item) => (
+            <Text key={item} style={styles.bodyText}>
+              - {item}
+            </Text>
+          ))}
+
+          <Text style={styles.sectionTitle}>{copy.recommendedProducts}</Text>
+          {translatedResult.recommended_products.map((item) => (
+            <Text key={item} style={styles.bodyText}>
+              - {item}
+            </Text>
+          ))}
+
+          {translatedResult.clarifying_questions.length > 0 ? (
+            <Text style={styles.sectionTitle}>{copy.clarifyingQuestions}</Text>
+          ) : null}
+          {translatedResult.clarifying_questions.map((item) => (
             <Text key={item} style={styles.bodyText}>
               - {item}
             </Text>

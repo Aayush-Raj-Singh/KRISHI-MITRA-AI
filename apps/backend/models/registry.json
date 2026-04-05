@@ -1,0 +1,436 @@
+{
+  "models": {
+    "price/maize__nagpur": {
+      "active_version": "prophet-20260405023018",
+      "versions": [
+        {
+          "version": "prophet-20260404182733",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\maize__nagpur.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 13.277
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-04T18:27:33.942006+00:00"
+        },
+        {
+          "version": "prophet-20260404183009",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\maize__nagpur.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 13.277
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-04T18:30:09.027898+00:00"
+        },
+        {
+          "version": "prophet-20260404183401",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\maize__nagpur.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 13.277
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-04T18:34:01.646826+00:00"
+        },
+        {
+          "version": "prophet-20260404183448",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\maize__nagpur.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 13.277
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-04T18:34:48.297551+00:00"
+        },
+        {
+          "version": "prophet-20260404184236",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\maize__nagpur.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 13.277
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-04T18:42:36.878134+00:00"
+        },
+        {
+          "version": "prophet-20260405023018",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\maize__nagpur.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 13.277
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-05T02:30:18.522244+00:00"
+        }
+      ]
+    },
+    "price/rice__patna": {
+      "active_version": "prophet-20260405023014",
+      "versions": [
+        {
+          "version": "prophet-20260404182734",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\rice__patna.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 10.717
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-04T18:27:34.556997+00:00"
+        },
+        {
+          "version": "prophet-20260404182823",
+          "artifact_path": "C:\\Users\\aayus\\AppData\\Local\\Temp\\pytest-of-aayus\\pytest-33\\test_price_retraining_produces0\\artifacts\\rice__patna.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 157.504
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 91
+          },
+          "registered_at": "2026-04-04T18:28:23.361431+00:00"
+        },
+        {
+          "version": "prophet-20260404182903",
+          "artifact_path": "C:\\Users\\aayus\\AppData\\Local\\Temp\\pytest-of-aayus\\pytest-34\\test_price_retraining_produces0\\artifacts\\rice__patna.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 157.504
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 91
+          },
+          "registered_at": "2026-04-04T18:29:03.602533+00:00"
+        },
+        {
+          "version": "prophet-20260404183009",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\rice__patna.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 10.717
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-04T18:30:09.657757+00:00"
+        },
+        {
+          "version": "prophet-20260404183402",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\rice__patna.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 10.717
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-04T18:34:02.234821+00:00"
+        },
+        {
+          "version": "prophet-20260404183416",
+          "artifact_path": "C:\\Users\\aayus\\AppData\\Local\\Temp\\pytest-of-aayus\\pytest-35\\test_price_retraining_produces0\\artifacts\\rice__patna.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 157.504
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 91
+          },
+          "registered_at": "2026-04-04T18:34:16.606563+00:00"
+        },
+        {
+          "version": "prophet-20260404183448",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\rice__patna.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 10.717
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-04T18:34:48.772285+00:00"
+        },
+        {
+          "version": "prophet-20260404183527",
+          "artifact_path": "C:\\Users\\aayus\\AppData\\Local\\Temp\\pytest-of-aayus\\pytest-36\\test_price_retraining_produces0\\artifacts\\rice__patna.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 157.504
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 91
+          },
+          "registered_at": "2026-04-04T18:35:27.145426+00:00"
+        },
+        {
+          "version": "prophet-20260404184237",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\rice__patna.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 10.717
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-04T18:42:37.377518+00:00"
+        },
+        {
+          "version": "prophet-20260404184250",
+          "artifact_path": "C:\\Users\\aayus\\AppData\\Local\\Temp\\pytest-of-aayus\\pytest-38\\test_price_retraining_produces0\\artifacts\\rice__patna.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 157.504
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 91
+          },
+          "registered_at": "2026-04-04T18:42:50.329320+00:00"
+        },
+        {
+          "version": "prophet-20260405023014",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\rice__patna.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 10.717
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-05T02:30:14.529401+00:00"
+        }
+      ]
+    },
+    "price/wheat__lucknow": {
+      "active_version": "prophet-20260405023017",
+      "versions": [
+        {
+          "version": "prophet-20260404182735",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\wheat__lucknow.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 10.758
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-04T18:27:35.139915+00:00"
+        },
+        {
+          "version": "prophet-20260404183010",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\wheat__lucknow.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 10.758
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-04T18:30:10.232902+00:00"
+        },
+        {
+          "version": "prophet-20260404183402",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\wheat__lucknow.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 10.758
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-04T18:34:02.832138+00:00"
+        },
+        {
+          "version": "prophet-20260404183449",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\wheat__lucknow.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 10.758
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-04T18:34:49.253991+00:00"
+        },
+        {
+          "version": "prophet-20260404184237",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\wheat__lucknow.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 10.758
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-04T18:42:37.893818+00:00"
+        },
+        {
+          "version": "prophet-20260405023017",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\wheat__lucknow.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 10.758
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-05T02:30:17.979642+00:00"
+        }
+      ]
+    },
+    "crop": {
+      "active_version": "crop-ensemble-v20260404184456",
+      "versions": [
+        {
+          "version": "crop-ensemble-v20260404182902",
+          "artifact_path": "C:\\Users\\aayus\\AppData\\Local\\Temp\\pytest-of-aayus\\pytest-34\\test_crop_training_produces_mo0\\crop.joblib",
+          "metadata_path": "C:\\Users\\aayus\\AppData\\Local\\Temp\\pytest-of-aayus\\pytest-34\\test_crop_training_produces_mo0\\crop_metadata.json",
+          "metrics": {
+            "accuracy": 1.0,
+            "cv_score": 1.0
+          },
+          "extra": {
+            "ensemble_members": [
+              "hist_gradient_boosting"
+            ],
+            "dataset_version": "crop_training-20260404180921-d4d8ae8b13db"
+          },
+          "registered_at": "2026-04-04T18:29:02.382623+00:00"
+        },
+        {
+          "version": "crop-ensemble-v20260404183359",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\crop\\crop_recommender.joblib",
+          "metadata_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\crop\\metadata.json",
+          "metrics": {
+            "accuracy": 0.9932,
+            "cv_score": 0.9875
+          },
+          "extra": {
+            "ensemble_members": [
+              "hist_gradient_boosting"
+            ],
+            "dataset_version": "crop_training-20260404180921-d4d8ae8b13db"
+          },
+          "registered_at": "2026-04-04T18:34:00.967048+00:00"
+        },
+        {
+          "version": "crop-ensemble-v20260404183412",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\crop\\crop_recommender.joblib",
+          "metadata_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\crop\\metadata.json",
+          "metrics": {
+            "accuracy": 0.9932,
+            "cv_score": 0.9875
+          },
+          "extra": {
+            "ensemble_members": [
+              "hist_gradient_boosting"
+            ],
+            "dataset_version": "crop_training-20260404180921-d4d8ae8b13db"
+          },
+          "registered_at": "2026-04-04T18:34:13.916742+00:00"
+        },
+        {
+          "version": "crop-ensemble-v20260404183415",
+          "artifact_path": "C:\\Users\\aayus\\AppData\\Local\\Temp\\pytest-of-aayus\\pytest-35\\test_crop_training_produces_mo0\\crop.joblib",
+          "metadata_path": "C:\\Users\\aayus\\AppData\\Local\\Temp\\pytest-of-aayus\\pytest-35\\test_crop_training_produces_mo0\\crop_metadata.json",
+          "metrics": {
+            "accuracy": 1.0,
+            "cv_score": 1.0
+          },
+          "extra": {
+            "ensemble_members": [
+              "hist_gradient_boosting"
+            ],
+            "dataset_version": "crop_training-20260404180921-d4d8ae8b13db"
+          },
+          "registered_at": "2026-04-04T18:34:15.653608+00:00"
+        },
+        {
+          "version": "crop-ensemble-v20260404183526",
+          "artifact_path": "C:\\Users\\aayus\\AppData\\Local\\Temp\\pytest-of-aayus\\pytest-36\\test_crop_training_produces_mo0\\crop.joblib",
+          "metadata_path": "C:\\Users\\aayus\\AppData\\Local\\Temp\\pytest-of-aayus\\pytest-36\\test_crop_training_produces_mo0\\crop_metadata.json",
+          "metrics": {
+            "accuracy": 1.0,
+            "cv_score": 1.0
+          },
+          "extra": {
+            "ensemble_members": [
+              "hist_gradient_boosting"
+            ],
+            "dataset_version": "crop_training-20260404180921-d4d8ae8b13db"
+          },
+          "registered_at": "2026-04-04T18:35:26.234474+00:00"
+        },
+        {
+          "version": "crop-ensemble-v20260404184249",
+          "artifact_path": "C:\\Users\\aayus\\AppData\\Local\\Temp\\pytest-of-aayus\\pytest-38\\test_crop_training_produces_mo0\\crop.joblib",
+          "metadata_path": "C:\\Users\\aayus\\AppData\\Local\\Temp\\pytest-of-aayus\\pytest-38\\test_crop_training_produces_mo0\\crop_metadata.json",
+          "metrics": {
+            "accuracy": 1.0,
+            "cv_score": 1.0
+          },
+          "extra": {
+            "ensemble_members": [
+              "hist_gradient_boosting"
+            ],
+            "dataset_version": "crop_training-20260404180921-d4d8ae8b13db"
+          },
+          "registered_at": "2026-04-04T18:42:49.338672+00:00"
+        },
+        {
+          "version": "crop-ensemble-v20260404184456",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\crop\\crop_recommender.joblib",
+          "metadata_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\crop\\metadata.json",
+          "metrics": {
+            "accuracy": 0.9932,
+            "cv_score": 0.9875
+          },
+          "extra": {
+            "ensemble_members": [
+              "hist_gradient_boosting"
+            ],
+            "dataset_version": "crop_training-20260404180921-d4d8ae8b13db"
+          },
+          "registered_at": "2026-04-04T18:44:57.416048+00:00"
+        }
+      ]
+    }
+  },
+  "updated_at": "2026-04-05T02:30:18.522244+00:00"
+}

@@ -34,7 +34,7 @@ def test_provider_defaults_preserve_current_runtime_behavior(monkeypatch):
     assert config.model_artifacts_root == DEFAULT_MODEL_ARTIFACTS_ROOT
     assert (
         config.crop_model_artifact_resolved_path
-        == DEFAULT_MODEL_ARTIFACTS_ROOT / "crop_model" / "crop_model.joblib"
+        == DEFAULT_MODEL_ARTIFACTS_ROOT / "crop" / "crop_recommender.joblib"
     )
 
 

@@ -11,7 +11,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from app.core.secrets import load_secrets_into_env
 
 BACKEND_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_MODEL_ARTIFACTS_ROOT = BACKEND_ROOT / "model-artifacts"
+DEFAULT_MODEL_ARTIFACTS_ROOT = BACKEND_ROOT / "models"
+DEFAULT_DATA_ROOT = BACKEND_ROOT / "data"
 LEGACY_ML_ROOT = BACKEND_ROOT / "ml"
 DEFAULT_EXTERNAL_LINK_ALLOWLIST = [
     "agmarknet.gov.in",
@@ -135,7 +136,7 @@ class Settings(BaseSettings):
     feature_background_jobs_enabled: bool = Field(True, alias="FEATURE_BACKGROUND_JOBS_ENABLED")
     feature_realtime_enabled: bool = Field(True, alias="FEATURE_REALTIME_ENABLED")
     background_task_backend: str = Field("local", alias="BACKGROUND_TASK_BACKEND")
-    rag_backend: str = Field("local_tfidf", alias="RAG_BACKEND")
+    rag_backend: str = Field("local_hybrid", alias="RAG_BACKEND")
     rag_top_k: int = Field(3, alias="RAG_TOP_K")
 
     scheduler_enabled: bool = Field(True, alias="SCHEDULER_ENABLED")
@@ -207,7 +208,7 @@ class Settings(BaseSettings):
     def crop_model_artifact_resolved_path(self) -> Path:
         return (
             self.crop_model_artifact_path
-            or self.model_artifacts_root / "crop_model" / "crop_model.joblib"
+            or self.model_artifacts_root / "crop" / "crop_recommender.joblib"
         )
 
     @property
@@ -216,11 +217,14 @@ class Settings(BaseSettings):
 
     @property
     def price_history_resolved_path(self) -> Path:
-        return self.price_history_path or LEGACY_ML_ROOT / "price_model" / "price_history.csv"
+        return (
+            self.price_history_path
+            or DEFAULT_DATA_ROOT / "processed" / "price" / "price_history.csv"
+        )
 
     @property
     def price_artifact_dir_resolved_path(self) -> Path:
-        return self.price_artifact_dir or self.model_artifacts_root / "price_model" / "artifacts"
+        return self.price_artifact_dir or self.model_artifacts_root / "price" / "artifacts"
 
     @property
     def price_artifact_legacy_dir(self) -> Path:
@@ -229,8 +233,7 @@ class Settings(BaseSettings):
     @property
     def price_metadata_resolved_path(self) -> Path:
         return (
-            self.price_metadata_path
-            or self.model_artifacts_root / "price_model" / "models_metadata.json"
+            self.price_metadata_path or self.model_artifacts_root / "price" / "models_metadata.json"
         )
 
     @property
@@ -239,16 +242,13 @@ class Settings(BaseSettings):
 
     @property
     def disease_labels_resolved_path(self) -> Path:
-        return (
-            self.disease_labels_path
-            or BACKEND_ROOT / "app" / "ml" / "disease_model" / "weights" / "labels.json"
-        )
+        return self.disease_labels_path or self.model_artifacts_root / "disease" / "labels.json"
 
     @property
     def disease_model_weights_resolved_path(self) -> Path:
         return (
             self.disease_model_weights_path
-            or self.model_artifacts_root / "disease_model" / "plantvillage_efficientnet_b0.pt"
+            or self.model_artifacts_root / "disease" / "plantvillage_efficientnet_b0.pt"
         )
 
     @property

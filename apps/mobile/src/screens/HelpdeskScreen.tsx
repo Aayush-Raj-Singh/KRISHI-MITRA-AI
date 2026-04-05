@@ -8,6 +8,7 @@ import { InlineTabs } from "../components/InlineTabs";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { ScreenShell } from "../components/ScreenShell";
 import { SectionCard } from "../components/SectionCard";
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { supportApi } from "../services/api";
 import { useAuthStore } from "../store/authStore";
 import { colors, spacing, typography } from "../theme";
@@ -25,6 +26,15 @@ export const HelpdeskScreen = () => {
   const [statusDrafts, setStatusDrafts] = useState<Record<string, string>>({});
   const [tickets, setTickets] = useState<TicketListResponse | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const translatedNotice = useMobileTranslatedContent({ notice: notice || "" }).notice;
+  const copy = useMobileTranslatedContent({
+    loadError: "Unable to load tickets.",
+    subjectBodyRequired: "Subject and issue details are required.",
+    ticketSubmitted: "Ticket submitted successfully.",
+    createTicketError: "Unable to create a ticket.",
+    replyError: "Unable to send the reply.",
+    statusError: "Unable to update the ticket status.",
+  });
 
   const loadTickets = async () => {
     try {
@@ -35,7 +45,7 @@ export const HelpdeskScreen = () => {
       });
       setTickets(response);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Unable to load tickets.");
+      setNotice(error instanceof Error ? error.message : copy.loadError);
     }
   };
 
@@ -45,7 +55,7 @@ export const HelpdeskScreen = () => {
 
   const handleSubmit = async () => {
     if (!subject || !body) {
-      setNotice("Subject and issue details are required.");
+      setNotice(copy.subjectBodyRequired);
       return;
     }
     setSubmitting(true);
@@ -55,10 +65,10 @@ export const HelpdeskScreen = () => {
       setSubject("");
       setBody("");
       setCategory("");
-      setNotice("Ticket submitted successfully.");
+      setNotice(copy.ticketSubmitted);
       await loadTickets();
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Unable to create a ticket.");
+      setNotice(error instanceof Error ? error.message : copy.createTicketError);
     } finally {
       setSubmitting(false);
     }
@@ -73,7 +83,7 @@ export const HelpdeskScreen = () => {
       setReplyDrafts((prev) => ({ ...prev, [ticketId]: "" }));
       await loadTickets();
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Unable to send the reply.");
+      setNotice(error instanceof Error ? error.message : copy.replyError);
     }
   };
 
@@ -86,7 +96,7 @@ export const HelpdeskScreen = () => {
       await supportApi.updateTicketStatus(ticketId, { status });
       await loadTickets();
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Unable to update the ticket status.");
+      setNotice(error instanceof Error ? error.message : copy.statusError);
     }
   };
 
@@ -100,7 +110,7 @@ export const HelpdeskScreen = () => {
     >
       {notice ? (
         <View style={styles.banner}>
-          <Text style={styles.bannerText}>{notice}</Text>
+          <Text style={styles.bannerText}>{translatedNotice}</Text>
         </View>
       ) : null}
 

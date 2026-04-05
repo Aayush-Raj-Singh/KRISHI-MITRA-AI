@@ -57,13 +57,16 @@ async def trigger_weekly_price_refresh(
 )
 async def trigger_quarterly_retrain(
     async_mode: bool = True,
+    force: bool = False,
     db: Database = Depends(get_db),
     user: UserInDB = Depends(require_roles(["admin"])),
     request: Request = None,
 ) -> APIResponse[TriggerOperationResponse]:
     service = OperationsService(db)
     data = await service.trigger_quarterly_retrain(
-        triggered_by=user.id or "admin", async_mode=async_mode
+        triggered_by=user.id or "admin",
+        async_mode=async_mode,
+        force=force,
     )
     if request is not None:
         manager = getattr(request.app.state, "realtime_manager", None)
@@ -79,6 +82,22 @@ async def trigger_quarterly_retrain(
                 }
             )
     return success_response(data, message="quarterly retrain triggered")
+
+
+@router.post("/ml/rollback")
+async def rollback_ml_model(
+    model_key: str,
+    version: str,
+    db: Database = Depends(get_db),
+    user: UserInDB = Depends(require_roles(["admin"])),
+) -> APIResponse[dict]:
+    service = OperationsService(db)
+    data = await service.rollback_model_version(
+        model_key=model_key,
+        version=version,
+        triggered_by=user.id or "admin",
+    )
+    return success_response(data, message="ml model rollback completed")
 
 
 @router.post(

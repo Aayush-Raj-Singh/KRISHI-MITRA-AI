@@ -9,6 +9,7 @@ import { PrimaryButton } from "../components/PrimaryButton";
 import { ScreenShell } from "../components/ScreenShell";
 import { SectionCard } from "../components/SectionCard";
 import { registerShowcasePoints } from "../data/appContent";
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { useAuthStore } from "../store/authStore";
 import { colors, typography } from "../theme";
 
@@ -38,6 +39,12 @@ export const RegisterScreen = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const copy = useMobileTranslatedContent({
+    fallbackError: "Unable to create account right now.",
+    backToSignIn: "Back to sign in",
+  });
+  const translatedRoles = useMobileTranslatedContent(roles, { ignoreKeys: ["id"] });
+  const translatedError = useMobileTranslatedContent({ error: error || "" }).error;
 
   const assignedRegions = useMemo(
     () =>
@@ -78,11 +85,7 @@ export const RegisterScreen = () => {
       }
       setUser(response.user);
     } catch (requestError) {
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "Unable to create account right now.",
-      );
+      setError(requestError instanceof Error ? requestError.message : copy.fallbackError);
     } finally {
       setLoading(false);
     }
@@ -129,7 +132,7 @@ export const RegisterScreen = () => {
           value={form.password}
         />
         <View style={styles.roleRow}>
-          {roles.map((role) => (
+          {translatedRoles.map((role) => (
             <Pressable
               key={role.id}
               onPress={() => setForm((prev) => ({ ...prev, role: role.id }))}
@@ -185,7 +188,7 @@ export const RegisterScreen = () => {
 
         {error ? (
           <View style={styles.errorBanner}>
-            <Text style={styles.errorText}>{error}</Text>
+            <Text style={styles.errorText}>{translatedError}</Text>
           </View>
         ) : null}
 
@@ -193,7 +196,7 @@ export const RegisterScreen = () => {
       </SectionCard>
 
       <Pressable onPress={() => navigation.goBack()}>
-        <Text style={styles.linkText}>Back to sign in</Text>
+        <Text style={styles.linkText}>{copy.backToSignIn}</Text>
       </Pressable>
     </ScreenShell>
   );

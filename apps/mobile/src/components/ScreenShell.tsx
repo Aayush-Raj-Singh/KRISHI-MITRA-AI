@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { AppChrome } from "./AppChrome";
 import { AppFooter } from "./AppFooter";
 import { colors, radius, shadows, spacing, typography } from "../theme";
@@ -29,20 +30,40 @@ export const ScreenShell = ({
   heroBadges,
   heroImageSource,
   children,
-}: ScreenShellProps) => (
-  <SafeAreaView style={styles.safeArea} edges={["top"]}>
-    <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-      <AppChrome />
-      {heroImageSource ? (
-        <ImageBackground imageStyle={styles.heroImage} source={heroImageSource} style={styles.hero}>
-          <View style={styles.heroOverlay}>
+}: ScreenShellProps) => {
+  const copy = useMobileTranslatedContent({ title, subtitle, eyebrow, heroBadges });
+
+  return (
+    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <AppChrome />
+        {heroImageSource ? (
+          <ImageBackground imageStyle={styles.heroImage} source={heroImageSource} style={styles.hero}>
+            <View style={styles.heroOverlay}>
+              <View style={styles.heroGlow} />
+              <Text style={styles.eyebrow}>{copy.eyebrow}</Text>
+              <Text style={styles.title}>{copy.title}</Text>
+              <Text style={styles.subtitle}>{copy.subtitle}</Text>
+              {copy.heroBadges?.length ? (
+                <View style={styles.badgesRow}>
+                  {copy.heroBadges.map((badge) => (
+                    <View key={badge} style={styles.badge}>
+                      <Text style={styles.badgeText}>{badge}</Text>
+                    </View>
+                  ))}
+                </View>
+              ) : null}
+            </View>
+          </ImageBackground>
+        ) : (
+          <View style={styles.hero}>
             <View style={styles.heroGlow} />
-            <Text style={styles.eyebrow}>{eyebrow}</Text>
-            <Text style={styles.title}>{title}</Text>
-            <Text style={styles.subtitle}>{subtitle}</Text>
-            {heroBadges?.length ? (
+            <Text style={styles.eyebrow}>{copy.eyebrow}</Text>
+            <Text style={styles.title}>{copy.title}</Text>
+            <Text style={styles.subtitle}>{copy.subtitle}</Text>
+            {copy.heroBadges?.length ? (
               <View style={styles.badgesRow}>
-                {heroBadges.map((badge) => (
+                {copy.heroBadges.map((badge) => (
                   <View key={badge} style={styles.badge}>
                     <Text style={styles.badgeText}>{badge}</Text>
                   </View>
@@ -50,29 +71,13 @@ export const ScreenShell = ({
               </View>
             ) : null}
           </View>
-        </ImageBackground>
-      ) : (
-        <View style={styles.hero}>
-          <View style={styles.heroGlow} />
-          <Text style={styles.eyebrow}>{eyebrow}</Text>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>{subtitle}</Text>
-          {heroBadges?.length ? (
-            <View style={styles.badgesRow}>
-              {heroBadges.map((badge) => (
-                <View key={badge} style={styles.badge}>
-                  <Text style={styles.badgeText}>{badge}</Text>
-                </View>
-              ))}
-            </View>
-          ) : null}
-        </View>
-      )}
-      <View style={styles.body}>{children}</View>
-      <AppFooter />
-    </ScrollView>
-  </SafeAreaView>
-);
+        )}
+        <View style={styles.body}>{children}</View>
+        <AppFooter />
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
   safeArea: {

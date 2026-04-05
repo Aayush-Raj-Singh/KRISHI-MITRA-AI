@@ -16,6 +16,7 @@ import { PrimaryButton } from "../components/PrimaryButton";
 import { ScreenShell } from "../components/ScreenShell";
 import { SectionCard } from "../components/SectionCard";
 import { StatBox } from "../components/StatBox";
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { dashboardApi, marketApi, recommendationApi, withRetry } from "../services/api";
 import { buildMandiOptions } from "../utils/mandiOptions";
 import { colors, spacing, typography } from "../theme";
@@ -61,6 +62,14 @@ export const MarketIntelligenceScreen = () => {
   const [arrivalsResult, setArrivalsResult] = useState<PriceArrivalDashboardResponse | null>(null);
   const [trendsResult, setTrendsResult] = useState<TrendAnalyticsResponse | null>(null);
   const [alertsResult, setAlertsResult] = useState<MarketAlert[]>([]);
+  const translatedNotice = useMobileTranslatedContent({ notice: notice || "" }).notice;
+  const copy = useMobileTranslatedContent({
+    examplesPrefix: "Examples:",
+    priceLoadError: "Unable to load the price forecast.",
+    arrivalsLoadError: "Unable to load arrival intelligence.",
+    trendsLoadError: "Unable to load trend analytics.",
+    alertsLoadError: "Unable to load market alerts.",
+  });
 
   useEffect(() => {
     if (
@@ -131,7 +140,7 @@ export const MarketIntelligenceScreen = () => {
   );
 
   const helperFor = (items: string[]) =>
-    items.length > 0 ? `Examples: ${items.slice(0, 3).join(", ")}` : undefined;
+    items.length > 0 ? `${copy.examplesPrefix} ${items.slice(0, 3).join(", ")}` : undefined;
 
   const filterPayload = {
     state: filters.state || undefined,
@@ -153,7 +162,7 @@ export const MarketIntelligenceScreen = () => {
       });
       setPriceResult(response);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Unable to load the price forecast.");
+      setNotice(error instanceof Error ? error.message : copy.priceLoadError);
     } finally {
       setLoading(null);
     }
@@ -166,7 +175,7 @@ export const MarketIntelligenceScreen = () => {
       const response = await dashboardApi.getPriceArrivalDashboard(filterPayload);
       setArrivalsResult(response);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Unable to load arrival intelligence.");
+      setNotice(error instanceof Error ? error.message : copy.arrivalsLoadError);
     } finally {
       setLoading(null);
     }
@@ -179,7 +188,7 @@ export const MarketIntelligenceScreen = () => {
       const response = await marketApi.getTrendAnalytics(filterPayload);
       setTrendsResult(response);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Unable to load trend analytics.");
+      setNotice(error instanceof Error ? error.message : copy.trendsLoadError);
     } finally {
       setLoading(null);
     }
@@ -192,7 +201,7 @@ export const MarketIntelligenceScreen = () => {
       const response = await marketApi.getMarketAlerts(filterPayload);
       setAlertsResult(response);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Unable to load market alerts.");
+      setNotice(error instanceof Error ? error.message : copy.alertsLoadError);
     } finally {
       setLoading(null);
     }
@@ -224,7 +233,7 @@ export const MarketIntelligenceScreen = () => {
 
       {notice ? (
         <View style={styles.banner}>
-          <Text style={styles.bannerText}>{notice}</Text>
+          <Text style={styles.bannerText}>{translatedNotice}</Text>
         </View>
       ) : null}
 

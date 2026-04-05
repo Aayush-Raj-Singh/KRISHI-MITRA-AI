@@ -2,11 +2,29 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { reportClientError } from "../services/errorReporter";
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { PrimaryButton } from "./PrimaryButton";
 import { colors } from "../theme/colors";
 
 type State = {
   hasError: boolean;
+};
+
+const ErrorFallback = ({ onRetry }: { onRetry: () => void }) => {
+  const copy = useMobileTranslatedContent({
+    title: "Something went wrong",
+    subtitle:
+      "The app hit an unexpected error. The event has been recorded, and you can retry the current session.",
+    action: "Retry app",
+  });
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>{copy.title}</Text>
+      <Text style={styles.subtitle}>{copy.subtitle}</Text>
+      <PrimaryButton label={copy.action} onPress={onRetry} />
+    </View>
+  );
 };
 
 export class AppErrorBoundary extends React.Component<React.PropsWithChildren, State> {
@@ -31,16 +49,7 @@ export class AppErrorBoundary extends React.Component<React.PropsWithChildren, S
 
   render() {
     if (this.state.hasError) {
-      return (
-        <View style={styles.container}>
-          <Text style={styles.title}>Something went wrong</Text>
-          <Text style={styles.subtitle}>
-            The app hit an unexpected error. The event has been recorded, and you can retry the
-            current session.
-          </Text>
-          <PrimaryButton label="Retry app" onPress={this.handleRetry} />
-        </View>
-      );
+      return <ErrorFallback onRetry={this.handleRetry} />;
     }
 
     return this.props.children;

@@ -1,6 +1,7 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { colors, radius, spacing, typography } from "../theme";
 
 interface OptionChipsProps {
@@ -11,7 +12,10 @@ interface OptionChipsProps {
 }
 
 export const OptionChips = ({ items, selected, onSelect, limit = 8 }: OptionChipsProps) => {
-  const visibleItems = items.filter(Boolean).slice(0, limit);
+  const translatedItems = useMobileTranslatedContent(items as Array<string | { label: string; value: string }>, {
+    ignoreKeys: ["value"],
+  });
+  const visibleItems = translatedItems.filter(Boolean).slice(0, limit);
   if (visibleItems.length === 0) {
     return null;
   }

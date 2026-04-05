@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, TextInput, type TextInputProps, View } from "react-native";
 
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { colors, radius, spacing, typography } from "../theme";
 
 interface FieldInputProps extends TextInputProps {
@@ -8,13 +9,22 @@ interface FieldInputProps extends TextInputProps {
   helperText?: string;
 }
 
-export const FieldInput = ({ label, helperText, style, ...props }: FieldInputProps) => (
-  <View style={styles.wrapper}>
-    <Text style={styles.label}>{label}</Text>
-    <TextInput placeholderTextColor={colors.mutedText} style={[styles.input, style]} {...props} />
-    {helperText ? <Text style={styles.helper}>{helperText}</Text> : null}
-  </View>
-);
+export const FieldInput = ({ label, helperText, style, placeholder, ...props }: FieldInputProps) => {
+  const copy = useMobileTranslatedContent({ label, helperText, placeholder });
+
+  return (
+    <View style={styles.wrapper}>
+      <Text style={styles.label}>{copy.label}</Text>
+      <TextInput
+        placeholder={copy.placeholder}
+        placeholderTextColor={colors.mutedText}
+        style={[styles.input, style]}
+        {...props}
+      />
+      {copy.helperText ? <Text style={styles.helper}>{copy.helperText}</Text> : null}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   wrapper: {

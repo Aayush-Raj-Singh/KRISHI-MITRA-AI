@@ -1,0 +1,76 @@
+{
+  "version": "crop-ensemble-v20260404184456",
+  "engine": "ensemble",
+  "ensemble_members": [
+    "hist_gradient_boosting"
+  ],
+  "ensemble_weights": {
+    "hist_gradient_boosting": 1.0
+  },
+  "accuracy": 0.9932,
+  "cv_score": 0.9875,
+  "trained_at": "2026-04-04T18:44:57.413051+00:00",
+  "samples": 2200,
+  "feature_columns": [
+    "soil_n",
+    "soil_p",
+    "soil_k",
+    "temperature_c",
+    "humidity_pct",
+    "soil_ph",
+    "rainfall_mm",
+    "soil_fertility_index",
+    "nutrient_balance_score",
+    "weather_7d_avg",
+    "weather_30d_avg",
+    "region_cluster"
+  ],
+  "classes": [
+    "apple",
+    "banana",
+    "blackgram",
+    "chickpea",
+    "coconut",
+    "coffee",
+    "cotton",
+    "grapes",
+    "jute",
+    "kidneybeans",
+    "lentil",
+    "maize",
+    "mango",
+    "mothbeans",
+    "mungbean",
+    "muskmelon",
+    "orange",
+    "papaya",
+    "pigeonpeas",
+    "pomegranate",
+    "rice",
+    "watermelon"
+  ],
+  "best_params": {
+    "hist_gradient_boosting": {
+      "min_samples_leaf": 20,
+      "max_leaf_nodes": 15,
+      "max_depth": null,
+      "learning_rate": 0.1,
+      "l2_regularization": 0.1
+    }
+  },
+  "dataset_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\data\\processed\\crop\\crop_recommendation.csv",
+  "dataset_version": "crop_training-20260404180921-d4d8ae8b13db",
+  "model_metrics": {
+    "hist_gradient_boosting": {
+      "accuracy": 0.9932,
+      "cv_score": 0.9875,
+      "best_params": {
+        "min_samples_leaf": 20,
+        "max_leaf_nodes": 15,
+        "max_depth": null,
+        "learning_rate": 0.1,
+        "l2_regularization": 0.1
+      }
+    }
+  }
+}

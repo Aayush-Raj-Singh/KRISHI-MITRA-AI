@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { colors, radius, spacing, typography } from "../theme";
 
 interface InfoPillProps {
@@ -8,17 +9,23 @@ interface InfoPillProps {
   tone?: "default" | "success" | "accent";
 }
 
-export const InfoPill = ({ label, tone = "default" }: InfoPillProps) => (
-  <View
-    style={[
-      styles.base,
-      tone === "success" ? styles.success : null,
-      tone === "accent" ? styles.accent : null,
-    ]}
-  >
-    <Text style={[styles.text, tone === "accent" ? styles.accentText : null]}>{label}</Text>
-  </View>
-);
+export const InfoPill = ({ label, tone = "default" }: InfoPillProps) => {
+  const copy = useMobileTranslatedContent({ label });
+
+  return (
+    <View
+      style={[
+        styles.base,
+        tone === "success" ? styles.success : null,
+        tone === "accent" ? styles.accent : null,
+      ]}
+    >
+      <Text style={[styles.text, tone === "accent" ? styles.accentText : null]}>
+        {copy.label}
+      </Text>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   base: {

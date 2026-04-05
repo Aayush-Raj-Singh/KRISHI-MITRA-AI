@@ -9,6 +9,7 @@ import {
 import { FieldInput } from "../components/FieldInput";
 import { ScreenShell } from "../components/ScreenShell";
 import { SectionCard } from "../components/SectionCard";
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { colors, radius, spacing, typography } from "../theme";
 
 const pageSize = 12;
@@ -40,6 +41,16 @@ export const ModernFarmingScreen = () => {
   }, [filtered, page]);
 
   const resetToFirstPage = () => setPage(1);
+  const copy = useMobileTranslatedContent({
+    previous: "Previous",
+    next: "Next",
+    pageLabel: `Page ${page} of ${totalPages}`,
+  });
+  const translatedCategories = useMobileTranslatedContent(["All", ...MODERN_FARMING_CATEGORIES]);
+  const translatedSeasons = useMobileTranslatedContent(MODERN_FARMING_SEASONS);
+  const translatedGuides = useMobileTranslatedContent(pageData, {
+    ignoreKeys: ["id", "durationDays"],
+  });
 
   return (
     <ScreenShell
@@ -66,50 +77,56 @@ export const ModernFarmingScreen = () => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.filterRow}
         >
-          {["All", ...MODERN_FARMING_CATEGORIES].map((item) => (
+          {translatedCategories.map((item, index) => {
+            const rawValue = index === 0 ? "All" : MODERN_FARMING_CATEGORIES[index - 1];
+            return (
             <Pressable
-              key={item}
+              key={`${rawValue}-${index}`}
               onPress={() => {
-                setCategory(item);
+                setCategory(rawValue);
                 resetToFirstPage();
               }}
-              style={[styles.filterChip, category === item ? styles.filterChipActive : null]}
+              style={[styles.filterChip, category === rawValue ? styles.filterChipActive : null]}
             >
               <Text
                 style={[
                   styles.filterChipText,
-                  category === item ? styles.filterChipTextActive : null,
+                  category === rawValue ? styles.filterChipTextActive : null,
                 ]}
               >
                 {item}
               </Text>
             </Pressable>
-          ))}
+            );
+          })}
         </ScrollView>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.filterRow}
         >
-          {MODERN_FARMING_SEASONS.map((item) => (
+          {translatedSeasons.map((item, index) => {
+            const rawValue = MODERN_FARMING_SEASONS[index];
+            return (
             <Pressable
-              key={item}
+              key={`${rawValue}-${index}`}
               onPress={() => {
-                setSeason(item);
+                setSeason(rawValue);
                 resetToFirstPage();
               }}
-              style={[styles.filterChip, season === item ? styles.filterChipActive : null]}
+              style={[styles.filterChip, season === rawValue ? styles.filterChipActive : null]}
             >
               <Text
                 style={[
                   styles.filterChipText,
-                  season === item ? styles.filterChipTextActive : null,
+                  season === rawValue ? styles.filterChipTextActive : null,
                 ]}
               >
                 {item}
               </Text>
             </Pressable>
-          ))}
+            );
+          })}
         </ScrollView>
       </SectionCard>
 
@@ -118,7 +135,7 @@ export const ModernFarmingScreen = () => {
         subtitle="Each card preserves the same crop, method, irrigation, nutrition, and market note structure as web."
       >
         <View style={styles.cardList}>
-          {pageData.map((guide) => (
+          {translatedGuides.map((guide) => (
             <View key={guide.id} style={styles.guideCard}>
               <Text style={styles.guideTitle}>{guide.crop}</Text>
               <Text style={styles.guideMeta}>
@@ -141,17 +158,15 @@ export const ModernFarmingScreen = () => {
             onPress={() => setPage((value) => Math.max(1, value - 1))}
             style={[styles.pageButton, page <= 1 ? styles.disabled : null]}
           >
-            <Text style={styles.pageButtonText}>Previous</Text>
+            <Text style={styles.pageButtonText}>{copy.previous}</Text>
           </Pressable>
-          <Text style={styles.pageLabel}>
-            Page {page} of {totalPages}
-          </Text>
+          <Text style={styles.pageLabel}>{copy.pageLabel}</Text>
           <Pressable
             disabled={page >= totalPages}
             onPress={() => setPage((value) => Math.min(totalPages, value + 1))}
             style={[styles.pageButton, page >= totalPages ? styles.disabled : null]}
           >
-            <Text style={styles.pageButtonText}>Next</Text>
+            <Text style={styles.pageButtonText}>{copy.next}</Text>
           </Pressable>
         </View>
       </SectionCard>

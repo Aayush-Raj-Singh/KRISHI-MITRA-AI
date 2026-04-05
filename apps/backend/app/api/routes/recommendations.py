@@ -66,16 +66,31 @@ async def crop_recommendations(
         user_id=user.id,
         season=payload.season,
     )
+    location_context = None
+    try:
+        weather = await external_data_service.fetch_weather(payload.location, days=7)
+        location_context = {
+            "weather_history": [item.model_dump(mode="json") for item in weather.forecast],
+            "weather_source": weather.source,
+        }
+    except Exception:
+        location_context = None
     try:
         if settings.sagemaker_runtime_enabled:
             request_payload = payload.model_dump(mode="json")
             if personalization_context:
                 request_payload["personalization_context"] = personalization_context
+            if location_context:
+                request_payload["location_context"] = location_context
             response = await asyncio.to_thread(
                 SageMakerInferenceService().crop_recommend, request_payload
             )
         else:
-            result = crop_model.recommend(payload, personalization_context=personalization_context)
+            result = crop_model.recommend(
+                payload,
+                personalization_context=personalization_context,
+                location_context=location_context,
+            )
             response = CropRecommendationResponse(
                 recommendations=result["recommendations"],
                 model_version=result["model_version"],
@@ -108,6 +123,7 @@ async def price_forecast(
     user: UserInDB = Depends(require_roles(["farmer", "extension_officer", "admin"])),
     cache: Cache = Depends(get_cache),
     recommendation_service: RecommendationService = Depends(get_recommendation_service),
+    external_data_service: ExternalDataService = Depends(get_external_data_service),
     price_model: PriceForecaster = Depends(get_price_forecaster),
 ) -> APIResponse[PriceForecastResponse]:
     cache_key = _cache_key("price", user.id, payload.model_dump())
@@ -125,7 +141,17 @@ async def price_forecast(
                 payload.model_dump(mode="json"),
             )
         else:
-            response = price_model.forecast(payload)
+            market_context = None
+            try:
+                mandi = await external_data_service.fetch_mandi_prices(
+                    payload.crop, payload.market, days=14
+                )
+                market_context = {
+                    "latest_prices": [item.model_dump(mode="json") for item in mandi.prices],
+                }
+            except Exception:
+                market_context = None
+            response = price_model.forecast(payload, market_context=market_context)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
     price_request = payload.model_dump()

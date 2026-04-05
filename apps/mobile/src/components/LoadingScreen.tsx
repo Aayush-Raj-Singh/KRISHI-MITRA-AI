@@ -1,17 +1,25 @@
 import React from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
+import { useMobileTranslatedContent } from "../hooks/useMobileTranslatedContent";
 import { colors } from "../theme/colors";
 
-export const LoadingScreen = ({ label }: { label: string }) => (
-  <View style={styles.container}>
-    <View style={styles.card}>
-      <ActivityIndicator color={colors.primary} size="large" />
-      <Text style={styles.title}>KrishiMitra AI</Text>
-      <Text style={styles.label}>{label}</Text>
+export const LoadingScreen = ({ label }: { label: string }) => {
+  const copy = useMobileTranslatedContent({
+    title: "KrishiMitra AI",
+    label,
+  });
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.card}>
+        <ActivityIndicator color={colors.primary} size="large" />
+        <Text style={styles.title}>{copy.title}</Text>
+        <Text style={styles.label}>{copy.label}</Text>
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   container: {

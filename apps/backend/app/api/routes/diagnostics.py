@@ -14,6 +14,7 @@ from app.schemas.response import APIResponse
 from app.services.aws_validation_service import AWSValidationService
 from app.services.bedrock_service import BedrockService
 from app.services.llm_factory import get_llm_runtime_profile, get_llm_service
+from app.services.ml_runtime_service import MLRuntimeService
 from app.services.translation_service import TranslationService
 from app.utils.responses import success_response
 
@@ -132,3 +133,35 @@ async def recent_client_errors(
         .to_list(length=limit)
     )
     return success_response(docs, message="recent client errors")
+
+
+@router.get("/ml/dashboard", response_model=APIResponse[Dict[str, Any]])
+async def ml_dashboard_diagnostics(
+    _: UserInDB = Depends(require_roles(["admin"])),
+) -> APIResponse[Dict[str, Any]]:
+    data = MLRuntimeService().dashboard()
+    return success_response(data, message="ml evaluation dashboard")
+
+
+@router.get("/ml/registry", response_model=APIResponse[Dict[str, Any]])
+async def ml_registry_diagnostics(
+    _: UserInDB = Depends(require_roles(["admin"])),
+) -> APIResponse[Dict[str, Any]]:
+    data = MLRuntimeService().registry()
+    return success_response(data, message="ml model registry")
+
+
+@router.get("/ml/datasets", response_model=APIResponse[Dict[str, Any]])
+async def ml_dataset_diagnostics(
+    _: UserInDB = Depends(require_roles(["admin"])),
+) -> APIResponse[Dict[str, Any]]:
+    data = MLRuntimeService().datasets()
+    return success_response(data, message="ml dataset manifests")
+
+
+@router.get("/ml/summary", response_model=APIResponse[Dict[str, Any]])
+async def ml_summary_diagnostics(
+    _: UserInDB = Depends(require_roles(["admin"])),
+) -> APIResponse[Dict[str, Any]]:
+    data = MLRuntimeService().summary()
+    return success_response(data, message="ml runtime summary")

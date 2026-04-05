@@ -1,6 +1,0 @@
-*.bak
-*.old
-*.tmp
-*.joblib.tmp
-*.joblib.bak
-generated/
