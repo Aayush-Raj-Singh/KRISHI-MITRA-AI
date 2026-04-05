@@ -1,7 +1,7 @@
 {
   "models": {
     "price/maize__nagpur": {
-      "active_version": "prophet-20260405023018",
+      "active_version": "prophet-20260405030307",
       "versions": [
         {
           "version": "prophet-20260404182733",
@@ -80,11 +80,24 @@
             "history_rows": 164
           },
           "registered_at": "2026-04-05T02:30:18.522244+00:00"
+        },
+        {
+          "version": "prophet-20260405030307",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\maize__nagpur.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 13.277
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-05T03:03:07.453564+00:00"
         }
       ]
     },
     "price/rice__patna": {
-      "active_version": "prophet-20260405023014",
+      "active_version": "prophet-20260405030308",
       "versions": [
         {
           "version": "prophet-20260404182734",
@@ -228,11 +241,24 @@
             "history_rows": 164
           },
           "registered_at": "2026-04-05T02:30:14.529401+00:00"
+        },
+        {
+          "version": "prophet-20260405030308",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\rice__patna.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 10.717
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-05T03:03:08.653359+00:00"
         }
       ]
     },
     "price/wheat__lucknow": {
-      "active_version": "prophet-20260405023017",
+      "active_version": "prophet-20260405030309",
       "versions": [
         {
           "version": "prophet-20260404182735",
@@ -311,11 +337,24 @@
             "history_rows": 164
           },
           "registered_at": "2026-04-05T02:30:17.979642+00:00"
+        },
+        {
+          "version": "prophet-20260405030309",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\wheat__lucknow.joblib",
+          "metadata_path": null,
+          "metrics": {
+            "mape": 10.758
+          },
+          "extra": {
+            "model_type": "prophet",
+            "history_rows": 164
+          },
+          "registered_at": "2026-04-05T03:03:09.879919+00:00"
         }
       ]
     },
     "crop": {
-      "active_version": "crop-ensemble-v20260404184456",
+      "active_version": "crop-ensemble-v20260405030635",
       "versions": [
         {
           "version": "crop-ensemble-v20260404182902",
@@ -428,9 +467,25 @@
             "dataset_version": "crop_training-20260404180921-d4d8ae8b13db"
           },
           "registered_at": "2026-04-04T18:44:57.416048+00:00"
+        },
+        {
+          "version": "crop-ensemble-v20260405030635",
+          "artifact_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\crop\\crop_recommender.joblib",
+          "metadata_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\crop\\metadata.json",
+          "metrics": {
+            "accuracy": 0.9932,
+            "cv_score": 0.9875
+          },
+          "extra": {
+            "ensemble_members": [
+              "hist_gradient_boosting"
+            ],
+            "dataset_version": "crop_training-20260404180921-d4d8ae8b13db"
+          },
+          "registered_at": "2026-04-05T03:06:36.688004+00:00"
         }
       ]
     }
   },
-  "updated_at": "2026-04-05T02:30:18.522244+00:00"
+  "updated_at": "2026-04-05T03:06:36.688004+00:00"
 }

@@ -1,5 +1,5 @@
 {
-  "version": "crop-ensemble-v20260404184456",
+  "version": "crop-ensemble-v20260405030635",
   "engine": "ensemble",
   "ensemble_members": [
     "hist_gradient_boosting"
@@ -9,7 +9,7 @@
   },
   "accuracy": 0.9932,
   "cv_score": 0.9875,
-  "trained_at": "2026-04-04T18:44:57.413051+00:00",
+  "trained_at": "2026-04-05T03:06:36.682004+00:00",
   "samples": 2200,
   "feature_columns": [
     "soil_n",

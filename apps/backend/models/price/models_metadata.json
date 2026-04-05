@@ -1,71 +1,13 @@
 {
-  "generated_at": "2026-04-05T02:30:18.525252+00:00",
+  "generated_at": "2026-04-05T03:03:09.884917+00:00",
   "models": [
-    {
-      "key": "rice__patna",
-      "crop": "rice",
-      "market": "patna",
-      "model_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\rice__patna.joblib",
-      "model_type": "prophet",
-      "version": "prophet-20260405023014",
-      "mape": 10.717,
-      "history_rows": 164,
-      "feature_columns": [
-        "lag_1",
-        "lag_7",
-        "lag_30",
-        "ma_7",
-        "ma_30",
-        "volatility_7",
-        "month",
-        "day_of_week",
-        "week_of_year",
-        "quarter",
-        "is_monsoon"
-      ],
-      "engines": {
-        "prophet": true,
-        "arima": false,
-        "lstm": false
-      },
-      "trained_at": "2026-04-05T02:30:14.534064+00:00"
-    },
-    {
-      "key": "wheat__lucknow",
-      "crop": "wheat",
-      "market": "lucknow",
-      "model_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\wheat__lucknow.joblib",
-      "model_type": "prophet",
-      "version": "prophet-20260405023017",
-      "mape": 10.758,
-      "history_rows": 164,
-      "feature_columns": [
-        "lag_1",
-        "lag_7",
-        "lag_30",
-        "ma_7",
-        "ma_30",
-        "volatility_7",
-        "month",
-        "day_of_week",
-        "week_of_year",
-        "quarter",
-        "is_monsoon"
-      ],
-      "engines": {
-        "prophet": true,
-        "arima": false,
-        "lstm": false
-      },
-      "trained_at": "2026-04-05T02:30:17.984650+00:00"
-    },
     {
       "key": "maize__nagpur",
       "crop": "maize",
       "market": "nagpur",
       "model_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\maize__nagpur.joblib",
       "model_type": "prophet",
-      "version": "prophet-20260405023018",
+      "version": "prophet-20260405030307",
       "mape": 13.277,
       "history_rows": 164,
       "feature_columns": [
@@ -86,26 +28,68 @@
         "arima": false,
         "lstm": false
       },
-      "trained_at": "2026-04-05T02:30:18.523253+00:00"
-    }
-  ],
-  "failures": [
+      "trained_at": "2026-04-05T03:03:07.459567+00:00"
+    },
     {
+      "key": "rice__patna",
       "crop": "rice",
-      "market": "pune",
-      "error": "Not enough historical data for rice/pune: 0 rows"
-    },
-    {
-      "crop": "wheat",
       "market": "patna",
-      "error": "Not enough historical data for wheat/patna: 0 rows"
+      "model_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\rice__patna.joblib",
+      "model_type": "prophet",
+      "version": "prophet-20260405030308",
+      "mape": 10.717,
+      "history_rows": 164,
+      "feature_columns": [
+        "lag_1",
+        "lag_7",
+        "lag_30",
+        "ma_7",
+        "ma_30",
+        "volatility_7",
+        "month",
+        "day_of_week",
+        "week_of_year",
+        "quarter",
+        "is_monsoon"
+      ],
+      "engines": {
+        "prophet": true,
+        "arima": false,
+        "lstm": false
+      },
+      "trained_at": "2026-04-05T03:03:08.658333+00:00"
     },
     {
-      "crop": "mustard",
-      "market": "jaipur",
-      "error": "Not enough historical data for mustard/jaipur: 0 rows"
+      "key": "wheat__lucknow",
+      "crop": "wheat",
+      "market": "lucknow",
+      "model_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\models\\price\\artifacts\\wheat__lucknow.joblib",
+      "model_type": "prophet",
+      "version": "prophet-20260405030309",
+      "mape": 10.758,
+      "history_rows": 164,
+      "feature_columns": [
+        "lag_1",
+        "lag_7",
+        "lag_30",
+        "ma_7",
+        "ma_30",
+        "volatility_7",
+        "month",
+        "day_of_week",
+        "week_of_year",
+        "quarter",
+        "is_monsoon"
+      ],
+      "engines": {
+        "prophet": true,
+        "arima": false,
+        "lstm": false
+      },
+      "trained_at": "2026-04-05T03:03:09.883917+00:00"
     }
   ],
+  "failures": [],
   "dataset_path": "C:\\Users\\aayus\\OneDrive\\Desktop\\krishi-mitra-ai\\apps\\backend\\data\\processed\\price\\price_history.csv",
   "dataset_version": "price_history-20260404182039-0a1ce5b1659c"
 }

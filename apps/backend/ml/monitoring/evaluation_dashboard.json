@@ -2,15 +2,15 @@
   "models": {
     "price": {
       "latest": {
-        "version": "2026-04-05T02:30:18.525252+00:00",
-        "recorded_at": "2026-04-05T02:30:18.528253+00:00",
+        "version": "2026-04-05T03:03:09.884917+00:00",
+        "recorded_at": "2026-04-05T03:03:09.890918+00:00",
         "dataset_version": "price_history-20260404182039-0a1ce5b1659c",
         "metrics": {
           "mape": 11.584
         },
         "extra": {
           "models": 3,
-          "failures": 3
+          "failures": 0
         }
       },
       "history": [
@@ -145,13 +145,25 @@
             "models": 3,
             "failures": 3
           }
+        },
+        {
+          "version": "2026-04-05T03:03:09.884917+00:00",
+          "recorded_at": "2026-04-05T03:03:09.890918+00:00",
+          "dataset_version": "price_history-20260404182039-0a1ce5b1659c",
+          "metrics": {
+            "mape": 11.584
+          },
+          "extra": {
+            "models": 3,
+            "failures": 0
+          }
         }
       ]
     },
     "crop": {
       "latest": {
-        "version": "crop-ensemble-v20260404184456",
-        "recorded_at": "2026-04-04T18:44:57.418048+00:00",
+        "version": "crop-ensemble-v20260405030635",
+        "recorded_at": "2026-04-05T03:06:36.691012+00:00",
         "dataset_version": "crop_training-20260404180921-d4d8ae8b13db",
         "metrics": {
           "accuracy": 0.9932,
@@ -277,6 +289,22 @@
               "hist_gradient_boosting"
             ]
           }
+        },
+        {
+          "version": "crop-ensemble-v20260405030635",
+          "recorded_at": "2026-04-05T03:06:36.691012+00:00",
+          "dataset_version": "crop_training-20260404180921-d4d8ae8b13db",
+          "metrics": {
+            "accuracy": 0.9932,
+            "cv_score": 0.9875,
+            "precision_proxy": 0.9932,
+            "recall_proxy": 0.9932
+          },
+          "extra": {
+            "ensemble_members": [
+              "hist_gradient_boosting"
+            ]
+          }
         }
       ]
     }
@@ -301,5 +329,5 @@
       "updated_at": "2026-04-04T18:42:32.671678+00:00"
     }
   },
-  "updated_at": "2026-04-05T02:30:18.528253+00:00"
+  "updated_at": "2026-04-05T03:06:36.691012+00:00"
 }
